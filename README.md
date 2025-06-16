@@ -5,9 +5,10 @@ Notes on my dev setup. For me.
 1. Ubuntu 24.04 on WSL2
 
 # IDEs
-1. Cursor (with WSL backend)
-2. Claude Desktop (with WSL backend)
-3. Intellij (with WSL backend)
+1. Claude Code
+2. Cursor (with WSL backend)
+3. Claude Desktop (with WSL backend)
+4. Intellij (with WSL backend)
 
 # MCP Servers for all IDEs
 Where possible, the MCP server should be run locally.
