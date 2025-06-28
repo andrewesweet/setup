@@ -54,48 +54,6 @@ The 64k token limit in GitHub Copilot implementations establishes core design pr
 - Task decomposition is essential strategy, not enhancement technique
   </constraint_design_reality>
 
-**RISK MITIGATION**
-
-<instruction_drift priority=“critical”>
-VERIFIED PATTERN: Format requirements and constraints lose effectiveness in complex technical contexts
-COMPENSATION STRATEGY: Sandwich method with XML enforcement and validation checkpoints
-
-TEMPLATE APPLICATION:
-
-```xml
-<primary_requirements>
-[Essential constraints and format requirements]
-</primary_requirements>
-
-[...detailed prompt content...]
-
-<critical_validation>
-Before responding, verify:
-- All primary requirements are addressed
-- Output format matches specification exactly
-- No technical details are invented without uncertainty markers
-</critical_validation>
-```
-
-</instruction_drift>
-
-<technical_hallucination priority=“high”>
-OBSERVED PATTERN: Model invents plausible but incorrect technical specifications
-COMPENSATION STRATEGY: Explicit uncertainty marking and verification requirements
-
-UNCERTAINTY INTEGRATION:
-
-```
-TECHNICAL ACCURACY PROTOCOL:
-- Mark verified practices: [VERIFIED: industry standard]
-- Mark recommendations: [RECOMMENDED: based on common patterns]  
-- Mark uncertain details: [UNCERTAIN: requires validation]
-- Never specify exact versions, APIs, or configurations without explicit uncertainty marking
-```
-
-</technical_hallucination>
-</limitation_framework>
-
 ## PROVEN METHODOLOGIES FOR TECHNICAL PROMPTING
 
 <methodology_framework>
@@ -382,19 +340,28 @@ Flag recommendations failing feasibility checks with specific concerns.
 <error_prevention>
 <hallucination_mitigation>
 
-- Require uncertainty marking for all unverified technical details
-- Include verification checkpoints at decision boundaries
+- Require uncertainty marking for all unverified technical details within minimal token budget
+- Include verification checkpoints at decision boundaries using concise language
 - Never request specific versions, APIs, or configurations without authoritative sources
 - For tool recommendations: Mandate ecosystem identification and feature uncertainty markers
+- **TECHNICAL ACCURACY PROTOCOL**: Mark verified practices [VERIFIED: industry standard], mark recommendations [RECOMMENDED: based on common patterns], mark uncertain details [UNCERTAIN: requires validation], never specify exact versions/APIs without explicit uncertainty marking
   </hallucination_mitigation>
 
 <scope_control>
 
-- Define explicit scope boundaries at prompt beginning and end
+- Define explicit scope boundaries at prompt beginning and end using minimal, precise language
 - Include modification authorization requirements for existing systems
 - Require change impact assessment for workflow modifications
 - Use change control language: “Only modify X when explicitly required for Y”
   </scope_control>
+
+<instruction_consistency>
+
+- **FORMAT REINFORCEMENT**: Use sandwich method with XML enforcement and validation checkpoints to prevent instruction drift
+- Include critical validation template: Before responding, verify all primary requirements are addressed, output format matches specification exactly, no technical details are invented without uncertainty markers
+- Reference established standards and examples throughout prompts
+- Maintain terminology consistency through explicit definitions
+  </instruction_consistency>
 
 <efficiency_optimization>
 
@@ -406,9 +373,7 @@ Flag recommendations failing feasibility checks with specific concerns.
 
 <consistency_enforcement>
 
-- Reference established standards and examples throughout prompts
 - Include format validation as mandatory pre-submission requirement
-- Maintain terminology consistency through explicit definitions
 - For tool recommendations: Ensure alignment with existing toolchain patterns
   </consistency_enforcement>
   </error_prevention>
