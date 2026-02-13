@@ -15,8 +15,8 @@ BUILD_DIR="$PWD"
 MAX_ITERATIONS=10
 
 # Ensure proxy is set (should be set already for px-proxy)
-export http_proxy="${http_proxy:-http://127.0.0.1:3128}"
-export https_proxy="${https_proxy:-http://127.0.0.1:3128}"
+export http_proxy="${http_proxy:-http://127.0.0.1:3129}"
+export https_proxy="${https_proxy:-http://127.0.0.1:3129}"
 
 echo -e "${GREEN}Zig Dependency Downloader for Corporate Proxies${NC}"
 echo "Proxy: $https_proxy"
@@ -30,8 +30,8 @@ mkdir -p "$TEMP_DIR"
 # Function to extract URLs from zig build output
 extract_failing_urls() {
     local build_output="$1"
-    # Extract URLs that failed with 403, 400, or 404
-    echo "$build_output" | grep -oP '\.url = "\K[^"]+' || true
+    # Extract URLs using sed (macOS compatible)
+    echo "$build_output" | sed -n 's/.*\.url = "\([^"]*\)".*/\1/p' | sort -u
 }
 
 # Function to download and cache a dependency
@@ -43,15 +43,17 @@ download_and_cache() {
     echo -e "${YELLOW}Downloading: $url${NC}"
     
     # Download with redirect following
-    if curl -L -f -o "$temp_file" "$url"; then
+    if curl -L -f -o "$temp_file" "$url" 2>&1; then
         echo -e "${GREEN}✓ Downloaded successfully${NC}"
         
         # Calculate hash using Zig
         echo "Calculating hash..."
-        local hash=$(zig fetch --debug-hash "$temp_file" 2>&1 | grep -oP '1220[a-f0-9]{64}' | head -1)
+        local hash_output=$(zig fetch --debug-hash "$temp_file" 2>&1)
+        local hash=$(echo "$hash_output" | grep -o '1220[a-f0-9]*' | head -1)
         
         if [ -z "$hash" ]; then
             echo -e "${RED}✗ Failed to calculate hash${NC}"
+            echo "Hash output: $hash_output"
             return 1
         fi
         
@@ -70,10 +72,12 @@ download_and_cache() {
             tar xzf "$temp_file"
             
             # GitHub archives have a subdirectory, move contents up
-            local subdir=$(ls -d */ 2>/dev/null | head -1)
+            local subdir=$(find . -maxdepth 1 -type d ! -name . | head -1)
             if [ -n "$subdir" ]; then
-                mv "$subdir"* . 2>/dev/null || true
-                mv "$subdir".* . 2>/dev/null || true
+                # Move all files (including hidden ones) from subdirectory
+                shopt -s dotglob 2>/dev/null || true
+                mv "$subdir"/* . 2>/dev/null || true
+                shopt -u dotglob 2>/dev/null || true
                 rmdir "$subdir" 2>/dev/null || true
             fi
         else
@@ -84,7 +88,7 @@ download_and_cache() {
         
         cd "$BUILD_DIR"
         rm "$temp_file"
-        echo -e "${GREEN}✓ Cached successfully${NC}"
+        echo -e "${GREEN}✓ Cached successfully at: $cache_dir${NC}"
         echo ""
         return 0
     else
@@ -103,13 +107,16 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
     # Run zig build and capture output
     build_output=$(zig build -Doptimize=ReleaseFast 2>&1 || true)
     
-    # Check if build succeeded
-    if echo "$build_output" | grep -q "Build Summary.*succeeded"; then
+    # Check if build succeeded (look for zig-out directory creation)
+    if [ -d "zig-out/Ghostty.app" ]; then
         echo -e "${GREEN}╔═══════════════════════════════════════╗${NC}"
         echo -e "${GREEN}║   🎉 BUILD SUCCESSFUL! 🎉            ║${NC}"
         echo -e "${GREEN}╚═══════════════════════════════════════╝${NC}"
         echo ""
         echo "Ghostty.app is at: zig-out/Ghostty.app"
+        echo ""
+        echo "To install, run:"
+        echo "  mv zig-out/Ghostty.app ~/Applications/"
         exit 0
     fi
     
@@ -119,12 +126,13 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
     if [ -z "$failing_urls" ]; then
         # No URL errors, but build still failed - show error
         echo -e "${RED}Build failed with non-URL error:${NC}"
-        echo "$build_output" | tail -20
+        echo "$build_output" | tail -30
         exit 1
     fi
     
     # Download each failing dependency
-    echo "Found $(echo "$failing_urls" | wc -l) failing URLs"
+    num_urls=$(echo "$failing_urls" | wc -l | tr -d ' ')
+    echo "Found $num_urls failing URL(s)"
     echo ""
     
     downloaded_any=false
