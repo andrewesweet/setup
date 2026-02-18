@@ -1,7 +1,7 @@
 ---
 name: Designer
 description: Handles all UI/UX design tasks.
-model: Gemini 3 Pro (Preview) (copilot)
+model: GPT-5.2 (copilot)
 tools: ['vscode', 'execute', 'read', 'agent', 'context7/*', 'edit', 'search', 'web', 'memory', 'todo']
 ---
 

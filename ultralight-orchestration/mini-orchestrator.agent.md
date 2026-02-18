@@ -1,6 +1,6 @@
 ---
 name: Mini Orchestrator
-description: Sonnet, Codex, Gemini
+description: GPT-5.2, GPT-5.2-Codex
 model: GPT-5 mini (copilot)
 tools: ['read/readFile', 'agent', 'memory']
 ---
