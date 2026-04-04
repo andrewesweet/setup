@@ -31,7 +31,8 @@ Read these in order before implementing anything:
 | `docs/design/dotfiles-neovim.md` | LazyVim config, all LSP setup, formatter/linter config, lazygit.nvim, fzf-lua, gitsigns, vim-tmux-navigator, direnv.vim |
 | `docs/design/dotfiles-container.md` | Podman + Wolfi container environment, multi-stage Containerfile, `dev` lifecycle script, mount strategy, security hardening |
 | `docs/design/dotfiles-cross-platform.md` | macOS / WSL2 / container platform guards, install scripts, OSC 9 notifications, dynamic Homebrew prefix |
-| `docs/design/dotfiles-review-fixes.md` | All fixes from adversarial reviews: alias changes, keybind fixes, cheatsheet, UX improvements |
+| `docs/design/dotfiles-vscode.md` | VS Code integration: settings, extensions, remote backends (WSL2, container), two personas (TUI-first, VS Code-primary) |
+| `docs/design/dotfiles-review-fixes.md` | All fixes from adversarial reviews: alias changes, keybind fixes, cheatsheet, UX improvements, markdownlint-cli2, gcloud, codeql, verification strategy |
 
 ---
 
@@ -272,6 +273,7 @@ macos-dev/
 │       ├── dotfiles-neovim.md
 │       ├── dotfiles-container.md
 │       ├── dotfiles-cross-platform.md
+│       ├── dotfiles-vscode.md
 │       └── dotfiles-review-fixes.md
 │
 ├── bash/
@@ -323,12 +325,21 @@ macos-dev/
 ├── prek/
 │   └── .pre-commit-config.yaml      # team baseline template
 │
-└── container/
-    ├── Containerfile                 # multi-stage (base + full)
-    ├── dev.sh                        # lifecycle management script
-    ├── dev.env.example               # env var template
-    ├── test-tool-installs.sh         # tool verification script
-    └── .dockerignore
+├── vscode/
+│   ├── settings.json                # user settings template
+│   └── extensions.json              # recommended extensions
+│
+├── container/
+│   ├── Containerfile                # multi-stage (base + full)
+│   ├── dev.sh                       # lifecycle management script
+│   ├── dev.env.example              # env var template
+│   ├── test-tool-installs.sh        # tool verification script
+│   └── .dockerignore
+│
+└── scripts/
+    ├── verify.sh                    # post-install verification
+    ├── check-configs.sh             # config parse validation
+    └── check-tool-manifest.sh       # tools.txt drift detection
 ```
 
 ---
@@ -350,8 +361,10 @@ issues:
 10. `opencode/` — all files
 11. `nvim/` — init.lua bootstrap first, then lua/ files
 12. `prek/.pre-commit-config.yaml`
-13. `container/` — Containerfile, dev.sh, dev.env.example, .dockerignore
-14. `docs/cheatsheet.md`
+13. `vscode/` — settings.json, extensions.json
+14. `container/` — Containerfile, dev.sh, dev.env.example, .dockerignore
+15. `scripts/` — verify.sh, check-configs.sh, check-tool-manifest.sh
+16. `docs/cheatsheet.md`
 15. `README.md` — after everything else exists
 
 ---
@@ -382,23 +395,41 @@ dotfiles-neovim.md
 
 dotfiles-container.md
   ├── extends: Brewfile (adds podman)
+  ├── extends: mount strategy (adds gcloud, codeql read-only mounts)
   └── adds: container/ (Containerfile, dev.sh, dev.env.example)
 
 dotfiles-cross-platform.md
   ├── modifies: bash (.bashrc platform guards, guarded evals,
-  │             OSC 9 notifications, conditional EDITOR/MANPAGER)
-  ├── modifies: bash aliases (conditional ports)
+  │             OSC 9 notifications, conditional EDITOR/MANPAGER,
+  │             bun PATH, bashrc.local sourcing)
+  ├── modifies: bash aliases (conditional ports/port)
   ├── modifies: tmux (OSC 52 only, no pbcopy)
   ├── modifies: git (removes editor from .gitconfig)
+  ├── modifies: Brewfile (adds gcloud, cloud-sql-proxy, codeql,
+  │             markdownlint-cli2, pandoc, typst, VS Code cask)
   ├── renames: install.sh → install-macos.sh
   └── adds: install-wsl.sh, tools.txt
 
-dotfiles-review-fixes.md
+dotfiles-vscode.md
+  ├── extends: Brewfile (adds VS Code cask)
+  └── adds: vscode/ (settings.json, extensions.json)
+
+dotfiles-review-fixes.md  (PRECEDENCE: wins over all earlier docs)
+  ├── fixes: nvim lsp.lua (syntax error, lspconfig.util removal)
   ├── modifies: bash aliases (fd→fdd, removes shadows, lg not gl,
-  │             adds aliases function, adds drd, gha-fix, notify)
+  │             adds aliases function, adds gcloud/codeql aliases)
+  ├── modifies: bash (.bashrc ordering, PROMPT_COMMAND guard,
+  │             completions for mise/uv/cog/git-cliff)
   ├── modifies: lazygit (delta syntax-theme)
-  ├── modifies: starship (adds golang module)
-  ├── modifies: nvim integrations (fzf-lua zoxide picker)
+  ├── modifies: starship (adds golang + rust modules)
+  ├── modifies: nvim linting (adds markdownlint-cli2)
+  ├── modifies: nvim formatting (adds markdownlint-cli2)
+  ├── modifies: nvim integrations (fzf-lua zoxide picker, fzf_opts
+  │             isolation, mnemonic swap fs↔fw)
+  ├── modifies: opencode tui.jsonc (removes ctrl+u/d collision)
   ├── modifies: tmux (Ctrl+L workaround)
-  └── adds: docs/cheatsheet.md, pandoc to Brewfile
+  ├── modifies: gitconfig (camelCase excludesFile, stash showPatch)
+  ├── modifies: prek config (adds markdownlint-cli2 hook)
+  ├── modifies: install scripts (backup, .inputrc, gcloud components)
+  └── adds: docs/cheatsheet.md, vscode/, scripts/, verify.sh
 ```

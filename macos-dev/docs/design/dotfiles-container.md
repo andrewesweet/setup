@@ -125,6 +125,8 @@ whichever directory you run it from.
 | Additional repos (`--ref`) | `/home/dev/refs/<name>` | Cross-reference |
 | `~/.local/share/opencode/auth.json` | `/home/dev/.local/share/opencode/auth.json` | Copilot token |
 | `~/.config/gh/` | `/home/dev/.config/gh/` | GitHub CLI auth |
+| `~/.config/gcloud/` | `/home/dev/.config/gcloud/` | GCP Application Default Credentials |
+| `~/.codeql/` | `/home/dev/.codeql/` | CodeQL query packs |
 | `$SSH_AUTH_SOCK` | `/run/ssh-agent.sock` | Git SSH operations |
 
 ### Named volumes (persistent across container recreates)

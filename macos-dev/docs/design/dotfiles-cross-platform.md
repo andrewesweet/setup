@@ -191,24 +191,35 @@ platform-agnostic.
 
 ### `install-macos.sh`
 
-1. Detect `HOMEBREW_PREFIX` dynamically
-2. `brew bundle` for all tools
-3. `brew install charmbracelet/tap/freeze` (from tap)
-4. `uv tool install ty@latest && uv tool install prek`
-5. `bun install -g opencode-ai critique`
-6. Symlink all configs into place
-7. Symlink `container/dev.sh` to `~/.local/bin/dev`
+1. Back up existing config files to `~/.dotfiles-backup/<timestamp>/`
+   (only files that exist and are not already symlinks to this repo)
+2. Detect `HOMEBREW_PREFIX` dynamically
+3. `brew bundle` for all tools (includes gcloud SDK, codeql, VS Code)
+4. `brew install charmbracelet/tap/freeze` (from tap)
+5. `gcloud components install alpha beta bq gke-gcloud-auth-plugin
+   pubsub-emulator cloud-datastore-emulator cloud-firestore-emulator
+   cloud-build-local bigtable spanner-emulator`
+6. `uv tool install ty@latest && uv tool install prek`
+7. `bun install -g opencode-ai critique`
+8. Symlink all configs into place (including `.inputrc`, VS Code
+   settings, VS Code extensions.json)
+9. Symlink `container/dev.sh` to `~/.local/bin/dev`
+10. Verify: run `bash -n` on all bash config files
 
 ### `install-wsl.sh`
 
-1. `sudo apt install` for tools in Ubuntu repos
-2. Install scripts for tools not in apt or stale:
-   starship, mise, uv, fzf, zoxide, bat, delta, fd, ripgrep,
-   lazygit, btop, lnav, glow, neovim, kitty, bun, podman
-3. `uv tool install ty@latest && uv tool install prek`
-4. `bun install -g opencode-ai critique`
-5. Same symlink logic as macOS
-6. Optional: create Kitty WSLg desktop entry for Windows Start menu
+1. Back up existing config files (same pattern as macOS)
+2. `sudo apt install` for tools in Ubuntu repos
+3. Install scripts for tools not in apt or stale:
+   starship, mise, uv, fzf (>= 0.48, from GitHub releases), zoxide,
+   bat, delta, fd, ripgrep, lazygit, btop, lnav, glow, neovim,
+   kitty, bun, podman, gcloud SDK, codeql
+4. `gcloud components install` (same list as macOS)
+5. `uv tool install ty@latest && uv tool install prek`
+6. `bun install -g opencode-ai critique`
+7. Same symlink logic as macOS
+8. Symlink VS Code settings to `~/.vscode-server/data/Machine/settings.json`
+9. Optional: create Kitty WSLg desktop entry for Windows Start menu
 
 ### Preventing install script drift
 
@@ -275,8 +286,8 @@ runs a Linux VM). The `dev` script works identically.
 
 | File | Change |
 |------|--------|
-| `.bashrc` | `_OS` guard, dynamic `HOMEBREW_PREFIX`, guarded evals, conditional `EDITOR`/`MANPAGER`, OSC 9 notification, mise/uv completions |
-| `.bash_aliases` | Conditional `ports` alias |
+| `.bashrc` | `_OS` guard, dynamic `HOMEBREW_PREFIX`, guarded evals, conditional `EDITOR`/`MANPAGER`, OSC 9 notification (after starship init), mise/uv/cog/git-cliff completions, `~/.bun/bin` on PATH, `~/.bashrc.local` sourcing |
+| `.bash_aliases` | Conditional `ports` and `port` aliases |
 | `.tmux.conf` | Replace `pbcopy` with `copy-selection-and-cancel` |
 | `.gitconfig` | Remove `editor` line |
-| `Brewfile` | Add `podman`, remove `terminal-notifier`, add `pandoc`, add `tap "charmbracelet/tap"` |
+| `Brewfile` | Add `podman`, `google-cloud-sdk`, `cloud-sql-proxy`, `codeql`, `markdownlint-cli2`, `pandoc`, `cask "visual-studio-code"`, `tap "charmbracelet/tap"`. Remove `terminal-notifier`. |
