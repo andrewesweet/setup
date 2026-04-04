@@ -126,8 +126,8 @@ Note: Dev Containers with Podman requires setting
 ## VS Code settings template
 
 `vscode/settings.json` — committed to dotfiles, symlinked to
-`~/.config/Code/User/settings.json` (macOS) or
-`~/.vscode-server/data/Machine/settings.json` (remote).
+`~/Library/Application Support/Code/User/settings.json` (macOS) or
+`~/.vscode-server/data/Machine/settings.json` (WSL2 remote).
 
 ```jsonc
 // settings.json
@@ -308,8 +308,8 @@ Add to `install-macos.sh`:
 
 ```bash
 # VS Code (macOS only — on WSL2 it's installed on Windows)
-link vscode/settings.json   ".config/Code/User/settings.json"
-link vscode/extensions.json ".config/Code/User/extensions.json"
+link vscode/settings.json   "Library/Application Support/Code/User/settings.json"
+link vscode/extensions.json "Library/Application Support/Code/User/extensions.json"
 ```
 
 For WSL2, VS Code settings sync handles the Windows-side config.

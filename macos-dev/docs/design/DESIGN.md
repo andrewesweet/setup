@@ -214,6 +214,11 @@ Now designed and ready to implement:
 
 Still deferred — do not implement without a new design document:
 
+- **Proxy-based allowlist and audit** — mitmproxy + cntlm for
+  credential injection, destination allowlisting, and traffic audit
+  from containers. Significant infrastructure; design separately.
+- **Shell startup caching** — eval output caching for faster shell
+  startup. Measure actual latency first (`time bash -ic exit`).
 - **Shell history sync across machines** — evaluated and skipped.
   Re-evaluate if multi-machine workflow becomes a need.
 - **sops + age** — secrets management. Not included in this iteration.
@@ -365,7 +370,7 @@ issues:
 14. `container/` — Containerfile, dev.sh, dev.env.example, .dockerignore
 15. `scripts/` — verify.sh, check-configs.sh, check-tool-manifest.sh
 16. `docs/cheatsheet.md`
-15. `README.md` — after everything else exists
+17. `README.md` — after everything else exists
 
 ---
 

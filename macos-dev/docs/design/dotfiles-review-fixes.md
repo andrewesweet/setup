@@ -1,8 +1,8 @@
 # Adversarial review fixes
 
-Documents all fixes adopted from the adversarial reviews of the
-original design documents. These changes apply across all prior
-design documents and must be incorporated during implementation.
+Documents all fixes adopted from adversarial reviews (rounds 1 and 2)
+of the design documents. These changes apply across all prior design
+documents and must be incorporated during implementation.
 
 **Precedence rule**: where this document or `dotfiles-cross-platform.md`
 conflicts with earlier documents (`dotfiles-setup.md`, `dotfiles-neovim.md`,
@@ -13,7 +13,7 @@ resolved version, not the original.
 
 ## Critical fixes
 
-### `lsp.lua` syntax error (CRITICAL)
+### `lsp.lua` syntax error
 
 The `vim.g.lazyvim_python_lsp = "ty"` and `vim.g.lazyvim_python_formatter`
 assignments sit inside the `return` table literal in `dotfiles-neovim.md`.
@@ -34,11 +34,10 @@ return {
 }
 ```
 
-### `lsp.lua` uses `require("lspconfig.util")` (CRITICAL)
+### `lsp.lua` uses `require("lspconfig.util")`
 
 `gh_actions_ls` root_dir uses `require("lspconfig.util").find_git_ancestor()`.
-This creates a dependency on lspconfig loading order and contradicts the
-"no require('lspconfig')" constraint.
+This creates a dependency on lspconfig loading order.
 
 **Fix**: Replace with Neovim 0.11+ native API:
 
@@ -48,24 +47,11 @@ root_dir = function(fname)
 end,
 ```
 
-### `PROMPT_COMMAND` clobbered by starship (CRITICAL)
+### `PROMPT_COMMAND` clobbered by starship
 
 Starship's `eval "$(starship init bash)"` overwrites `PROMPT_COMMAND`.
-If the OSC 9 notification hook is set before starship init, it's wiped.
 
 **Fix**: The notification hook must be appended **after** starship init.
-Order in `.bashrc`:
-
-```bash
-# 1. Tool evals (fzf, zoxide, mise, direnv, gh, starship)
-command -v starship &>/dev/null && eval "$(starship init bash)"
-
-# 2. OSC 9 notification (after starship, appended to PROMPT_COMMAND)
-NOTIFY_THRESHOLD="${NOTIFY_THRESHOLD:-10}"
-# ... timer functions ...
-PROMPT_COMMAND="__cmd_timer_notify;${PROMPT_COMMAND}"
-```
-
 Guard against duplication on re-source:
 
 ```bash
@@ -74,21 +60,134 @@ if [[ "$PROMPT_COMMAND" != *"__cmd_timer_notify"* ]]; then
 fi
 ```
 
+### `dev-data-opencode` volume shadows auth bind mount
+
+Named volume at `/home/dev/.local/share/opencode` shadows the
+read-only bind mount of `auth.json` inside that same path.
+
+**Fix**: Mount `auth.json` to a separate path and configure OpenCode
+to read from there:
+
+```bash
+-v ~/.local/share/opencode/auth.json:/home/dev/.opencode-auth/auth.json:ro
+```
+
+Set `OPENCODE_AUTH_FILE=/home/dev/.opencode-auth/auth.json` in the
+container environment (verify this env var with OpenCode docs at
+implementation time).
+
+---
+
+## Security fixes
+
+### OpenCode permissions — restrict read scope
+
+`"read": "allow"` lets the agent read any file including mounted
+credentials. Scope to workspace, tmp, and specific config paths.
+
+**Fix**: Replace broad `read` allow with path-scoped rules:
+
+```jsonc
+"read": {
+  "*": "ask",
+  "~/workspace/**": "allow",
+  "/home/dev/workspace/**": "allow",
+  "/tmp/**": "allow",
+  "~/.config/opencode/**": "allow",
+  "~/.config/mise/**": "allow"
+},
+```
+
+Similarly restrict `cat` in bash permissions:
+
+```jsonc
+"cat /home/dev/workspace/*": "allow",
+"cat /tmp/*": "allow",
+```
+
+Remove the broad `"cat *": "allow"` rule. Keep `"bat *": "allow"`
+for syntax-highlighted viewing (bat is read-only).
+
+### OpenCode permissions — restrict edit scope
+
+```jsonc
+"edit": {
+  "*": "ask",
+  "~/workspace/**": "allow",
+  "/home/dev/workspace/**": "allow",
+  "/tmp/**": "allow"
+},
+```
+
+### `.gitignore_global` coverage gaps
+
+Add missing patterns:
+
+```gitignore
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+auth.json
+credentials.json
+application_default_credentials.json
+*.keystore
+
+# Dotfiles local overrides
+.bashrc.local
+dev.env
+```
+
+### SSH agent: require confirmation
+
+Document that `ssh-add -c` must be enabled on the host so each
+SSH key use inside the container requires user confirmation:
+
+```bash
+# On macOS host
+ssh-add -c ~/.ssh/id_ed25519
+```
+
+### Container capabilities: drop SETUID/SETGID
+
+`SETUID` and `SETGID` are not needed at runtime. Only `CHOWN`,
+`DAC_OVERRIDE`, and `FOWNER` are required.
+
+```bash
+--cap-drop=ALL \
+--cap-add=CHOWN,DAC_OVERRIDE,FOWNER \
+```
+
+### `GITHUB_TOKEN` in shell history
+
+`gha-pin` alias expands `$(gh auth token)` into shell history.
+
+**Fix**: Add `HISTIGNORE` pattern in `.bashrc`:
+
+```bash
+HISTIGNORE="*GITHUB_TOKEN*:*TOKEN*:*SECRET*:*PASSWORD*:*KEY*"
+```
+
+### Supply chain: version pinning for curl-pipe-bash installs
+
+`install-wsl.sh` uses `curl | bash` for mise, uv, and starship.
+
+**Fix**: Pin versions and verify checksums in `install-wsl.sh`.
+Document the expected checksums. The Containerfile must also pin
+versions with checksums for all static binary downloads.
+
 ---
 
 ## Alias fixes
 
 ### `fd` alias shadows binary (HIGH)
 
-`alias fd='fd --type d'` breaks `FZF_DEFAULT_COMMAND` and any tool
-that calls `fd` directly.
-
 **Fix**: Rename to `fdd='fd --type d'`.
 
 ### POSIX command shadows (HIGH)
-
-`alias ps='ps aux'`, `alias grep='rg'`, `alias find='fd'`,
-`alias cat='bat --paging=never'` shadow standard commands.
 
 **Fix**: Remove all shadows. Replace with distinct aliases:
 - `psa='ps aux'`
@@ -97,42 +196,55 @@ that calls `fd` directly.
 - Keep `fd` as `fd` (don't alias `find`)
 - Keep `bat` as `bat` (don't alias `cat`)
 
-### `alias ~='cd ~'` unnecessary (LOW)
+### `gc` alias collision (HIGH)
 
-`cd` with no args already goes home. Remove the alias.
+`dotfiles-setup.md` defines `gc='git commit'`.
+GCP aliases define `gc='gcloud'`.
 
-### lazygit alias: `gl` to `lg` (LOW)
+**Fix**: Remove `gc='git commit'` (redundant — `gcm` exists for
+commit-with-message, and `git commit` is what you type for
+interactive commits). `gc='gcloud'` takes the slot.
 
-`gl` conflicts with common `git log` mnemonics. `lg` is the
-near-universal convention for lazygit.
+### `alias ~='cd ~'` unnecessary
+
+Remove. `cd` with no args already goes home.
+
+### lazygit alias: `gl` to `lg`
 
 **Fix**: `alias lg='lazygit'`
 
-### `alias uvx='uvx'` is a no-op (LOW)
+### `alias uvx='uvx'` is a no-op
 
-Maps a command to itself. Remove it.
+Remove it.
 
-### Missing aliases (LOW)
+### Missing aliases
 
 Add:
-- `drd='direnv deny'` — complement `da`/`dr`
-- `gha-fix='zizmor --fix'` — complement `gha-*` family
-- `notify='printf "\e]9;Done\a"'` — manual OSC 9 notification
-- `cql='codeql'` — CodeQL CLI
+- `drd='direnv deny'`
+- `gha-fix='zizmor --fix'`
+- `notify='printf "\e]9;Done\a"'`
+- `cql='codeql'`
 - `cql-db='codeql database create'`
 - `cql-analyze='codeql database analyze'`
 - `lzd='lazydocker'`
 - `tfsum='tf-summarize'`
+- `mdl='markdownlint-cli2'`
+
+### `httpie` alias
+
+Drop `--style=monokai` — httpie's adaptive default is fine.
+Remove the alias entirely.
+
+### `glow` alias
+
+Pin dark mode: `alias md='glow -s dark'`
 
 ---
 
 ## Alias discoverability (MEDIUM)
 
-No runtime way to discover 70+ aliases and functions.
-
 **Fix**: Add an `aliases` function to `.bash_aliases` that covers
-shell aliases, shell functions (`cr`, `crw`, `crs`, `cheat`), and
-git aliases:
+shell aliases, shell functions, and git aliases:
 
 ```bash
 aliases() {
@@ -152,30 +264,17 @@ aliases() {
 }
 ```
 
-Usage: `aliases` (all), `aliases git` (filtered).
-
 ---
 
 ## Integration fixes
 
-### lazygit delta syntax theme (MEDIUM)
+### lazygit delta syntax theme
 
-lazygit invokes delta directly, bypassing gitconfig.
+**Fix**: `pager: delta --paging=never --syntax-theme='Monokai Extended'`
 
-**Fix**: Change lazygit `config.yml`:
+### Starship fixes
 
-```yaml
-git:
-  paging:
-    pager: delta --paging=never --syntax-theme='Monokai Extended'
-```
-
-### Starship missing language modules (MEDIUM)
-
-`$golang` and `$rust` are in the format string but have no config
-sections. Display is inconsistent with other language modules.
-
-**Fix**: Add to `starship.toml`:
+Add missing language modules:
 
 ```toml
 [golang]
@@ -185,57 +284,38 @@ format = "[ $version](cyan) "
 format = "[ $version](red) "
 ```
 
-### fzf-lua zoxide picker (MEDIUM)
+Remove `vimins_symbol` — not a valid Starship key. `success_symbol`
+and `error_symbol` already cover insert mode.
 
-**Fix**: Add to `integrations.lua` fzf-lua keys:
+Add prompt scan timeout:
+
+```toml
+scan_timeout = 30
+```
+
+### fzf-lua fixes
+
+Add zoxide picker:
 
 ```lua
 { "<leader>fz", "<cmd>FzfLua zoxide<cr>", desc = "Zoxide dirs" },
 ```
 
-### fzf-lua inherits shell `FZF_DEFAULT_OPTS` (HIGH)
-
-Shell opts set `ctrl-j:down,ctrl-k:up` which conflict with Neovim
-keymaps inside fzf-lua pickers.
-
-**Fix**: Set `fzf_opts` explicitly in fzf-lua plugin spec to isolate
-from shell environment:
+Isolate from shell `FZF_DEFAULT_OPTS`:
 
 ```lua
 opts = {
   fzf_opts = {
     ["--bind"] = "ctrl-j:down,ctrl-k:up",
   },
-  -- ... winopts ...
 },
 ```
 
-### fzf-lua mnemonic swap (LOW)
+Swap mnemonics:
+- `<leader>fs` → `FzfLua live_grep` (matches shell `fs`)
+- `<leader>fw` → `FzfLua grep_cword` (find word)
 
-`<leader>fs` is `grep_cword` in Neovim but `fs` means "find string"
-(rg) in shell aliases. `<leader>fg` is live grep.
-
-**Fix**: Swap:
-- `<leader>fs` → `FzfLua live_grep` (find string, matches shell)
-- `<leader>fw` → `FzfLua grep_cword` (find word under cursor)
-
-### `httpie` alias theme (LOW)
-
-`--style=monokai` is not the same palette as bat/delta's `Monokai
-Extended`. Drop the `--style` flag — httpie's adaptive default is fine.
-
-**Fix**: `alias http='http'` (remove the alias entirely, use httpie
-directly).
-
-### `glow` dark mode (LOW)
-
-glow can misdetect light/dark in tmux. Pin dark mode.
-
-**Fix**: `alias md='glow -s dark'`
-
-### Missing completions (MEDIUM)
-
-Add completions for tools that support them:
+### Missing completions
 
 ```bash
 command -v mise      &>/dev/null && eval "$(mise completion bash)"
@@ -244,176 +324,180 @@ command -v cog       &>/dev/null && eval "$(cog generate-completions bash)"
 command -v git-cliff &>/dev/null && eval "$(git-cliff completions bash)"
 ```
 
-Check if prek and pinact expose completion generators — add if so.
+Add gcloud completion (platform-specific):
 
-### `git stash show` bypasses delta (LOW)
-
-**Fix**: Add to `.gitconfig`:
-
-```ini
-[stash]
-    showPatch = true
+```bash
+if [[ $_OS == macos ]]; then
+  local _gcloud_comp="$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.bash.inc"
+  [[ -r "$_gcloud_comp" ]] && source "$_gcloud_comp"
+elif [[ $_OS == wsl || $_OS == linux ]]; then
+  [[ -r /usr/share/google-cloud-sdk/completion.bash.inc ]] && \
+    source /usr/share/google-cloud-sdk/completion.bash.inc
+fi
 ```
+
+### `git stash show` bypasses delta
+
+**Fix**: Add `[stash] showPatch = true` to `.gitconfig`.
+
+### `direnv` missing from Brewfile
+
+**Fix**: Add `brew "direnv"` to consolidated Brewfile.
+
+### `tap "homebrew/bundle"` deprecated
+
+Remove from Brewfile. Unnecessary since Homebrew 4.x.
+
+### Theme consistency note
+
+The tmux status bar uses Catppuccin Mocha hex values. bat, delta,
+and lazygit use `Monokai Extended`. These are different palettes.
+Document this as intentional — tmux UI chrome uses Catppuccin, code
+rendering tools use Monokai Extended. No action needed.
 
 ---
 
 ## Keybind fixes
 
-### Ctrl+L in vim-tmux-navigator (HIGH)
+### Ctrl+L in vim-tmux-navigator
 
-The `bind-key -n 'C-l'` intercepts clear-screen in all tmux panes.
+**Fix**: Add binding: `bind C-l send-keys C-l`
+Document `Ctrl+A Ctrl+L` for clear-screen in tmux.
 
-**Fix**: Add a separate binding for clear-screen:
+### Ctrl+A collision: tmux prefix vs OpenCode input
 
-```conf
-bind C-l send-keys C-l    # Prefix + Ctrl+L = clear screen
-```
+**Fix**: Document prominently. Add comment in `.tmux.conf` and tip
+on first `dev shell` attach.
 
-Document that `Ctrl+A Ctrl+L` clears screen when in tmux. Add a
-comment in `.tmux.conf` near the prefix binding.
+### Ctrl+U/D collision in OpenCode
 
-### Ctrl+A collision: tmux prefix vs OpenCode input (HIGH)
-
-**Fix**: Not worth changing the prefix. Document prominently:
-- `Ctrl+A Ctrl+A` sends literal `Ctrl+A` to the inner process
-- Add a one-line tip on first `dev shell` attach
-
-### Ctrl+U/D collision in OpenCode (HIGH)
-
-`messages_half_page_up` is bound to `ctrl+u` but the input area's
-hardcoded emacs `Ctrl+U` (delete to start of line) fires when the
-input box has focus.
-
-**Fix**: Remove bare `ctrl+u`/`ctrl+d` from `tui.jsonc` message
-scrolling. Use only the `ctrl+alt+u`/`ctrl+alt+d` variants:
+**Fix**: Remove bare `ctrl+u`/`ctrl+d` from `tui.jsonc`. Use only:
 
 ```jsonc
 "messages_half_page_up":   "ctrl+alt+u",
 "messages_half_page_down": "ctrl+alt+d",
 ```
 
-### Esc in lazygit inside Neovim (MEDIUM)
+### VS Code Ctrl+P and Ctrl+K intercept
 
-Pressing `Esc` in lazygit's floating terminal can be intercepted by
-Neovim's terminal mode.
+VS Code captures `Ctrl+P` (Quick Open) and `Ctrl+K` (chord prefix)
+before they reach OpenCode or bash in the integrated terminal.
 
-**Fix**: LazyVim's default floating terminal config typically handles
-this. Verify during implementation. If needed, add to `keymaps.lua`:
+**Fix**: Document as known limitation. Users running OpenCode in
+VS Code's terminal should use OpenCode's `<leader>` bindings
+instead.
+
+### tmux `bind l` shadows `last-window`
+
+**Fix**: Add `bind L last-window` to restore the shortcut on
+Shift+L.
+
+### Esc in lazygit inside Neovim
+
+Verify LazyVim handles this during implementation. Fallback:
 
 ```lua
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 ```
 
-### btop half-page scroll (LOW)
+### btop, delta, lnav quirks
 
-btop uses bare `d`/`u`, not configurable.
-
-**Fix**: Document in cheatsheet only.
-
-### Delta `n`/`N` override search-next (LOW)
-
-With `navigate=true`, `n`/`N` jump between hunks, overriding
-`less` search-next after `/pattern`.
-
-**Fix**: Document in cheatsheet. This is a known trade-off of
-`navigate=true`.
-
-### lnav yank is `c`, not `y` (LOW)
-
-lnav's default and not configurable. Flag prominently in cheatsheet
-as the one yank outlier.
+Document in cheatsheet only. No config changes possible.
 
 ---
 
-## Cheatsheet
+## Cross-platform fixes
 
-A single `docs/cheatsheet.md` serves as both terminal reference and
-printable document.
+### `is_vim` tmux detection breaks on Linux
 
-### Terminal access
+`ps -o state= -o comm= -t '#{pane_tty}'` uses BSD semantics.
 
-`cheat` function renders via `glow`. The function processes raw
-markdown (not ANSI output) for section filtering:
+**Fix**: Test on WSL2/container during implementation. If it breaks,
+use `pgrep`-based detection as portable alternative. Ensure `procps`
+is installed in the Containerfile.
+
+### VS Code settings path on macOS
+
+`~/.config/Code/User/settings.json` is the Linux path. macOS uses
+`~/Library/Application Support/Code/User/settings.json`.
+
+**Fix**: `install-macos.sh` uses the correct macOS path:
 
 ```bash
-cheat() {
-  local dotfiles="${DOTFILES:-$HOME/.dotfiles}"
-  local file="$dotfiles/docs/cheatsheet.md"
-  case "${1:-}" in
-    keys)
-      sed -n '/^## Key bindings/,/^## Tool reference/p' "$file" \
-        | head -n -1 | glow -s dark -p ;;
-    tools)
-      sed -n '/^## Tool reference/,$p' "$file" \
-        | glow -s dark -p ;;
-    *)
-      glow "$file" -s dark -p ;;
-  esac
+link vscode/settings.json \
+  "Library/Application Support/Code/User/settings.json"
+```
+
+### `gcloud components install` fails when package-managed
+
+When gcloud is installed via apt or apk, `gcloud components install`
+is disabled.
+
+**Fix**:
+- macOS (Homebrew): `gcloud components install` works
+- WSL2 (apt): install components as separate apt packages
+  (e.g. `google-cloud-sdk-gke-gcloud-auth-plugin`)
+- Container (apk): install as separate apk packages or download
+  binaries directly
+
+### `head -n -1` not portable
+
+BSD `head` on macOS doesn't support negative line counts.
+
+**Fix**: Replace `head -n -1` with `sed '$d'` in the `cheat`
+function.
+
+### `fzf --bash` version requirement
+
+Requires fzf >= 0.48. WSL2 apt ships 0.29.
+
+**Fix**: `install-wsl.sh` must install fzf from GitHub releases,
+not apt. No version guard needed in `.bashrc` — the install script
+ensures the correct version.
+
+### `opencode.jsonc` project template missing comma
+
+```jsonc
+// Before the comment, add the missing comma:
+{
+  "instructions": [
+    ".opencode/AGENTS.md"
+  ],
+  // Uncomment to override model:
 }
 ```
-
-### Print
-
-`pandoc` generates landscape A4 PDF. Use `typst` as the PDF engine
-(lighter than xelatex, no full TeX Live install required):
-
-```bash
-pandoc docs/cheatsheet.md \
-  -o docs/cheatsheet.pdf \
-  --pdf-engine=typst \
-  -V geometry:landscape \
-  -V geometry:margin=1.5cm
-```
-
-Add `pandoc` and `typst` to Brewfile.
-
-### Content structure
-
-**Page 1: Key bindings by action**
-
-Columns: Action | Shell | tmux | Neovim | lazygit | OpenCode | btop/lnav
-
-Grouped by action (navigate, search, copy, quit) not by tool.
-
-**Page 2: Tool for the job**
-
-Columns: Task | Tool | Quick command | Alias
-
-Grouped by workflow: searching, git, editing, formatting, linting,
-containers, kubernetes, terraform, GCP.
 
 ---
 
 ## `.bashrc` ordering and structure
 
-The final `.bashrc` must follow this order to avoid dependency and
-override issues:
+The final `.bashrc` must follow this order:
 
 ```bash
-# 1. Guard: only for interactive shells
+# 1.  Guard: only for interactive shells
 [[ $- != *i* ]] && return
 
-# 2. Platform detection (_OS)
+# 2.  Platform detection (_OS)
 
-# 3. PATH setup (Homebrew, bun, local bin) — BEFORE any evals
+# 3.  PATH setup (Homebrew, bun, local bin) — BEFORE any evals
 if [[ $_OS == macos ]]; then
   HOMEBREW_PREFIX="$(brew --prefix)"
   export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 fi
 export PATH="$HOME/.bun/bin:$HOME/.local/bin:$PATH"
 
-# 4. Bash-completion (platform-specific path)
+# 4.  Bash-completion (platform-specific path)
 
-# 5. Vi mode + readline bindings
+# 5.  Vi mode + readline bindings
 
-# 6. History settings + shell options
+# 6.  History settings + shell options + HISTIGNORE
 
-# 7. Tool evals (all guarded with command -v)
-#    fzf, zoxide, mise, direnv, gh, starship — in that order
+# 7.  Tool evals (all guarded with command -v)
+#     fzf, zoxide, mise, direnv, gh — then starship LAST
 
-# 8. Completions (mise, uv, cog, git-cliff)
+# 8.  Completions (mise, uv, cog, git-cliff, gcloud)
 
-# 9. OSC 9 notification hook (AFTER starship, with duplication guard)
+# 9.  OSC 9 notification hook (AFTER starship, with guard)
 
 # 10. Environment variables (EDITOR, VISUAL, MANPAGER, BAT_THEME, FZF_*)
 
@@ -426,100 +510,81 @@ export PATH="$HOME/.bun/bin:$HOME/.local/bin:$PATH"
 
 ---
 
-## `dev` script fixes
+## `.gitconfig` fixes
 
-### `dev` with no args prints usage (LOW)
-
-### `dev.env` missing check (MEDIUM)
-
-Prints message, offers to copy from example.
-
-### `dev shell` resolves to git root (MEDIUM)
-
-Mount `$(git rev-parse --show-toplevel)` instead of `$PWD`. Warn
-if they differ.
-
-### `dev.sh` validates `$SSH_AUTH_SOCK` (MEDIUM)
-
-Check that `$SSH_AUTH_SOCK` exists and is a socket before mounting.
-Print diagnostic if missing.
-
-### `dev.sh` passes `--dns` on WSL2 (LOW)
-
-Pass `--dns` from host `/etc/resolv.conf` nameserver to avoid
-WSL2 Podman DNS resolution issues.
-
-### Stale image detection blocks by default (LOW)
-
-`--skip-check` to bypass.
-
----
-
-## Container fixes
-
-### Containerfile: explicit `adduser` (LOW)
-
-```dockerfile
-RUN adduser -D -h /home/dev -s /bin/bash dev
-```
-
-### Containerfile: locale (MEDIUM)
-
-```dockerfile
-RUN apk add glibc-locales
-ENV LANG=C.UTF-8
-```
-
-### `--userns=keep-id` on macOS Podman Machine (MEDIUM)
-
-Document that on macOS, Podman runs inside a VM and `keep-id` maps
-to the VM user, not the host user. Consider explicit UID mapping:
-`--userns=keep-id:uid=1000,gid=1000` for deterministic behaviour.
-
----
-
-## `.gitconfig` fix
-
-### Remove hardcoded editor (HIGH)
-
-Remove `editor = code --wait` from `.gitconfig`. Git falls back to
-`$EDITOR`. Also use canonical `excludesFile` (camelCase):
+Remove hardcoded `editor`. Use canonical `excludesFile` (camelCase).
+Add `stash.showPatch`:
 
 ```ini
 [core]
     pager        = delta
     excludesFile = ~/.gitignore_global
     autocrlf     = input
-```
 
-### Add stash showPatch (LOW)
-
-```ini
 [stash]
     showPatch = true
 ```
 
 ---
 
+## `dev` script fixes
+
+- `dev` with no args prints usage
+- `dev.env` missing: print message, offer to copy from example
+- `dev shell` resolves to git root (`git rev-parse --show-toplevel`),
+  warns if `$PWD` differs
+- Validate `$SSH_AUTH_SOCK` exists before mounting; print diagnostic
+- Pass `--dns` from host `/etc/resolv.conf` on WSL2
+- Stale image detection blocks by default, `--skip-check` to bypass
+- Add `dev uninstall` command that restores backups from
+  `~/.dotfiles-backup/`
+
+---
+
+## Container fixes
+
+### Containerfile
+
+- Explicit adduser: `adduser -D -h /home/dev -s /bin/bash dev`
+- Locale: `apk add glibc-locales` + `ENV LANG=C.UTF-8`
+- Install `procps` for `is_vim` tmux detection
+- Layer ordering: apk installs → tool installs (mise, uv) →
+  global packages (bun, uv tools) → configs and user setup
+- Install gcloud CLI and codeql in base stage
+- gcloud components: install as individual apk packages (not
+  `gcloud components install`)
+
+### `--userns=keep-id` on macOS Podman Machine
+
+Document that on macOS, Podman runs inside a VM. Consider explicit
+UID mapping: `--userns=keep-id:uid=1000,gid=1000`.
+
+---
+
 ## Install script fixes
 
-### Backup before overwriting (HIGH)
+### Backup before overwriting
 
-Both install scripts back up existing non-symlink config files to
-`~/.dotfiles-backup/<timestamp>/` before creating symlinks.
+Both scripts back up existing non-symlink config files to
+`~/.dotfiles-backup/<timestamp>/`.
 
-### `.inputrc` missing from symlinks (MEDIUM)
+### `.inputrc` in symlinks
 
 Add `link bash/.inputrc .inputrc` to both install scripts.
 
-### `tools.txt` format (MEDIUM)
+### `tools.txt` format
 
-Simple format: one tool per line, `#` comments, optional
-`brew:<name>` / `apt:<name>` / `apk:<name>` / `uv:<name>` prefixes
-for platform-specific install names.
+One tool per line, `#` comments, optional platform-specific install
+name suffixes:
 
-Validation script: checks that every tool in `tools.txt` is
-referenced in Brewfile, `install-wsl.sh`, and the Containerfile.
+```
+# tool-name  brew:formula  apt:package  apk:package
+bash          bash          bash          bash
+delta         git-delta     -             -
+```
+
+Validation script checks all tools are referenced in Brewfile,
+`install-wsl.sh`, and Containerfile.
 
 ---
 
@@ -535,7 +600,7 @@ brew "markdownlint-cli2"
 
 Add `"markdownlint-cli2"` to Mason's `ensure_installed`.
 
-### nvim-lint
+### nvim-lint (linting only — not conform)
 
 Add to `linting.lua`:
 
@@ -543,12 +608,12 @@ Add to `linting.lua`:
 markdown = { "markdownlint-cli2" },
 ```
 
-### conform.nvim
-
-Add to `formatting.lua`:
+Do NOT add to conform.nvim — markdownlint-cli2 is a linter with
+`--fix`, not a conform-compatible formatter. Use prettier for
+markdown formatting via conform:
 
 ```lua
-markdown = { "markdownlint-cli2" },
+markdown = { "prettier" },
 ```
 
 ### prek baseline
@@ -556,7 +621,6 @@ markdown = { "markdownlint-cli2" },
 Add to `.pre-commit-config.yaml`:
 
 ```yaml
-  # ── Markdown ──────────────────────────────────────────────────────────
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.17.1
     hooks:
@@ -565,7 +629,7 @@ Add to `.pre-commit-config.yaml`:
 
 ### Config file
 
-`.markdownlint.jsonc` (committed to each repo):
+`.markdownlint.jsonc` template for each repo:
 
 ```jsonc
 {
@@ -575,10 +639,6 @@ Add to `.pre-commit-config.yaml`:
   "MD041": false
 }
 ```
-
-- `MD013`: line length warning at 120 (matches yamllint)
-- `MD033`: allow inline HTML (common in GitHub READMEs)
-- `MD041`: don't require first line to be h1
 
 ---
 
@@ -591,7 +651,7 @@ brew "google-cloud-sdk"
 brew "cloud-sql-proxy"
 ```
 
-### Post-install gcloud components
+### Post-install (macOS only — Homebrew SDK)
 
 ```bash
 gcloud components install \
@@ -605,18 +665,16 @@ gcloud components install \
   spanner-emulator
 ```
 
+WSL2 and container: install as individual packages via apt/apk.
+
 ### Credentials
 
-Application Default Credentials stored at `~/.config/gcloud/`.
-Mounted read-only into the container.
-
-Never hardcode GCP project IDs, service account keys, or org-specific
-config in dotfiles.
+Mounted read-only into container. IAM is the security boundary.
+No secrets in dotfiles.
 
 ### Aliases
 
 ```bash
-# ── GCP ──────────────────────────────────────────────────────────────────────
 alias gc='gcloud'
 alias gcp='gcloud config configurations'
 alias gcl='gcloud config configurations list'
@@ -627,8 +685,8 @@ alias gke='gcloud container clusters'
 alias gsq='gcloud sql'
 ```
 
-Note: `gc` may shadow `git commit` alias if someone uses that.
-Since our git commit alias is `gcm` (with message), `gc` is safe.
+The original `gc='git commit'` from `dotfiles-setup.md` is removed
+(redundant — `gcm` covers commit-with-message).
 
 ---
 
@@ -642,28 +700,75 @@ brew "codeql"
 
 ### Pack storage
 
-Query packs downloaded to `~/.codeql/` on the host. Mounted
-read-only into the container at `/home/dev/.codeql/`.
+`~/.codeql/` on host, mounted read-only into container.
 
-### Container Containerfile
+### Container
 
-CodeQL CLI installed in base stage (agents may use it for security
-analysis). `--search-path` set via environment variable or config.
+CodeQL CLI installed in base stage. `--search-path` configured
+via environment or config file.
+
+---
+
+## Cheatsheet
+
+A single `docs/cheatsheet.md` for terminal and print.
+
+### Terminal access
+
+```bash
+cheat() {
+  local dotfiles="${DOTFILES:-$HOME/.dotfiles}"
+  local file="$dotfiles/docs/cheatsheet.md"
+  case "${1:-}" in
+    keys)
+      sed -n '/^## Key bindings/,/^## Tool reference/p' "$file" \
+        | sed '$d' | glow -s dark -p ;;
+    tools)
+      sed -n '/^## Tool reference/,$p' "$file" \
+        | glow -s dark -p ;;
+    *)
+      glow "$file" -s dark -p ;;
+  esac
+}
+```
+
+### Print
+
+```bash
+pandoc docs/cheatsheet.md \
+  -o docs/cheatsheet.pdf \
+  --pdf-engine=typst \
+  -V geometry:landscape \
+  -V geometry:margin=1.5cm
+```
+
+Add `pandoc` and `typst` to Brewfile.
 
 ---
 
 ## Verification and testing
 
-### `verify.sh` (NEW)
+### `verify.sh`
 
-Add a `verify.sh` at repo root, run after install:
-
-1. Symlink check — every expected symlink exists and points correctly
-2. `bash -n` on all bash config files — syntax validation
+1. Symlink check (platform-aware paths for VS Code)
+2. `bash -n` on all bash config files
 3. `bash container/test-tool-installs.sh` — all tools present
 4. Config parse validation (tmux, starship, opencode JSONC)
-5. `dev build --base` — container builds (if Podman present)
-6. Print manual verification steps (Neovim LSP check)
+5. `dev build --base` (if Podman present)
+6. `gke-gcloud-auth-plugin --version` and other gcloud components
+7. `code --version` (if VS Code expected)
+8. `codeql resolve packs` (if codeql packs downloaded)
+9. Print manual steps (Neovim LSP, VS Code extensions)
+
+### `test-tool-installs.sh` gaps
+
+Add missing tools:
+- `ruff`
+- `bun`
+- `gcloud`
+- `codeql`
+- `markdownlint-cli2`
+- `code` (VS Code CLI, skip if not installed)
 
 ### CI (GitHub Actions)
 
@@ -684,13 +789,37 @@ jobs:
         run: podman build --target base -t dotfiles-base container/
 ```
 
-### `test-tool-installs.sh` gaps
+---
 
-Add missing tools:
-- `ruff` (critical, installed via Mason/mise)
-- `bun` (runtime for opencode/critique)
+## Performance (deferred)
 
-Fix: `pinact` install method is `brew` (correct per current design).
+### Shell startup caching — MEASURE FIRST
+
+Eight sequential `eval` calls add ~300-600ms to shell startup.
+Caching eval output to `~/.cache/dotfiles/<tool>.bash` could reduce
+this by 90%.
+
+**Decision**: Measure actual startup time on target hardware before
+implementing. Add a `time bash -ic exit` benchmark to `verify.sh`.
+If startup exceeds 500ms, implement caching.
+
+### Other performance notes (implement now)
+
+- Starship `scan_timeout = 30` — prevents slow prompts in large repos
+- Containerfile layer ordering — enforce expensive ops first
+- `fzf --max-depth 6` — optional tuning for large monorepos
+  (add to FZF_DEFAULT_COMMAND if needed, not by default)
+
+---
+
+## Deferred (future design documents)
+
+- **Proxy-based allowlist and audit** — mitmproxy + cntlm for
+  credential injection, destination allowlisting, and traffic audit.
+  Significant infrastructure; design separately.
+- **`--network=none` for offline agent runs** — requires proxy above
+  to be practical.
+- **Shell startup caching** — measure before implementing.
 
 ---
 

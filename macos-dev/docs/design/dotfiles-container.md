@@ -65,12 +65,29 @@ Configs copied into image:
 - opencode config (`opencode.jsonc`, `tui.jsonc`, instruction files)
 - mise config (`config.toml`)
 
+Additional base stage tools:
+- gcloud CLI (via apk, components as individual packages)
+- codeql CLI
+- procps (for `is_vim` tmux detection)
+
 User setup:
 ```dockerfile
-RUN adduser -D dev
+RUN adduser -D -h /home/dev -s /bin/bash dev
 USER dev
 WORKDIR /home/dev
 ```
+
+Locale:
+```dockerfile
+RUN apk add glibc-locales
+ENV LANG=C.UTF-8
+```
+
+Layer ordering (for cache efficiency):
+1. apk installs (system packages)
+2. Tool installs (mise, uv scripts)
+3. Global packages (bun, uv tools)
+4. Configs and user setup (cheapest, changes most often)
 
 ### Stage: full
 
@@ -115,19 +132,28 @@ constrained to explicit, purpose-specific locations.
 |-----------|---------------|---------|
 | `$PWD` (current repo) | `/home/dev/workspace` | Active working repo |
 
-Only one repo is mounted read-write. The `dev shell` command mounts
-whichever directory you run it from.
+Only one repo is mounted read-write. `dev shell` resolves to the
+git root (`git rev-parse --show-toplevel`), warning if `$PWD`
+differs.
 
 ### Read-only bind mounts
 
 | Host path | Container path | Purpose |
 |-----------|---------------|---------|
 | Additional repos (`--ref`) | `/home/dev/refs/<name>` | Cross-reference |
-| `~/.local/share/opencode/auth.json` | `/home/dev/.local/share/opencode/auth.json` | Copilot token |
+| `~/.local/share/opencode/auth.json` | `/home/dev/.opencode-auth/auth.json` | Copilot token (separate path to avoid volume shadow) |
 | `~/.config/gh/` | `/home/dev/.config/gh/` | GitHub CLI auth |
-| `~/.config/gcloud/` | `/home/dev/.config/gcloud/` | GCP Application Default Credentials |
+| `~/.config/gcloud/` | `/home/dev/.config/gcloud/` | GCP ADC (IAM is the security boundary) |
 | `~/.codeql/` | `/home/dev/.codeql/` | CodeQL query packs |
-| `$SSH_AUTH_SOCK` | `/run/ssh-agent.sock` | Git SSH operations |
+| `$SSH_AUTH_SOCK` | `/run/ssh-agent.sock` | Git SSH (host must use `ssh-add -c`) |
+
+Note: OpenCode auth is mounted to `/home/dev/.opencode-auth/` (not
+inside `.local/share/opencode/`) to avoid being shadowed by the
+`dev-data-opencode` named volume. Configure OpenCode to read auth
+from this path.
+
+`dev.sh` validates that `$SSH_AUTH_SOCK` exists and is a socket
+before mounting. Prints diagnostic if missing.
 
 ### Named volumes (persistent across container recreates)
 
@@ -138,7 +164,7 @@ whichever directory you run it from.
 | `dev-cache-mise` | `/home/dev/.local/share/mise` | mise installs |
 | `dev-cache-mason` | `/home/dev/.local/share/nvim/mason` | Mason tools (full only) |
 | `dev-cache-bun` | `/home/dev/.cache/bun` | bun global cache |
-| `dev-data-opencode` | `/home/dev/.local/share/opencode` | OpenCode sessions |
+| `dev-data-opencode` | `/home/dev/.local/share/opencode` | OpenCode sessions, history |
 
 ### tmpfs (ephemeral, RAM-only)
 
@@ -160,19 +186,23 @@ immutable at runtime. Writes only go to mounted volumes and tmpfs.
 podman run \
   --read-only \
   --cap-drop=ALL \
-  --cap-add=CHOWN,DAC_OVERRIDE,FOWNER,SETUID,SETGID \
+  --cap-add=CHOWN,DAC_OVERRIDE,FOWNER \
   --security-opt=no-new-privileges \
   --network=slirp4netns \
   --userns=keep-id \
   ...
 ```
 
-- `--cap-drop=ALL` + minimal add-back for file ownership in volumes
+- `--cap-drop=ALL` + minimal add-back (`CHOWN`, `DAC_OVERRIDE`,
+  `FOWNER` only — `SETUID`/`SETGID` not needed at runtime)
 - `--security-opt=no-new-privileges` prevents privilege escalation
-- `--userns=keep-id` maps container user to host UID
+- `--userns=keep-id` maps container user to host UID. On macOS
+  Podman Machine, consider explicit mapping:
+  `--userns=keep-id:uid=1000,gid=1000`
 - `slirp4netns` — rootless networking, outbound HTTPS only
 - No `--privileged`, ever
 - Optional `--port` flag for dev servers: `dev shell --port 8080`
+- SSH agent requires `ssh-add -c` on host (confirmation per use)
 
 ---
 
