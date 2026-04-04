@@ -1,321 +1,131 @@
-# Dotfiles — Design Document
+# Design Specification Index
 
-This document gives Claude Code (and future contributors) the context,
-constraints, and decisions behind this dotfiles repository. Read this
-file and all files in `docs/design/` before making any changes.
+This repository contains unified design specifications for a personal dotfiles repository managed as a senior engineering leader's configuration baseline, with design choices documented to support team-shareable standardization.
 
----
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY",
+and "OPTIONAL" in these documents are to be interpreted as described
+in BCP 14 [RFC 2119] [RFC 8174] when, and only when, they appear in
+all capitals, as shown here.
 
 ## What this repo is
 
-A personal dotfiles repository for a macOS-based senior engineering
-leader at a regulated financial institution (Deutsche Bank). The setup
-is designed to be team-shareable as a baseline for engineers adopting
-a CLI/TUI-driven development workflow.
-
-The owner uses GitHub Enterprise Managed Users (EMU) and GitHub Copilot
-as the sole AI provider. All tooling must be compatible with that
-constraint.
-
----
+A personal dotfiles repository for a macOS-based senior engineering leader at a regulated financial institution. Team-shareable baseline. Uses GitHub Enterprise Managed Users and GitHub Copilot as sole AI provider. Three platforms: macOS (Apple Silicon, Homebrew), WSL2 (Ubuntu on Windows 11, Kitty via WSLg primary / Windows Terminal fallback), Container (Wolfi Linux under Podman). The repo lives in `andrewesweet/setup` under the `macos-dev/` subdirectory.
 
 ## Design documents
 
-Read these in order before implementing anything:
-
 | File | Covers |
 |------|--------|
-| `docs/design/dotfiles-setup.md` | Core setup: bash, kitty, starship, tmux, lazygit, git config, fzf, zoxide, delta, bat, ripgrep, fd, jq, yq, httpie, lnav, btop, glow, the full alias scheme |
-| `docs/design/dotfiles-opencode-critique.md` | OpenCode config, critique shell functions, tui.jsonc keybinds, instruction files, vim keybinding reference |
-| `docs/design/dotfiles-language-ecosystem.md` | mise, uv, direnv, pinact, prek, team-baseline `.pre-commit-config.yaml`, per-language quality tools |
-| `docs/design/dotfiles-neovim.md` | LazyVim config, all LSP setup, formatter/linter config, lazygit.nvim, fzf-lua, gitsigns, vim-tmux-navigator, direnv.vim |
-| `docs/design/dotfiles-container.md` | Podman + Wolfi container environment, multi-stage Containerfile, `dev` lifecycle script, mount strategy, security hardening |
-| `docs/design/dotfiles-cross-platform.md` | macOS / WSL2 / container platform guards, install scripts, OSC 9 notifications, dynamic Homebrew prefix |
-| `docs/design/dotfiles-vscode.md` | VS Code integration: settings, extensions, remote backends (WSL2, container), two personas (TUI-first, VS Code-primary) |
-| `docs/design/dotfiles-review-fixes.md` | All fixes from adversarial reviews: alias changes, keybind fixes, cheatsheet, UX improvements, markdownlint-cli2, gcloud, codeql, verification strategy |
+| shell.md | Bash config, aliases, completions, platform guards, notifications, .inputrc |
+| terminal.md | Kitty, tmux, starship |
+| git.md | .gitconfig, .gitignore_global, delta, lazygit, conventional commits |
+| editor-neovim.md | LazyVim, LSP, formatters, linters, integrations |
+| editor-vscode.md | VS Code settings, extensions, remote backends, two personas |
+| languages.md | mise, uv, direnv, prek, per-language quality tools, markdownlint-cli2 |
+| opencode.md | OpenCode config, tui.jsonc, instruction files, critique |
+| container.md | Podman + Wolfi, Containerfile, dev script, mounts, security |
+| install.md | install-macos.sh, install-wsl.sh, tools.txt, Brewfile, verification |
+| security.md | OpenCode permissions, credentials, .gitignore_global, container hardening |
+| cheatsheet-spec.md | Cheatsheet design, cheat function, PDF generation |
 
----
+## Key constraints (MUST NOT violate)
 
-## Key constraints
-
-### Must not violate these
-
-- **GitHub Copilot only** as the AI provider for OpenCode. No direct
-  Anthropic API, no Vertex AI, no OpenRouter. The model string format
-  is `github-copilot/<model>`. Credentials are managed by
-  `opencode auth login` and stored in `~/.local/share/opencode/auth.json`.
-  Never hardcode tokens in config files.
-
-- **No secrets in dotfiles**. All credentials come from environment
-  variables, `gh auth token`, or tool-managed credential stores.
-  `.gitignore` must cover all common secret file patterns.
-
-- **Defensive OpenCode permissions**. The global default is `"*": "ask"`.
-  Specific safe patterns are explicitly allowed. `rm -rf *`, `sudo *`,
-  and `chmod 777 *` are explicitly denied. See `opencode.jsonc`.
-
-- **vim keybindings everywhere possible**. The single scheme investment
-  transfers across lazygit, btop, lnav, tmux copy mode, Neovim, and
-  the shell. The only hardcoded exception is the OpenCode input area,
-  which uses emacs-style bindings that cannot be changed.
-
-- **No `require('lspconfig')` in Neovim config**. Use `vim.lsp.config`
-  and `vim.lsp.enable` (Neovim 0.11+ native API). nvim-lspconfig is
-  still a dependency for its server definitions, but the old setup{}
-  pattern is deprecated.
-
-- **ty is not installed via Mason**. It is installed via
-  `uv tool install ty@latest`. Do not add it to Mason's
-  `ensure_installed` list.
-
-- **prek is not on Homebrew**. It is installed via `uv tool install prek`.
-
-- **pinact is managed via mise**, not Homebrew. See `~/.config/mise/config.toml`.
-
-### Strongly preferred
-
-- Single binary / Rust-native tools preferred over Python/Node wrappers
-  where equivalent quality exists (e.g. delta over diff-highlight,
-  fd over find, rg over grep, zoxide over autojump, prek over pre-commit).
-
-- Aliases follow a prefix scheme: `g*` for git, `f*` for search,
-  `p*` for process/ports, `t*` for tmux, `pk*` for prek, `uv*` for uv,
-  `m*` for mise, `cr*` for critique, `gha-*` for GitHub Actions tooling.
-  New aliases should follow this scheme.
-
-- Config files use JSONC (JSON with comments) where the tool supports it.
-  Comments explain non-obvious decisions, especially permission rules.
-
----
+- GitHub Copilot only as AI provider for OpenCode. Model format `github-copilot/<model>`. Credentials managed by `opencode auth login`. MUST NOT hardcode tokens.
+- No secrets in dotfiles. All credentials from env vars, `gh auth token`, or tool-managed stores. `.gitignore` MUST cover common secret patterns.
+- Defensive OpenCode permissions. Global default `"*": "ask"`. Read scoped to workspace + tmp + specific config paths. `rm -rf *`, `sudo *`, `chmod 777 *` explicitly denied.
+- vim keybindings everywhere possible. One scheme across lazygit, btop, lnav, tmux copy mode, Neovim, shell. Exception: OpenCode input area (hardcoded emacs).
+- No `require('lspconfig')` in Neovim config. Use `vim.lsp.config` / `vim.lsp.enable`. nvim-lspconfig is a dependency for server definitions only.
+- ty installed via `uv tool install ty@latest`, NOT Mason.
+- prek installed via `uv tool install prek`, NOT Homebrew.
+- pinact installed via Homebrew.
+- Single-binary / Rust-native tools SHOULD be preferred over Python/Node wrappers.
+- Aliases MUST follow prefix scheme: g* git, f* search, p* process, t* tmux, pk* prek, uv* uv, m* mise, cr* critique, gha-* GitHub Actions, gc/gcp/gcl/gca/gcr/gce/gke/gsq gcloud, cql* codeql.
+- Config files SHOULD use JSONC where supported. Comments MUST explain non-obvious decisions.
 
 ## OS targets
 
 Three platforms, one set of configs:
+- macOS (Apple Silicon, Homebrew — prefix detected dynamically)
+- WSL2 (Ubuntu on Windows 11, Kitty via WSLg primary, Windows Terminal fallback)
+- Container (Wolfi Linux under Podman, accessed via `dev shell`)
 
-- **macOS** (Apple Silicon, Homebrew). Bash 5 via Homebrew. Kitty
-  terminal emulator. Starship prompt. Homebrew prefix detected
-  dynamically (not hardcoded to `/opt/homebrew`).
-- **WSL2** (Ubuntu on Windows 11). Kitty via WSLg (primary), Windows
-  Terminal (fallback). Tools via apt + install scripts.
-- **Container** (Wolfi Linux under Podman). Accessed via `dev shell`.
-  See `dotfiles-container.md` and `dotfiles-cross-platform.md`.
+## Architecture decisions (brief summaries pointing to detailed docs)
 
----
+- Version management: mise (see languages.md)
+- Python toolchain: full Astral stack — mise + uv + ruff + ty (see languages.md)
+- Neovim: LazyVim distribution (see editor-neovim.md)
+- GitHub Actions LSP scoping: yaml.github filetype (see editor-neovim.md)
+- zizmor vs pinact: zizmor = blocking gate, pinact = interactive authoring (see languages.md)
+- tmux clipboard: OSC 52 everywhere, no pbcopy (see terminal.md)
+- Container: AI agent sandbox primary, team dev env secondary (see container.md)
+- Notifications: OSC 9 escape sequences, no terminal-notifier (see shell.md)
+- Editor: conditional — nvim if present, code --wait fallback (see shell.md)
 
-## Architecture decisions
+## Deferred — do not implement without new design document
 
-### Version management: mise
+- Proxy-based allowlist and audit (mitmproxy + cntlm)
+- Shell startup caching (measure first with `time bash -ic exit`)
+- Shell history sync across machines
+- sops + age secrets management
 
-mise manages Python, Go, and pinact versions. It replaces pyenv and
-goenv. The global config is at `~/.config/mise/config.toml`. Each repo
-gets a `.mise.toml` pinning its language versions.
+## What to ask about vs fill in
 
-`auto_install = true` is set globally so mise installs missing tools
-when entering a directory with a `.mise.toml`.
+Ask: exact Copilot model strings, tool versions, DB-specific infrastructure, experimental OpenCode features.
+Fill in: LazyVim bootstrap init.lua (from starter repo), lazy.nvim plugin specs, Mason tool names, prek hook revisions.
+Do not invent: API keys/tokens/credentials, GitHub org names/repo names/Enterprise URLs, DB-internal config, behaviour not in design docs.
 
-### Python toolchain: full Astral stack
-
-- **mise** manages the Python interpreter version
-- **uv** manages packages, virtual environments, and globally installed tools
-- **ruff** handles linting and formatting (replaces flake8, black, isort)
-- **ty** handles type checking and LSP (replaces pyright/basedpyright)
-
-ty is in beta as of April 2026. It is the chosen type checker. If it
-causes persistent problems on a repo, the fallback is
-`vim.g.lazyvim_python_lsp = "basedpyright"` in Neovim and installing
-basedpyright via Mason.
-
-### Neovim: LazyVim distribution
-
-LazyVim is the chosen starting point, not a hand-rolled config. The
-config in `lua/plugins/` overrides and extends LazyVim defaults rather
-than replacing them. Do not fight LazyVim's defaults — extend them.
-
-The Python LSP is switched from basedpyright to ty via the single global:
-`vim.g.lazyvim_python_lsp = "ty"` in `lua/plugins/lsp.lua`.
-
-### GitHub Actions LSP scoping
-
-The GitHub Actions Language Server (`gh_actions_ls`) must only activate
-on workflow and composite action files — not on all YAML. This is
-achieved by:
-
-1. Defining a custom `yaml.github` filetype in `lua/config/autocmds.lua`
-   using `vim.filetype.add()` with path-based Lua patterns
-2. Configuring `gh_actions_ls` with `filetypes = { "yaml.github" }`
-3. Configuring `yamlls` with `filetypes = { "yaml" }` (explicitly
-   excludes `yaml.github`)
-
-The patterns cover:
-- `.github/workflows/*.yml` / `.yaml`
-- `.github/actions/<name>/action.yml` / `.yaml`
-- Root-level `action.yml` / `action.yaml` (standalone action repos)
-
-Root-level action files are matched by filename only, which may produce
-false positives in repos with unrelated `action.yml` files. The escape
-hatch is a modeline: `# vim: ft=yaml`
-
-### zizmor vs pinact division of labour
-
-- **zizmor** runs as a prek hook (blocking gate at commit time) and as
-  an nvim-lint linter (inline diagnostics while editing). It enforces
-  both security issues and SHA pinning via its `unpinned-uses` rule.
-- **pinact** is an interactive tool for pinning actions when authoring
-  workflows. It requires a `GITHUB_TOKEN` to resolve SHAs and is not
-  suitable as a blocking commit hook.
-
-The workflow is: `gha-pin` (pinact) to pin while authoring, then zizmor
-catches anything missed at commit time.
-
-### tmux clipboard
-
-`pbcopy` is macOS-only. tmux is configured with `set-clipboard on` to
-forward OSC 52 sequences to Kitty, which writes to the macOS clipboard.
-This is the mechanism that will also work in the future container variant.
-
-### OpenCode `/tmp` access
-
-`$TMPDIR` on macOS resolves to a session-specific path under
-`/private/var/folders/...` and cannot be referenced by environment
-variable name in OpenCode permission patterns (only `~` and `$HOME`
-expansion is supported).
-
-`/tmp` is used instead — it is a stable symlink to `/private/tmp` on
-macOS. The `external_directory` permission allows `/tmp/**`. The
-`scratch-dirs.md` instruction file tells the agent to prefer `/tmp`.
-
-There is a known upstream bug (opencode issue #20045) where `edit`
-permissions use relative paths internally while `external_directory`
-uses absolute paths, meaning an `edit` allow rule for `/tmp/**` may
-not match. Agent writes to `/tmp` typically go via `bash` commands
-rather than the edit tool directly, so this is unlikely to cause
-friction in practice.
-
----
-
-## What is deferred / not yet designed
-
-Now designed and ready to implement:
-
-- **vhs, freeze, asciinema** — terminal recording tools. Add to
-  Brewfile (freeze via `charmbracelet/tap`). No config files needed.
-- **k9s, kubectl, kubectx** — Kubernetes tools. Add to Brewfile.
-- **tenv** — Terraform version manager. Add to Brewfile. Note:
-  conflicts with `atmos` in Homebrew (both install `atmos` binary).
-- **tf-summarize** — Terraform plan formatter. Add to Brewfile.
-  Alias: `tfsum`. Uses `-v` for version (not `--version`).
-- **lazydocker** — Container TUI. Add to Brewfile. Alias: `lzd`.
-- **Podman / Wolfi container** — see `dotfiles-container.md`.
-- **Cross-platform (macOS + WSL2)** — see `dotfiles-cross-platform.md`.
-- **Notifications** — OSC 9 replaces terminal-notifier. See
-  `dotfiles-cross-platform.md`.
-- **Cheatsheet** — key bindings + tool reference. See
-  `dotfiles-review-fixes.md`.
-
-Still deferred — do not implement without a new design document:
-
-- **Proxy-based allowlist and audit** — mitmproxy + cntlm for
-  credential injection, destination allowlisting, and traffic audit
-  from containers. Significant infrastructure; design separately.
-- **Shell startup caching** — eval output caching for faster shell
-  startup. Measure actual latency first (`time bash -ic exit`).
-- **Shell history sync across machines** — evaluated and skipped.
-  Re-evaluate if multi-machine workflow becomes a need.
-- **sops + age** — secrets management. Not included in this iteration.
-
----
-
-## What to ask about vs what to fill in
-
-### Ask the user before deciding
-
-- Exact model strings for GitHub Copilot (verify with
-  `opencode models list | grep copilot` after auth)
-- Specific tool versions in the Brewfile (prefer `latest` / no version
-  pin for Homebrew formulae unless there is a known compatibility issue)
-- Any config that touches DB-specific infrastructure (Terraform workspaces,
-  GCP project IDs, GitHub Enterprise endpoint URLs)
-- Whether to enable experimental OpenCode features
-  (`OPENCODE_EXPERIMENTAL_LSP_TOOL`)
-
-### Fill in from upstream documentation
-
-- LazyVim bootstrap `init.lua` — copy from
-  https://github.com/LazyVim/starter verbatim
-- Exact lazy.nvim plugin specs — follow LazyVim conventions
-- Mason tool names — verify against `:Mason` search or
-  https://mason-registry.dev
-- prek hook revisions — run `prek autoupdate` after initial install
-  rather than hardcoding versions
-
-### Do not invent
-
-- API keys, tokens, or credentials of any kind
-- GitHub organisation names, repo names, or Enterprise URLs
-- DB-internal configuration or compliance-specific settings
-- Behaviour not described in the design documents
-
----
-
-## Repo structure (target)
+## Repo structure
 
 ```
 macos-dev/
-├── README.md                        # index + team onboarding
-├── Brewfile                         # all Homebrew installs
-├── tools.txt                        # shared tool manifest
-├── install-macos.sh                 # macOS install + symlinks
-├── install-wsl.sh                   # WSL2 Ubuntu install + symlinks
+├── README.md
+├── Brewfile
+├── tools.txt
+├── install-macos.sh
+├── install-wsl.sh
 ├── .gitignore
-│
 ├── docs/
-│   ├── cheatsheet.md                # key bindings + tool reference
-│   └── design/                      # design documents
+│   ├── cheatsheet.md
+│   └── design/
 │       ├── DESIGN.md
-│       ├── dotfiles-setup.md
-│       ├── dotfiles-opencode-critique.md
-│       ├── dotfiles-language-ecosystem.md
-│       ├── dotfiles-neovim.md
-│       ├── dotfiles-container.md
-│       ├── dotfiles-cross-platform.md
-│       ├── dotfiles-vscode.md
-│       └── dotfiles-review-fixes.md
-│
+│       ├── shell.md
+│       ├── terminal.md
+│       ├── git.md
+│       ├── editor-neovim.md
+│       ├── editor-vscode.md
+│       ├── languages.md
+│       ├── opencode.md
+│       ├── container.md
+│       ├── install.md
+│       ├── security.md
+│       └── cheatsheet-spec.md
 ├── bash/
 │   ├── .bash_profile
 │   ├── .bashrc
 │   ├── .bash_aliases
 │   └── .inputrc
-│
 ├── git/
 │   ├── .gitconfig
 │   └── .gitignore_global
-│
 ├── kitty/
 │   └── kitty.conf
-│
 ├── tmux/
 │   └── .tmux.conf
-│
 ├── starship/
 │   └── starship.toml
-│
 ├── lazygit/
 │   └── config.yml
-│
 ├── opencode/
 │   ├── opencode.jsonc
 │   ├── tui.jsonc
 │   └── instructions/
 │       ├── git-conventions.md
 │       └── scratch-dirs.md
-│
 ├── mise/
 │   └── config.toml
-│
 ├── nvim/
-│   ├── init.lua                     # LazyVim bootstrap
-│   ├── lazy-lock.json               # generated; commit for reproducibility
+│   ├── init.lua
+│   ├── lazy-lock.json
 │   └── lua/
 │       ├── config/
 │       │   ├── options.lua
@@ -326,115 +136,39 @@ macos-dev/
 │           ├── formatting.lua
 │           ├── linting.lua
 │           └── integrations.lua
-│
 ├── prek/
-│   └── .pre-commit-config.yaml      # team baseline template
-│
+│   └── .pre-commit-config.yaml
 ├── vscode/
-│   ├── settings.json                # user settings template
-│   └── extensions.json              # recommended extensions
-│
+│   ├── settings.json
+│   └── extensions.json
 ├── container/
-│   ├── Containerfile                # multi-stage (base + full)
-│   ├── dev.sh                       # lifecycle management script
-│   ├── dev.env.example              # env var template
-│   ├── test-tool-installs.sh        # tool verification script
+│   ├── Containerfile
+│   ├── dev.sh
+│   ├── dev.env.example
+│   ├── test-tool-installs.sh
 │   └── .dockerignore
-│
 └── scripts/
-    ├── verify.sh                    # post-install verification
-    ├── check-configs.sh             # config parse validation
-    └── check-tool-manifest.sh       # tools.txt drift detection
+    ├── verify.sh
+    ├── check-configs.sh
+    └── check-tool-manifest.sh
 ```
-
----
 
 ## Implementation order
 
-When implementing from scratch, follow this order to avoid dependency
-issues:
-
-1. `.gitignore`, `tools.txt`, and `Brewfile`
-2. `install-macos.sh` and `install-wsl.sh`
-3. `bash/` — `.bash_profile`, `.bashrc`, `.bash_aliases`, `.inputrc`
-4. `git/` — `.gitconfig`, `.gitignore_global`
-5. `kitty/kitty.conf`
-6. `tmux/.tmux.conf`
-7. `starship/starship.toml`
-8. `lazygit/config.yml`
-9. `mise/config.toml`
-10. `opencode/` — all files
-11. `nvim/` — init.lua bootstrap first, then lua/ files
-12. `prek/.pre-commit-config.yaml`
-13. `vscode/` — settings.json, extensions.json
-14. `container/` — Containerfile, dev.sh, dev.env.example, .dockerignore
-15. `scripts/` — verify.sh, check-configs.sh, check-tool-manifest.sh
-16. `docs/cheatsheet.md`
-17. `README.md` — after everything else exists
-
----
-
-## Relationship between documents
-
-```
-dotfiles-setup.md
-  └── establishes: bash, git, kitty, tmux, starship, lazygit,
-                   core CLI tools, alias scheme, keybinding scheme
-
-dotfiles-opencode-critique.md
-  ├── extends: bash aliases (adds cr*, crs functions)
-  ├── extends: tmux (OSC 52 clipboard note)
-  └── adds: opencode/, tui.jsonc, instruction files
-
-dotfiles-language-ecosystem.md
-  ├── extends: bash aliases (adds uv*, mx, pk*, gha-*, da, dr)
-  ├── extends: Brewfile (language tools)
-  └── adds: mise/, prek/, direnv hook in .bashrc
-
-dotfiles-neovim.md
-  ├── extends: bash (sets $EDITOR=nvim, $MANPAGER)
-  ├── extends: bash aliases (adds v, vd)
-  ├── extends: tmux (adds vim-tmux-navigator bindings)
-  ├── extends: Brewfile (neovim, node)
-  └── adds: nvim/
-
-dotfiles-container.md
-  ├── extends: Brewfile (adds podman)
-  ├── extends: mount strategy (adds gcloud, codeql read-only mounts)
-  └── adds: container/ (Containerfile, dev.sh, dev.env.example)
-
-dotfiles-cross-platform.md
-  ├── modifies: bash (.bashrc platform guards, guarded evals,
-  │             OSC 9 notifications, conditional EDITOR/MANPAGER,
-  │             bun PATH, bashrc.local sourcing)
-  ├── modifies: bash aliases (conditional ports/port)
-  ├── modifies: tmux (OSC 52 only, no pbcopy)
-  ├── modifies: git (removes editor from .gitconfig)
-  ├── modifies: Brewfile (adds gcloud, cloud-sql-proxy, codeql,
-  │             markdownlint-cli2, pandoc, typst, VS Code cask)
-  ├── renames: install.sh → install-macos.sh
-  └── adds: install-wsl.sh, tools.txt
-
-dotfiles-vscode.md
-  ├── extends: Brewfile (adds VS Code cask)
-  └── adds: vscode/ (settings.json, extensions.json)
-
-dotfiles-review-fixes.md  (PRECEDENCE: wins over all earlier docs)
-  ├── fixes: nvim lsp.lua (syntax error, lspconfig.util removal)
-  ├── modifies: bash aliases (fd→fdd, removes shadows, lg not gl,
-  │             adds aliases function, adds gcloud/codeql aliases)
-  ├── modifies: bash (.bashrc ordering, PROMPT_COMMAND guard,
-  │             completions for mise/uv/cog/git-cliff)
-  ├── modifies: lazygit (delta syntax-theme)
-  ├── modifies: starship (adds golang + rust modules)
-  ├── modifies: nvim linting (adds markdownlint-cli2)
-  ├── modifies: nvim formatting (adds markdownlint-cli2)
-  ├── modifies: nvim integrations (fzf-lua zoxide picker, fzf_opts
-  │             isolation, mnemonic swap fs↔fw)
-  ├── modifies: opencode tui.jsonc (removes ctrl+u/d collision)
-  ├── modifies: tmux (Ctrl+L workaround)
-  ├── modifies: gitconfig (camelCase excludesFile, stash showPatch)
-  ├── modifies: prek config (adds markdownlint-cli2 hook)
-  ├── modifies: install scripts (backup, .inputrc, gcloud components)
-  └── adds: docs/cheatsheet.md, vscode/, scripts/, verify.sh
-```
+1. .gitignore, tools.txt, Brewfile
+2. install-macos.sh, install-wsl.sh
+3. bash/ (.bash_profile, .bashrc, .bash_aliases, .inputrc)
+4. git/ (.gitconfig, .gitignore_global)
+5. kitty/kitty.conf
+6. tmux/.tmux.conf
+7. starship/starship.toml
+8. lazygit/config.yml
+9. mise/config.toml
+10. opencode/ (all files)
+11. nvim/ (init.lua first, then lua/)
+12. prek/.pre-commit-config.yaml
+13. vscode/ (settings.json, extensions.json)
+14. container/ (Containerfile, dev.sh, dev.env.example, .dockerignore)
+15. scripts/ (verify.sh, check-configs.sh, check-tool-manifest.sh)
+16. docs/cheatsheet.md
+17. README.md
