@@ -6,12 +6,17 @@ set -uo pipefail
 # Usage:
 #   bash test-tool-installs.sh              # test all tools
 #   bash test-tool-installs.sh --install    # install missing tools first, then test
+#   bash test-tool-installs.sh --diagnose   # reinstall + verbose diagnostics for failures
 #
 # Output: pass/fail for each tool with the method used to install it.
 # Tools that fail the no-op run are likely blocked by binary signature policy.
 
 INSTALL=false
-[[ "${1:-}" == "--install" ]] && INSTALL=true
+DIAGNOSE=false
+case "${1:-}" in
+  --install)  INSTALL=true ;;
+  --diagnose) INSTALL=true; DIAGNOSE=true ;;
+esac
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -23,6 +28,7 @@ FAIL=0
 SKIP=0
 
 results=()
+diagnostics=()
 
 check_tool() {
   local name="$1"
@@ -64,17 +70,64 @@ check_tool() {
 
   # Test
   if ! command -v "$name" &>/dev/null; then
+    if $DIAGNOSE; then
+      diagnostics+=("")
+      diagnostics+=("── SKIP: $name ──────────────────────────────")
+      diagnostics+=("  Binary '$name' not found on PATH")
+      diagnostics+=("  PATH: $PATH")
+      # Check if brew knows about it
+      local brew_info
+      if brew_info=$(brew info "$brew_name" 2>&1); then
+        diagnostics+=("  brew info $brew_name:")
+        diagnostics+=("$(echo "$brew_info" | head -5 | sed 's/^/    /')")
+      fi
+      # Check brew prefix for actual binary names
+      local prefix
+      if prefix=$(brew --prefix "$brew_name" 2>/dev/null) && [[ -d "$prefix" ]]; then
+        diagnostics+=("  brew prefix: $prefix")
+        if [[ -d "$prefix/bin" ]]; then
+          diagnostics+=("  binaries in $prefix/bin/:")
+          diagnostics+=("$(ls -la "$prefix/bin/" 2>/dev/null | sed 's/^/    /')")
+        else
+          diagnostics+=("  no bin/ directory in prefix")
+        fi
+        # Check if linked
+        local linked
+        linked=$(brew list "$brew_name" 2>/dev/null | head -10)
+        if [[ -n "$linked" ]]; then
+          diagnostics+=("  brew list $brew_name (first 10 files):")
+          diagnostics+=("$(echo "$linked" | head -10 | sed 's/^/    /')")
+        fi
+      fi
+    fi
     results+=("$(printf "${YELLOW}SKIP${RESET}  %-20s  not installed (%s)" "$name" "$install_method")")
     ((SKIP++))
     return
   fi
 
-  local version_output
+  local binary_path version_output
+  binary_path=$(command -v "$name")
+
   if version_output=$(eval "$test_cmd" 2>&1); then
     version_output=$(echo "$version_output" | head -1 | sed 's/^[[:space:]]*//')
     results+=("$(printf "${GREEN}PASS${RESET}  %-20s  %-14s  %s" "$name" "$install_method" "$version_output")")
     ((PASS++))
   else
+    if $DIAGNOSE; then
+      diagnostics+=("")
+      diagnostics+=("── FAIL: $name ──────────────────────────────")
+      diagnostics+=("  binary path: $binary_path")
+      diagnostics+=("  file type:   $(file "$binary_path" 2>&1)")
+      diagnostics+=("  code sign:   $(codesign -dv "$binary_path" 2>&1 || true)")
+      diagnostics+=("  test cmd:    $test_cmd")
+      diagnostics+=("  stderr:")
+      diagnostics+=("$(eval "$test_cmd" 2>&1 | sed 's/^/    /')")
+      # Check if it's a Homebrew bottle or source build
+      local install_receipt
+      install_receipt=$(brew info --json=v2 "$brew_name" 2>/dev/null \
+        | jq -r '.formulae[0].installed[0].built_as_bottle // "unknown"' 2>/dev/null)
+      diagnostics+=("  installed as bottle: $install_receipt")
+    fi
     results+=("$(printf "${RED}FAIL${RESET}  %-20s  %-14s  (binary may be blocked)" "$name" "$install_method")")
     ((FAIL++))
   fi
@@ -217,15 +270,32 @@ echo "============================================"
 printf "  ${GREEN}PASS: %d${RESET}  ${RED}FAIL: %d${RESET}  ${YELLOW}SKIP: %d${RESET}\n" "$PASS" "$FAIL" "$SKIP"
 echo "============================================"
 
-if (( FAIL > 0 )); then
+if (( FAIL > 0 || SKIP > 0 )); then
   echo ""
-  echo "Failed tools may be blocked by binary signature policy."
-  echo "For each FAIL, try: brew install --build-from-source <formula>"
-  echo "If that also fails, the tool needs a local toolchain (Rust/Go/etc)."
-  echo ""
-  echo "Required toolchains for source builds:"
-  echo "  - Xcode CLT:  xcode-select --install"
-  echo "  - Rust:        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
-  echo "  - Go:          mise install go@latest (already in dotfiles)"
+  if (( FAIL > 0 )); then
+    echo "Failed tools may be blocked by binary signature policy."
+    echo "For each FAIL, try: brew install --build-from-source <formula>"
+    echo "If that also fails, the tool needs a local toolchain (Rust/Go/etc)."
+    echo ""
+    echo "Required toolchains for source builds:"
+    echo "  - Xcode CLT:  xcode-select --install"
+    echo "  - Rust:        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+    echo "  - Go:          mise install go@latest (already in dotfiles)"
+  fi
+
+  if $DIAGNOSE && (( ${#diagnostics[@]} > 0 )); then
+    echo ""
+    echo "============================================"
+    echo "  Diagnostics"
+    echo "============================================"
+    for d in "${diagnostics[@]}"; do
+      echo -e "$d"
+    done
+  elif (( FAIL > 0 || SKIP > 0 )); then
+    echo ""
+    echo "Re-run with --diagnose for detailed failure/skip diagnostics:"
+    echo "  bash $0 --diagnose"
+  fi
+
   exit 1
 fi
