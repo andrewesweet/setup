@@ -238,12 +238,12 @@ check_tool "podman"            "brew"       "podman --version"
 # ── Terraform extras ─────────────────────────────────────────────────────────
 echo "── Terraform extras ──"
 check_tool "tenv"              "brew"       "tenv --version"
-check_tool "tf-summarize"      "brew"       "tf-summarize --version"
+check_tool "tf-summarize"      "brew"       "tf-summarize -v"
 
 # ── Terminal recording ───────────────────────────────────────────────────────
 echo "── Terminal recording ──"
 check_tool "vhs"               "brew"       "vhs --version"
-check_tool "freeze"            "brew"       "freeze --version"
+check_tool "freeze"            "brew"       "freeze --version"         "charmbracelet/tap/freeze"
 check_tool "asciinema"         "brew"       "asciinema --version"
 
 # ── OpenCode + critique ──────────────────────────────────────────────────────
