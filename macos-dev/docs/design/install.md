@@ -61,7 +61,6 @@ brew "uv"
 # Go quality
 brew "golangci-lint"
 brew "gofumpt"
-brew "goimports"
 
 # Bash quality
 brew "shellcheck"
@@ -111,8 +110,6 @@ brew "neovim"
 # direnv
 brew "direnv"
 
-**Note on node:** Node is managed via mise (`nodejs = "lts"` in global config) to avoid PATH conflicts with Homebrew.
-
 # Taps
 tap "charmbracelet/tap"
 brew "charmbracelet/tap/freeze"
@@ -121,6 +118,8 @@ brew "charmbracelet/tap/freeze"
 cask "visual-studio-code"
 ```
 
+**Note on node:** Node.js is managed via mise (`nodejs = "lts"` in global config). MUST NOT be installed via Homebrew to avoid PATH conflicts.
+
 ### Brewfile Requirements
 
 The Brewfile MUST satisfy the following requirements:
@@ -128,6 +127,7 @@ The Brewfile MUST satisfy the following requirements:
 - `tap "homebrew/bundle"` MUST NOT be included (deprecated since Homebrew 4.x)
 - tenv conflicts with atmos in Homebrew. If atmos is present, unlink it first.
 - tf-summarize uses `-v` for version (not `--version`)
+- goimports is installed via `go install golang.org/x/tools/cmd/goimports@latest` or via Mason in Neovim. It has no standalone Homebrew formula.
 
 ## install-macos.sh
 

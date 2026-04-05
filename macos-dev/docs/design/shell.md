@@ -2,12 +2,6 @@
 
 This is the consolidated bash config specification. All platform guards, all aliases, all completions, all evals — in one place. No contradictions. Self-consistent.
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY",
-and "OPTIONAL" in these documents are to be interpreted as described
-in BCP 14 [RFC 2119] [RFC 8174] when, and only when, they appear in
-all capitals, as shown here.
-
 ## Platform detection
 
 All platform-conditional logic MUST use this guard:
@@ -69,8 +63,8 @@ if [[ $_OS == macos ]]; then
   export PATH="$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
 fi
 
-# DOTFILES — set by install script (install-macos.sh or install-wsl.sh MUST set this)
-export DOTFILES="${DOTFILES:-}"
+# Set by install script. Defaults to script's own directory.
+export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 
 # ~/.bun/bin (Node.js toolchain)
 [[ -d "$HOME/.bun/bin" ]] && export PATH="$HOME/.bun/bin:$PATH"
@@ -406,8 +400,10 @@ alias pk='prek run'
 alias pka='prek run --all-files'
 alias pkl='prek list'
 alias pki='prek install && prek install-hooks'
-alias pku='prek autoupdate --cooldown-days 7'
+alias pku='prek autoupdate'
 ```
+
+**Note on pku:** The `--cooldown-days` flag is from Python pre-commit and MAY not be supported by prek. Verify against prek CLI at implementation time.
 
 ### GCP — prefix: gc (REQUIRED)
 

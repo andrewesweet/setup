@@ -4,7 +4,7 @@
 
 LazyVim is the chosen starting point. Config in `lua/plugins/` MUST override and extend LazyVim defaults. Configuration MUST NOT fight LazyVim defaults — extend them.
 
-**Note on node:** Node SHOULD be managed via mise global config (`nodejs = "lts"`) rather than Homebrew to avoid PATH conflicts. The Brewfile entry for `node` exists for other tools that may depend on it; however, the primary node toolchain is managed by mise.
+**Note on node:** Node SHOULD be managed via mise global config (`nodejs = "lts"`) rather than Homebrew to avoid PATH conflicts. Mason LSP servers that need node use mise-managed node.
 
 ## init.lua
 
@@ -168,7 +168,7 @@ return {
   {
     "stevearc/conform.nvim",
     opts = {
-      format_on_save = { timeout_ms = 500, lsp_fallback = true },
+      format_on_save = { timeout_ms = 500, lsp_format = "fallback" }, -- conform v5+: renamed from lsp_fallback
       formatters_by_ft = {
         sh   = { "shfmt" },
         bash = { "shfmt" },

@@ -197,7 +197,7 @@ check_tool "uv"                "brew"       "uv --version"
 # ── Neovim ───────────────────────────────────────────────────────────────────
 echo "── Neovim ──"
 check_tool "nvim"              "brew"       "nvim --version"           "neovim"
-check_tool "node"              "brew"       "node --version"
+check_tool "node"              "mise"       "node --version"           "nodejs@lts"
 
 # ── Python quality ───────────────────────────────────────────────────────────
 echo "── Python quality (uv tools) ──"

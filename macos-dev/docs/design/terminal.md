@@ -274,6 +274,7 @@ format = "[ $version](cyan) "
 
 ```toml
 [kubernetes]
+disabled = false
 format = "[⎈ $context](blue) "
 ```
 

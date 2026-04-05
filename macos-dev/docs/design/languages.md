@@ -14,7 +14,7 @@ python = "3.13"
 go     = "1.24"
 
 [settings]
-auto_install = true
+auto_install = false # Interactive machines: false. CI: override to true.
 ```
 
 Per-project `.mise.toml` files MUST be provided as a template with versions adjusted per repository.
@@ -40,6 +40,8 @@ direnv MUST be included in Brewfile as `brew "direnv"`.
 Typical .envrc patterns MUST support: `source .venv/bin/activate`, environment variables, and GOPATH.
 
 `direnv allow` MUST be executed once per new or changed .envrc.
+
+**SECURITY WARNING:** Users MUST inspect `.envrc` content before running `direnv allow` on untrusted or unfamiliar repositories. A malicious `.envrc` can execute arbitrary commands.
 
 ## pinact — pin GitHub Actions to SHAs
 

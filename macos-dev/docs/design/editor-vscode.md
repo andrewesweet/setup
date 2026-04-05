@@ -96,7 +96,7 @@ The following settings MUST be applied to the VS Code user configuration:
   },
 
   // ── Git ───────────────────────────────────────────────────────────
-  "git.autofetch": true,
+  "git.autofetch": false, // Manual fetch preferred — avoids silent credential use on timer
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
   "diffEditor.renderSideBySide": true,
@@ -266,6 +266,8 @@ Use .devcontainer/devcontainer.json for standalone container creation.
     // This approach is more secure and aligns with container.md SSH strategy.
     // The SSH_AUTH_SOCK environment variable will be forwarded automatically by Dev Containers.
     "source=${localEnv:HOME}/.config/gh,target=/home/dev/.config/gh,type=bind",
+    // Note: Symlink resolution MAY differ between Docker and Podman rootless.
+    // If mount issues arise, mount the git/ directory instead of the symlink target.
     "source=${localEnv:HOME}/.gitconfig,target=/home/dev/.gitconfig,type=bind,readonly"
   ],
   "remoteUser": "dev",
