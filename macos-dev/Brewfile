@@ -1,0 +1,122 @@
+# Brewfile — reproducible Homebrew installs for macOS
+# Usage: brew bundle --file=Brewfile
+#
+# Validated against tools.txt by scripts/check-tool-manifest.sh.
+# Keep categories in sync with tools.txt section headers.
+
+# ── Shell ────────────────────────────────────────────────────────────────────
+brew "bash"
+brew "bash-completion@2"
+brew "starship"
+
+# ── Git core ─────────────────────────────────────────────────────────────────
+brew "git"
+brew "git-delta"
+brew "difftastic"
+brew "lazygit"
+brew "git-cliff"
+brew "cocogitto"
+brew "gh"
+
+# ── Navigation & search ──────────────────────────────────────────────────────
+brew "fzf"
+brew "zoxide"
+brew "fd"
+brew "ripgrep"
+
+# ── File viewing ─────────────────────────────────────────────────────────────
+brew "bat"
+brew "glow"
+brew "lnav"
+
+# ── Process monitoring ───────────────────────────────────────────────────────
+brew "btop"
+
+# ── Terminal multiplexer ─────────────────────────────────────────────────────
+brew "tmux"
+
+# ── Data wrangling ───────────────────────────────────────────────────────────
+brew "jq"
+brew "yq"
+brew "miller"
+brew "httpie"
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+brew "tree"
+brew "wget"
+brew "pandoc"
+brew "typst"
+
+# ── Version management ───────────────────────────────────────────────────────
+brew "mise"
+
+# ── Python ───────────────────────────────────────────────────────────────────
+brew "uv"
+
+# ── Go quality ───────────────────────────────────────────────────────────────
+# Note: goimports is NOT a Homebrew formula. It is installed via
+#   go install golang.org/x/tools/cmd/goimports@latest
+# or via Mason in Neovim.
+brew "golangci-lint"
+brew "gofumpt"
+
+# ── Bash quality ─────────────────────────────────────────────────────────────
+brew "shellcheck"
+brew "shfmt"
+
+# ── Markdown quality ─────────────────────────────────────────────────────────
+brew "markdownlint-cli2"
+
+# ── Terraform ────────────────────────────────────────────────────────────────
+brew "tflint"
+
+# ── GitHub Actions ───────────────────────────────────────────────────────────
+brew "actionlint"
+brew "zizmor"
+brew "pinact"
+
+# ── Kubernetes ───────────────────────────────────────────────────────────────
+brew "kubernetes-cli"
+brew "k9s"
+brew "kubectx"
+
+# ── Container ────────────────────────────────────────────────────────────────
+brew "podman"
+brew "lazydocker"
+
+# ── Terraform extras ─────────────────────────────────────────────────────────
+# Note: tenv conflicts with atmos. If atmos is present, unlink it first:
+#   brew unlink atmos
+brew "tenv"
+brew "tf-summarize"
+
+# ── Terminal recording ───────────────────────────────────────────────────────
+brew "vhs"
+brew "asciinema"
+
+# ── GCP ──────────────────────────────────────────────────────────────────────
+brew "google-cloud-sdk"
+brew "cloud-sql-proxy"
+
+# ── Security ─────────────────────────────────────────────────────────────────
+brew "codeql"
+
+# ── OpenCode runtime ─────────────────────────────────────────────────────────
+# Bun is used instead of node. OpenCode and critique are installed via
+# `bun install -g opencode-ai critique` by install-macos.sh.
+brew "bun"
+
+# ── Neovim ───────────────────────────────────────────────────────────────────
+# Note: node is intentionally NOT installed via Homebrew. It is managed
+# via mise (nodejs = "lts" in global config) to avoid PATH conflicts.
+brew "neovim"
+
+# ── direnv ───────────────────────────────────────────────────────────────────
+brew "direnv"
+
+# ── Taps ─────────────────────────────────────────────────────────────────────
+tap "charmbracelet/tap"
+brew "charmbracelet/tap/freeze"
+
+# ── VS Code (macOS cask) ─────────────────────────────────────────────────────
+cask "visual-studio-code"
