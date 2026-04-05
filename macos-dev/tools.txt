@@ -1,0 +1,112 @@
+# tools.txt — single source of truth for tool names across platforms
+#
+# Format: <tool>  brew:<formula>  apt:<package>  apk:<package>
+# Use "-" when a platform has no package (install via other means).
+#
+# This file is validated by scripts/check-tool-manifest.sh which
+# checks that every brew formula here matches an entry in Brewfile.
+
+# ── Shell ────────────────────────────────────────────────────────────────────
+bash                 brew:bash                      apt:bash                apk:bash
+bash-completion      brew:bash-completion@2         apt:bash-completion     apk:bash-completion
+starship             brew:starship                  apt:-                   apk:starship
+
+# ── Git core ─────────────────────────────────────────────────────────────────
+git                  brew:git                       apt:git                 apk:git
+delta                brew:git-delta                 apt:-                   apk:delta
+difftastic           brew:difftastic                apt:-                   apk:-
+lazygit              brew:lazygit                   apt:-                   apk:lazygit
+git-cliff            brew:git-cliff                 apt:-                   apk:-
+cocogitto            brew:cocogitto                 apt:-                   apk:-
+gh                   brew:gh                        apt:gh                  apk:github-cli
+
+# ── Navigation & search ──────────────────────────────────────────────────────
+fzf                  brew:fzf                       apt:-                   apk:fzf
+zoxide               brew:zoxide                    apt:-                   apk:zoxide
+fd                   brew:fd                        apt:fd-find             apk:fd
+ripgrep              brew:ripgrep                   apt:ripgrep             apk:ripgrep
+
+# ── File viewing ─────────────────────────────────────────────────────────────
+bat                  brew:bat                       apt:bat                 apk:bat
+glow                 brew:glow                      apt:-                   apk:glow
+lnav                 brew:lnav                      apt:lnav                apk:-
+
+# ── Process monitoring ───────────────────────────────────────────────────────
+btop                 brew:btop                      apt:btop                apk:btop
+
+# ── Terminal multiplexer ─────────────────────────────────────────────────────
+tmux                 brew:tmux                      apt:tmux                apk:tmux
+
+# ── Data wrangling ───────────────────────────────────────────────────────────
+jq                   brew:jq                        apt:jq                  apk:jq
+yq                   brew:yq                        apt:-                   apk:yq
+miller               brew:miller                    apt:miller              apk:-
+httpie               brew:httpie                    apt:httpie              apk:httpie
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+tree                 brew:tree                      apt:tree                apk:tree
+wget                 brew:wget                      apt:wget                apk:wget
+pandoc               brew:pandoc                    apt:pandoc              apk:pandoc
+typst                brew:typst                     apt:-                   apk:typst
+
+# ── Version management ───────────────────────────────────────────────────────
+mise                 brew:mise                      apt:-                   apk:-
+
+# ── Python ───────────────────────────────────────────────────────────────────
+uv                   brew:uv                        apt:-                   apk:uv
+
+# ── Go quality ───────────────────────────────────────────────────────────────
+golangci-lint        brew:golangci-lint             apt:-                   apk:-
+gofumpt              brew:gofumpt                   apt:-                   apk:-
+
+# ── Bash quality ─────────────────────────────────────────────────────────────
+shellcheck           brew:shellcheck                apt:shellcheck          apk:shellcheck
+shfmt                brew:shfmt                     apt:-                   apk:shfmt
+
+# ── Markdown quality ─────────────────────────────────────────────────────────
+markdownlint-cli2    brew:markdownlint-cli2         apt:-                   apk:-
+
+# ── Terraform ────────────────────────────────────────────────────────────────
+tflint               brew:tflint                    apt:-                   apk:-
+
+# ── GitHub Actions ───────────────────────────────────────────────────────────
+actionlint           brew:actionlint                apt:-                   apk:actionlint
+zizmor               brew:zizmor                    apt:-                   apk:-
+pinact               brew:pinact                    apt:-                   apk:-
+
+# ── Kubernetes ───────────────────────────────────────────────────────────────
+kubectl              brew:kubernetes-cli            apt:kubectl             apk:kubectl
+k9s                  brew:k9s                       apt:-                   apk:k9s
+kubectx              brew:kubectx                   apt:-                   apk:-
+
+# ── Container ────────────────────────────────────────────────────────────────
+podman               brew:podman                    apt:podman              apk:podman
+lazydocker           brew:lazydocker                apt:-                   apk:-
+
+# ── Terraform extras ─────────────────────────────────────────────────────────
+tenv                 brew:tenv                      apt:-                   apk:-
+tf-summarize         brew:tf-summarize              apt:-                   apk:-
+
+# ── Terminal recording ───────────────────────────────────────────────────────
+vhs                  brew:vhs                       apt:-                   apk:-
+asciinema            brew:asciinema                 apt:asciinema           apk:asciinema
+freeze               brew:charmbracelet/tap/freeze  apt:-                   apk:-
+
+# ── GCP ──────────────────────────────────────────────────────────────────────
+gcloud               brew:google-cloud-sdk          apt:google-cloud-sdk    apk:-
+cloud-sql-proxy      brew:cloud-sql-proxy           apt:-                   apk:-
+
+# ── Security ─────────────────────────────────────────────────────────────────
+codeql               brew:codeql                    apt:-                   apk:-
+
+# ── OpenCode runtime ─────────────────────────────────────────────────────────
+bun                  brew:bun                       apt:-                   apk:-
+
+# ── Neovim ───────────────────────────────────────────────────────────────────
+nvim                 brew:neovim                    apt:neovim              apk:neovim
+
+# ── direnv ───────────────────────────────────────────────────────────────────
+direnv               brew:direnv                    apt:direnv              apk:direnv
+
+# ── VS Code (macOS only — Windows installs on Windows side for WSL2) ─────────
+code                 brew:visual-studio-code        apt:-                   apk:-
