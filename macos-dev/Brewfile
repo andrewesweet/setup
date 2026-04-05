@@ -101,7 +101,11 @@ brew "asciinema"
 brew "cloud-sql-proxy"
 
 # ── Security ─────────────────────────────────────────────────────────────────
-brew "codeql"
+# codeql is distributed as a Homebrew cask (~3.4GB), not a formula.
+# On fresh installs with a restrictive corporate proxy, the cask download
+# may also fail. If brew bundle errors here, install codeql manually via
+# GitHub releases: https://github.com/github/codeql-cli-binaries/releases
+cask "codeql"
 
 # ── OpenCode runtime ─────────────────────────────────────────────────────────
 # Bun is used instead of node. OpenCode and critique are installed via
