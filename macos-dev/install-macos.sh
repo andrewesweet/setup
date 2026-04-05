@@ -168,10 +168,13 @@ log "HOMEBREW_PREFIX=$HOMEBREW_PREFIX"
 # step, but we include it in the Brewfile (under its tap declaration) instead.
 # `brew bundle` handles tapped formulas correctly, so one step covers both.
 log "running brew bundle"
-if [[ -f "$DOTFILES/Brewfile" ]]; then
-  brew bundle --file="$DOTFILES/Brewfile"
-else
+if [[ ! -f "$DOTFILES/Brewfile" ]]; then
   err "Brewfile not found at $DOTFILES/Brewfile"
+  exit 1
+fi
+if ! brew bundle --file="$DOTFILES/Brewfile"; then
+  err "brew bundle failed — aborting install"
+  err "check the output above for the specific formula that failed"
   exit 1
 fi
 

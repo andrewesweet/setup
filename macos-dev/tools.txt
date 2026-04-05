@@ -58,6 +58,7 @@ uv                   brew:uv                        apt:-                   apk:
 # ── Go quality ───────────────────────────────────────────────────────────────
 golangci-lint        brew:golangci-lint             apt:-                   apk:-
 gofumpt              brew:gofumpt                   apt:-                   apk:-
+goimports            brew:goimports                 apt:-                   apk:-
 
 # ── Bash quality ─────────────────────────────────────────────────────────────
 shellcheck           brew:shellcheck                apt:shellcheck          apk:shellcheck
@@ -100,7 +101,7 @@ cloud-sql-proxy      brew:cloud-sql-proxy           apt:-                   apk:
 codeql               brew:codeql                    apt:-                   apk:-
 
 # ── OpenCode runtime ─────────────────────────────────────────────────────────
-bun                  brew:bun                       apt:-                   apk:-
+bun                  brew:oven-sh/bun/bun           apt:-                   apk:-
 
 # ── Neovim ───────────────────────────────────────────────────────────────────
 nvim                 brew:neovim                    apt:neovim              apk:neovim

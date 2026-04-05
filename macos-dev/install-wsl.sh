@@ -141,13 +141,20 @@ fi
 # Only tools that are acceptably up-to-date in Ubuntu apt go here.
 # Stale or missing tools are installed via GitHub releases in step 2.
 log "apt update + install"
-sudo apt update
-sudo apt install -y \
+if ! sudo apt update; then
+  err "apt update failed — aborting install"
+  err "check that you have passwordless sudo or run interactively"
+  exit 1
+fi
+if ! sudo apt install -y \
   bash bash-completion \
   git tmux tree wget curl \
   jq \
   shellcheck \
-  direnv
+  direnv; then
+  err "apt install failed — aborting install"
+  exit 1
+fi
 
 # ── Step 2: GitHub release / install script installs ─────────────────────────
 # STUBBED: this plan creates the skeleton only. Later plans add:
