@@ -160,7 +160,13 @@ The macOS installation script MUST perform the following steps in order:
    - vscode/settings.json → "Library/Application Support/Code/User/settings.json"
    - vscode/extensions.json → "Library/Application Support/Code/User/extensions.json"
 9. Symlink container/dev.sh → ~/.local/bin/dev
-10. Verify all bash configuration files with `bash -n`
+10. Install Podman Machine LaunchAgent (macOS only):
+    - Substitute `@HOMEBREW_PREFIX@` in `container/io.podman.machine.plist` with the detected prefix
+    - Write to `~/Library/LaunchAgents/io.podman.machine.plist`
+    - `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.podman.machine.plist`
+    - `launchctl kickstart -k gui/$(id -u)/io.podman.machine`
+    - Print instructions for `dev init-machine` if no Podman Machine exists yet (the LaunchAgent will auto-start it once created)
+11. Verify all bash configuration files with `bash -n`
 
 ### link() Function
 

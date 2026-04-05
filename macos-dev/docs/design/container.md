@@ -98,13 +98,122 @@ SSH agent REQUIRES ssh-add -c on host.
 
 Optional --port for dev servers.
 
+## Podman Machine lifecycle (macOS only)
+
+On macOS, Podman runs rootless containers inside a Linux VM ("Podman Machine") backed by vfkit or QEMU. The VM MUST be running before any `podman` command can execute. On WSL2 and native Linux, Podman runs without a VM — this section does not apply.
+
+### Machine detection and auto-start
+
+The `dev` script MUST check Podman Machine state before running any container command on macOS:
+
+1. If no machine exists: print a message and offer to run `dev init-machine` (non-interactive runs SHOULD exit with a clear error).
+2. If a machine exists but is stopped: auto-start it via `podman machine start`.
+3. If a machine is running: proceed.
+
+The script MUST implement this as a `_ensure_machine()` helper called at the start of every command that needs container access (`shell`, `build`, `stop`, `rebuild`, `status`, `clean-sessions`).
+
+### `dev init-machine` command
+
+Creates a new Podman Machine with sensible defaults:
+
+```bash
+podman machine init \
+  --cpus 4 \
+  --memory 8192 \
+  --disk-size 100 \
+  --now
+```
+
+- `--now` starts it immediately after creation
+- CPU/memory/disk defaults are starting points; users MAY override via flags to `dev init-machine --cpus 8 --memory 16384`
+- The script SHOULD print the resource limits and ask for confirmation before creating
+
+After `init-machine` completes, the script SHOULD also install the LaunchAgent plist (see below) unless the user opts out with `--no-autostart`.
+
+### LaunchAgent for auto-start at login (macOS)
+
+To ensure the machine is always running without manual intervention, `install-macos.sh` MUST install a LaunchAgent plist at `~/Library/LaunchAgents/io.podman.machine.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>io.podman.machine</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/podman</string>
+    <string>machine</string>
+    <string>start</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/tmp/podman-machine.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/podman-machine.err.log</string>
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+</dict>
+</plist>
+```
+
+Key behaviours:
+- `RunAtLoad`: starts the machine when the user logs in
+- `KeepAlive.SuccessfulExit = false`: relaunch `podman machine start` if it exits non-zero (crash, failed start). A successful `start` exits 0 once the machine is up; launchd will not loop in that case.
+- `ThrottleInterval`: minimum 30 seconds between restart attempts, preventing tight crash loops
+- Logs to `/tmp/` for diagnostics (SHOULD be rotated manually if needed)
+- Path is hardcoded to `/opt/homebrew/bin/podman` — the install script MUST verify this path exists and substitute if Homebrew is at a different prefix
+
+The plist template lives at `container/io.podman.machine.plist` with `@HOMEBREW_PREFIX@` as a substitution marker. `install-macos.sh` substitutes the actual prefix at install time.
+
+### Loading the LaunchAgent
+
+`install-macos.sh` MUST run:
+
+```bash
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.podman.machine.plist
+launchctl kickstart -k gui/$(id -u)/io.podman.machine
+```
+
+`bootstrap` loads the plist. `kickstart -k` forcibly starts the service immediately (useful on first install before the next login).
+
+### Uninstall
+
+`install-macos.sh --restore` (or equivalent uninstall flow) MUST remove the LaunchAgent:
+
+```bash
+launchctl bootout gui/$(id -u)/io.podman.machine 2>/dev/null || true
+rm -f ~/Library/LaunchAgents/io.podman.machine.plist
+```
+
+### WSL2 and native Linux
+
+These platforms do not need lifecycle management — Podman is a daemonless local binary. The `_ensure_machine()` helper is a no-op on non-macOS platforms.
+
+---
+
 ## dev script
 
 Lives at container/dev.sh → ~/.local/bin/dev
 
-Commands: build [--base], shell [--base] [--ref] [--port] [--skip-check], stop, rebuild [--clean], status, prune, clean-sessions, uninstall (restore backups)
-
-- `clean-sessions`: Remove OpenCode session data from dev-data-opencode volume.
+Commands:
+- `build [--base]` — build container image
+- `shell [--base] [--ref <path>] [--port <port>] [--skip-check]` — start/attach to dev container (runs `_ensure_machine` first on macOS)
+- `stop` — stop container for current repo
+- `rebuild [--clean]` — rebuild image and recreate container
+- `status` — show running dev containers
+- `prune` — remove stopped containers + dangling images
+- `clean-sessions` — remove OpenCode session data from dev-data-opencode volume
+- `init-machine [--cpus N] [--memory MB] [--disk-size GB] [--no-autostart]` — macOS only: create a new Podman Machine and install the LaunchAgent
+- `uninstall` — restore backups and remove LaunchAgent
 
 Container naming: dev-<repo-dir-name>
 
@@ -135,4 +244,16 @@ container/dev.env
 
 ```ruby
 brew "podman"
+```
+
+## Repo structure additions
+
+```
+container/
+├── Containerfile               # multi-stage build
+├── dev.sh                      # lifecycle script
+├── dev.env.example             # env var template
+├── io.podman.machine.plist     # LaunchAgent template (macOS)
+├── test-tool-installs.sh       # tool verification
+└── .dockerignore
 ```
