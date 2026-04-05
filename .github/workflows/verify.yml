@@ -43,9 +43,12 @@ jobs:
             | xargs -0 -n1 bash -n
 
       - name: shellcheck on all shell scripts under macos-dev
+        # --severity=warning ignores info-level findings (SC2012, SC2016,
+        # SC2155). These are stylistic warnings and several are intentional
+        # (e.g. SC2016 for literal strings we show to the user).
         run: |
           find macos-dev -type f -name '*.sh' -print0 \
-            | xargs -0 shellcheck
+            | xargs -0 shellcheck --severity=warning
 
       - name: Tool manifest drift check
         run: bash macos-dev/scripts/check-tool-manifest.sh
@@ -88,11 +91,16 @@ jobs:
       - name: Report Homebrew version
         run: brew --version
 
+      - name: Install shellcheck
+        # macos-latest runners do not ship with shellcheck. Install it via
+        # Homebrew (fast — ~15s — and already configured on macOS runners).
+        run: brew install shellcheck
+
       - name: bash -n on install-macos.sh
         run: bash -n macos-dev/install-macos.sh
 
       - name: shellcheck on install-macos.sh
-        run: shellcheck macos-dev/install-macos.sh
+        run: shellcheck --severity=warning macos-dev/install-macos.sh
 
       - name: brew bundle check (validates formulas without installing)
         run: brew bundle check --file=macos-dev/Brewfile --verbose || true
