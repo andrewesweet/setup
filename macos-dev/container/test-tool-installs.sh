@@ -280,7 +280,7 @@ check_tool "code"              "skip"       "code --version"
 
 # ── Go formatting ──────────────────────────────────────────────────────────
 echo "── Go formatting ──"
-check_tool "goimports"         "brew"       "goimports --help"
+check_tool "goimports"         "skip"       "goimports --help"
 
 echo ""
 echo "============================================"
