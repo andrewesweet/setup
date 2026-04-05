@@ -4,6 +4,8 @@
 
 LazyVim is the chosen starting point. Config in `lua/plugins/` MUST override and extend LazyVim defaults. Configuration MUST NOT fight LazyVim defaults — extend them.
 
+**Note on node:** Node SHOULD be managed via mise global config (`nodejs = "lts"`) rather than Homebrew to avoid PATH conflicts. The Brewfile entry for `node` exists for other tools that may depend on it; however, the primary node toolchain is managed by mise.
+
 ## init.lua
 
 The `init.lua` file MUST be filled in from https://github.com/LazyVim/starter verbatim at implementation time.
@@ -198,7 +200,7 @@ return {
   {
     "mfussenegger/nvim-lint",
     opts = {
-      events = { "BufWritePost", "BufReadPost", "InsertLeave" },
+      events = { "BufWritePost", "BufReadPost" },
       linters_by_ft = {
         sh       = { "shellcheck" },
         bash     = { "shellcheck" },
@@ -218,6 +220,8 @@ return {
   },
 }
 ```
+
+**Note on linting events:** `InsertLeave` was removed from the events list to prevent lag from slow linters (golangcilint, tflint, zizmor, actionlint). These linters now only fire on `BufWritePost` and `BufReadPost`. Fast linting feedback for shell and Python comes from the LSP servers (bashls, ruff, ty) which run continuously.
 
 ## lua/plugins/integrations.lua
 

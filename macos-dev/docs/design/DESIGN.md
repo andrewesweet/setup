@@ -8,6 +8,8 @@ and "OPTIONAL" in these documents are to be interpreted as described
 in BCP 14 [RFC 2119] [RFC 8174] when, and only when, they appear in
 all capitals, as shown here.
 
+This interpretation clause applies to all documents in the `docs/design/` directory.
+
 ## What this repo is
 
 A personal dotfiles repository for a macOS-based senior engineering leader at a regulated financial institution. Team-shareable baseline. Uses GitHub Enterprise Managed Users and GitHub Copilot as sole AI provider. Three platforms: macOS (Apple Silicon, Homebrew), WSL2 (Ubuntu on Windows 11, Kitty via WSLg primary / Windows Terminal fallback), Container (Wolfi Linux under Podman). The repo lives in `andrewesweet/setup` under the `macos-dev/` subdirectory.

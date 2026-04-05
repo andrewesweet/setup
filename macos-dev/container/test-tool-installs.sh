@@ -228,7 +228,7 @@ check_tool "pinact"            "brew"       "pinact --version"
 echo "── Kubernetes ──"
 check_tool "kubectl"           "brew"       "kubectl version --client"  "kubernetes-cli"
 check_tool "k9s"               "brew"       "k9s version --short"
-check_tool "kubectx"           "brew"       "kubectx --help"
+check_tool "kubectx"           "brew"       "kubectx --version"
 
 # ── Container ────────────────────────────────────────────────────────────────
 echo "── Container ──"
@@ -254,6 +254,33 @@ check_tool "critique"          "bun-global" "critique --version"       "critique
 # ── direnv ───────────────────────────────────────────────────────────────────
 echo "── direnv ──"
 check_tool "direnv"            "brew"       "direnv --version"
+
+# ── Document tools ──────────────────────────────────────────────────────────
+echo "── Document tools ──"
+check_tool "pandoc"            "brew"       "pandoc --version"
+check_tool "typst"             "brew"       "typst --version"
+
+# ── GCP ─────────────────────────────────────────────────────────────────────
+echo "── GCP ──"
+check_tool "gcloud"            "brew"       "gcloud --version"         "google-cloud-sdk"
+check_tool "cloud-sql-proxy"   "brew"       "cloud-sql-proxy --version"
+check_tool "bq"                "skip"       "bq --version"
+
+# ── Security ────────────────────────────────────────────────────────────────
+echo "── Security ──"
+check_tool "codeql"            "brew"       "codeql --version"
+
+# ── Markdown ────────────────────────────────────────────────────────────────
+echo "── Markdown ──"
+check_tool "markdownlint-cli2" "brew"       "markdownlint-cli2 --help"
+
+# ── VS Code (optional) ─────────────────────────────────────────────────────
+echo "── VS Code (optional) ──"
+check_tool "code"              "skip"       "code --version"
+
+# ── Go formatting ──────────────────────────────────────────────────────────
+echo "── Go formatting ──"
+check_tool "goimports"         "brew"       "goimports --help"
 
 echo ""
 echo "============================================"

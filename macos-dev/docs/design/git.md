@@ -92,7 +92,7 @@ The primary git configuration file contains user identity, core behaviors, diff/
 - The `difftastic` tool is the primary diff engine, invoked by `git difftool`.
 - VS Code is the merge conflict resolution tool, blocking until resolved with `code --wait`.
 - Pull operations MUST rebase instead of merge by default (`pull.rebase = true`).
-- Rebase operations MUST automatically stash and unsquash fixup commits (`rebase.autoStash`, `rebase.autoSquash`).
+- Rebase operations MUST automatically stash and squash fixup commits (`rebase.autoStash`, `rebase.autoSquash`).
 - Push MUST default to the current branch and auto-track remote branches (`push.default`, `push.autoSetupRemote`).
 - Fetch MUST automatically prune deleted remote branches (`fetch.prune = true`).
 - Stash display MUST show patch diffs by default (`stash.showPatch = true`).
@@ -195,6 +195,10 @@ keybinding:
 - Nerd Fonts version 3 is REQUIRED for icon rendering.
 - Commit signing (GPG) is DISABLED by default (`commit.signOff: false`).
 - Fetch operations MUST run on a 60-second interval in the background.
+
+## Go formatting tools
+
+The Brewfile SHOULD include both `gofumpt` and `goimports` for comprehensive Go code formatting. `goimports` handles import organization and MUST be available alongside `gofumpt`.
 
 ## Conventional commits
 

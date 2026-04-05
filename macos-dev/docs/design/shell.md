@@ -69,6 +69,9 @@ if [[ $_OS == macos ]]; then
   export PATH="$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
 fi
 
+# DOTFILES — set by install script (install-macos.sh or install-wsl.sh MUST set this)
+export DOTFILES="${DOTFILES:-}"
+
 # ~/.bun/bin (Node.js toolchain)
 [[ -d "$HOME/.bun/bin" ]] && export PATH="$HOME/.bun/bin:$PATH"
 
@@ -82,7 +85,6 @@ Platform-specific sourcing:
 
 ```bash
 if [[ $_OS == macos ]]; then
-  HOMEBREW_PREFIX=$(brew --prefix)
   [[ -f "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh" ]] && \
     source "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh"
 else
@@ -183,7 +185,6 @@ fi
 
 # gcloud (platform-specific path)
 if [[ $_OS == macos ]]; then
-  HOMEBREW_PREFIX=$(brew --prefix)
   [[ -f "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.bash.inc" ]] && \
     source "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.bash.inc"
 else
@@ -288,7 +289,7 @@ alias gs='git status -sb'
 alias ga='git add'
 alias gaa='git add --all'
 alias gcm='git commit -m'
-alias gca='git commit --amend'
+alias gam='git commit --amend'
 alias gd='git diff'
 alias gdc='git diff --cached'
 alias gp='git push'
@@ -331,7 +332,7 @@ alias fh='history | fzf'
 
 ```bash
 alias psa='ps aux'
-alias psg='ps aux | rg'
+alias psg='ps aux | rg --'
 ```
 
 Platform-conditional ports alias (see Platform-conditional section below).
@@ -515,6 +516,10 @@ cheat() {
   esac
 }
 ```
+
+## Brewfile notes
+
+**Note**: The Brewfile includes `gofumpt` but SHOULD also include `goimports` (golang.org/x/tools/cmd/goimports). See install.md for Brewfile updates.
 
 ## .inputrc
 

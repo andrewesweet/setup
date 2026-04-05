@@ -19,7 +19,7 @@ auto_install = true
 
 Per-project `.mise.toml` files MUST be provided as a template with versions adjusted per repository.
 
-NOTE: `auto_install = true` MAY block prompt on cd if tools require downloading.
+NOTE: For interactive machines, `auto_install` SHOULD be set to `false`. Run `mise install` explicitly instead. For CI environments, `auto_install = true` is acceptable to avoid blocking gates.
 
 ## uv — Python package management
 
@@ -73,6 +73,8 @@ The complete configuration MUST include the following hook groups:
 - GitHub Actions: actionlint v1.7.4, zizmor-pre-commit v1.5.0
 - YAML: yamllint v1.35.1 (MUST exclude .github/workflows and .github/actions)
 - Markdown: markdownlint-cli2 v0.17.1
+
+Hook revisions above are starting points. Run `prek autoupdate` after initial install to get current versions. The `pku` alias wraps this command.
 
 ## yamllint config template
 

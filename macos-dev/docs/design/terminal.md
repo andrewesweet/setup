@@ -16,18 +16,20 @@ This design specification defines the terminal configuration for dotfiles across
 - Font family: JetBrains Mono
 - Font size: 13.0 points
 - `shell_integration` MUST be enabled
-- `scrollback_lines` MUST be set to 10000
+- `scrollback_lines` SHOULD be set to 10000
 
 ### Audio and Visual Feedback
 
-- `enable_audio_bell` MUST be disabled (no)
-- `visual_bell_duration` MUST be 0
-- `window_alert_on_bell` MUST be disabled (no)
-- `confirm_os_window_close` MUST be set to 0 (close without confirmation)
+- `enable_audio_bell` SHOULD be disabled (no)
+- `visual_bell_duration` SHOULD be 0
+- `window_alert_on_bell` SHOULD be disabled (no)
+- `confirm_os_window_close` SHOULD be set to 0 (close without confirmation)
 
 ### Selection and Clipboard
 
-- `copy_on_select` MUST be set to clipboard (auto-copy on selection)
+- `copy_on_select` SHOULD be set to clipboard (auto-copy on selection)
+
+Note: On WSL2 via WSLg, `copy_on_select` copies to the Wayland clipboard, not the Windows system clipboard. For reliable cross-environment clipboard access (e.g., copying from container to host), use OSC 52 via tmux with `set -s set-clipboard on` instead.
 
 ### Key Bindings
 
@@ -82,7 +84,8 @@ Navigation bindings use vi keys and integrate with vim-tmux-navigator (see secti
 - Prefix + H: resize pane left by 5 units (repeatable)
 - Prefix + J: resize pane down by 5 units (repeatable)
 - Prefix + K: resize pane up by 5 units (repeatable)
-- Prefix + L: resize pane right by 5 units (repeatable)
+
+Note: `prefix + L` is bound to `last-window` (see Known Friction Points below). To resize right, use `prefix + Right` arrow instead with `bind -r Right resize-pane -R 5`.
 
 ### Copy Mode
 
@@ -167,7 +170,8 @@ format = """
 $directory\
 $git_branch\
 $git_status\
-$nodejs$python$golang$rust$terraform\
+$kubernetes\
+$nodejs$python$golang$terraform\
 $cmd_duration\
 $line_break\
 $character"""
@@ -266,11 +270,11 @@ format = "[ $version](yellow) "
 format = "[ $version](cyan) "
 ```
 
-#### Rust
+#### Kubernetes
 
 ```toml
-[rust]
-format = "[ $version](red) "
+[kubernetes]
+format = "[⎈ $context](blue) "
 ```
 
 #### Terraform
@@ -310,7 +314,7 @@ Language version indicators are displayed when tools are detected in the working
 | prefix + H | Resize pane left (5 units, repeatable) |
 | prefix + J | Resize pane down (5 units, repeatable) |
 | prefix + K | Resize pane up (5 units, repeatable) |
-| prefix + L | Resize pane right (5 units, repeatable) |
+| prefix + Right | Resize pane right (5 units, repeatable) |
 | prefix + s | Choose session |
 | prefix + r | Reload configuration |
 | prefix + Shift+L | Last window |
@@ -343,6 +347,7 @@ Language version indicators are displayed when tools are detected in the working
 | Ctrl+L consumed by navigator | Use `prefix + Ctrl+L` to clear screen |
 | Ctrl+A double-tap for OpenCode | Reserved; use prefix binding for other commands |
 | vim-tmux-navigator on WSL2 | Test and fallback to pgrep if ps detection fails |
+| Delta n/N for next/prev hunk | In diff tools, conflicts with vim keybinds; use arrow keys or custom binding |
 
 ## Platform Compatibility
 

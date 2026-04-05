@@ -92,6 +92,8 @@ MUST NOT add SETUID/SETGID. MUST NOT use --privileged.
 
 On macOS Podman Machine, consider `--userns=keep-id:uid=1000,gid=1000`.
 
+**Platform Note on Networking:** On macOS, Podman Machine uses gvproxy/vfkit networking, not slirp4netns. The `dev.sh` script MUST detect platform and omit the `--network=slirp4netns` flag on macOS to avoid compatibility issues.
+
 SSH agent REQUIRES ssh-add -c on host.
 
 Optional --port for dev servers.
@@ -100,7 +102,9 @@ Optional --port for dev servers.
 
 Lives at container/dev.sh → ~/.local/bin/dev
 
-Commands: build [--base], shell [--base] [--ref] [--port] [--skip-check], stop, rebuild [--clean], status, prune, uninstall (restore backups)
+Commands: build [--base], shell [--base] [--ref] [--port] [--skip-check], stop, rebuild [--clean], status, prune, clean-sessions, uninstall (restore backups)
+
+- `clean-sessions`: Remove OpenCode session data from dev-data-opencode volume.
 
 Container naming: dev-<repo-dir-name>
 

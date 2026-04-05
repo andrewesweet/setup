@@ -58,7 +58,6 @@ The configuration file MUST conform to the OpenCode schema at `https://opencode.
       "cat /home/dev/workspace/*": "allow",
       "cat /tmp/*": "allow",
       "ls *": "allow", "ls": "allow",
-      "echo *": "allow",
       "which *": "allow", "type *": "allow",
       "pwd": "allow", "date *": "allow", "date": "allow",
       "npm list *": "allow", "brew list *": "allow",
@@ -80,7 +79,7 @@ The configuration file MUST conform to the OpenCode schema at `https://opencode.
     "doom_loop": "ask"
   },
   "share": { "mode": "manual" },
-  "autoupdate": true
+  "autoupdate": false // Pin version for supply-chain security. Update deliberately.
 }
 ```
 
@@ -206,7 +205,7 @@ The PATH environment variable MUST include `~/.bun/bin` to ensure the installed 
 
 ## Configuration Auto-Updates
 
-The `autoupdate` field MUST be set to `true` to enable automatic updates of the OpenCode and critique tools.
+The `autoupdate` field MUST be set to `false` to pin versions for supply-chain security. Updates SHOULD be applied deliberately after review.
 
 ## Session Sharing
 

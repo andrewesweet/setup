@@ -49,6 +49,8 @@ pandoc docs/cheatsheet.md \
 `typst` MUST be in Brewfile.
 `docs/cheatsheet.pdf` MUST be in .gitignore (generated file).
 
+**Note on geometry variables:** The `-V geometry:*` flags are LaTeX-specific and MUST be replaced with typst-native equivalents at implementation time. The exact typst page setup syntax should be verified against current pandoc/typst documentation.
+
 ## Page 1: Key bindings by action
 
 Columns: Action | Shell (vi mode) | tmux | Neovim | lazygit | OpenCode | btop/lnav
@@ -99,6 +101,7 @@ Note: lnav uses `c` for copy — the one outlier. Not configurable.
 | Ctrl+A captured by tmux (OpenCode) | Ctrl+A Ctrl+A for literal Ctrl+A |
 | btop uses d/u not Ctrl+D/U | No fix — btop's default, not configurable |
 | Ctrl+P/K captured by VS Code | Use OpenCode leader bindings in VS Code terminal |
+| Delta n/N jumps hunks not search results | Use `less` search separately, or disable `navigate=true` in delta |
 
 ## Page 2: Tool for the job
 

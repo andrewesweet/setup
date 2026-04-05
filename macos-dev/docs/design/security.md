@@ -16,6 +16,10 @@ Primary risks:
 
 Global default: `"*": "ask"`. See opencode.md for full config.
 
+Security updates:
+- `"echo *": "allow"` has been REMOVED from bash permissions to prevent credential laundering (agent could echo $VAR > /tmp/file).
+- `autoupdate` is now DISABLED (`false`) for supply-chain security. Updates SHOULD be applied deliberately.
+
 Key restrictions:
 - `read` MUST be scoped to workspace + /tmp + specific config paths. MUST NOT be broadly allowed.
 - `cat` in bash MUST be scoped to `/home/dev/workspace/*` and `/tmp/*`. The original broad `"cat *": "allow"` is REMOVED.
@@ -55,7 +59,9 @@ SSH agent: `ssh-add -c` on the host REQUIRES user confirmation for each key use 
 
 ### GITHUB_TOKEN in shell history
 
-Aliases like `gha-pin` expand `$(gh auth token)` into shell history.
+Aliases like `gha-pin` expand `$(gh auth token)` into shell history, making tokens visible via `/proc/*/cmdline`.
+
+SHOULD wrap in functions using environment variable injection rather than inline expansion.
 
 MUST add to .bashrc:
 ```bash
@@ -64,44 +70,7 @@ HISTIGNORE="*GITHUB_TOKEN*:*TOKEN*:*SECRET*:*PASSWORD*:*KEY*"
 
 ## .gitignore_global
 
-MUST include these patterns:
-
-```gitignore
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Editor artefacts
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.aider*
-
-# OS / tools
-Thumbs.db
-.direnv/
-
-# Secrets and credentials
-.env
-.env.*
-.env.local
-*.pem
-*.key
-*.p12
-*.pfx
-auth.json
-credentials.json
-application_default_credentials.json
-*.keystore
-
-# Dotfiles local overrides
-.bashrc.local
-dev.env
-```
+The complete `.gitignore_global` is defined in git.md. It MUST include patterns for macOS, editor artefacts, secrets/credentials, and dotfiles local overrides. See git.md for the authoritative list.
 
 ## Container hardening
 

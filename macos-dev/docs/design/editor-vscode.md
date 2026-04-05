@@ -62,88 +62,106 @@ Settings propagate across installations when using the same GitHub account for V
 
 The following settings MUST be applied to the VS Code user configuration:
 
-```json
+```jsonc
+// settings.json
 {
-  "[editor]": {
-    "fontFamily": "JetBrains Mono",
-    "fontSize": 13,
-    "tabSize": 2,
-    "insertSpaces": true,
-    "formatOnSave": true,
-    "rulers": [100],
-    "minimap.enabled": false,
-    "trimAutoWhitespace": true
+  // ── Editor ────────────────────────────────────────────────────────
+  "editor.fontSize": 13,
+  "editor.fontFamily": "JetBrains Mono, monospace",
+  "editor.fontLigatures": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": null,
+  "editor.rulers": [100],
+  "editor.renderWhitespace": "trailing",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.minimap.enabled": false,
+
+  // ── Terminal ──────────────────────────────────────────────────────
+  "terminal.integrated.defaultProfile.osx": "bash",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.fontFamily": "JetBrains Mono",
+  "terminal.integrated.fontSize": 13,
+
+  // ── Files ─────────────────────────────────────────────────────────
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/node_modules": true
   },
-  "[terminal]": {
-    "integrated.defaultProfile.osx": "bash",
-    "integrated.defaultProfile.linux": "bash",
-    "integrated.fontFamily": "JetBrains Mono",
-    "integrated.fontSize": 13
-  },
-  "[files]": {
-    "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true,
-    "files.autoSave": "onFocusChange"
-  },
-  "[git]": {
-    "git.autofetch": true,
-    "git.smartCommit": true,
-    "git.ignoreMissingGitWarning": false
-  },
+
+  // ── Git ───────────────────────────────────────────────────────────
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "diffEditor.renderSideBySide": true,
+
+  // ── Python ────────────────────────────────────────────────────────
   "[python]": {
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-    "[python]": {
-      "editor.defaultFormatter": "charliermarsh.ruff",
-      "editor.formatOnSave": true,
-      "editor.codeActionsOnSave": {
-        "source.organizeImports.ruff": "explicit",
-        "source.fixAll.ruff": "explicit"
-      }
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
     }
   },
+
+  // ── Go ────────────────────────────────────────────────────────────
   "[go]": {
     "editor.defaultFormatter": "golang.go",
     "editor.formatOnSave": true,
-    "[go]": {
-      "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit"
-      }
-    },
-    "go.lintOnSave": "package",
-    "go.lintTool": "golangci-lint",
-    "go.lintArgs": ["--fast"],
-    "go.useLanguageServer": true
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
   },
+  "go.lintTool": "golangci-lint",
+  "go.formatTool": "gofumpt",
+  "go.useLanguageServer": true,
+
+  // ── Terraform ─────────────────────────────────────────────────────
   "[terraform]": {
     "editor.defaultFormatter": "hashicorp.terraform",
     "editor.formatOnSave": true
   },
+
+  // ── YAML ──────────────────────────────────────────────────────────
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.tabSize": 2
   },
+
+  // ── JSON / JSONC ──────────────────────────────────────────────────
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ── Markdown ──────────────────────────────────────────────────────
+  "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on",
     "editor.formatOnSave": true
   },
-  "[markdown]": {
-    "editor.wordWrap": "on",
-    "editor.formatOnSave": true,
-    "markdownlint.run": "onSave"
-  },
+
+  // ── Shell ─────────────────────────────────────────────────────────
   "[shellscript]": {
-    "editor.defaultFormatter": "timonwong.shellcheck",
-    "editor.formatOnSave": true,
-    "shellformat.path": "shfmt",
-    "shellformat.args": ["-i", "2", "-ci", "-bn"]
+    "editor.defaultFormatter": "mkhl.shfmt",
+    "editor.formatOnSave": true
   },
+  "shellformat.flag": "-i 2 -ci -bn",
+
+  // ── Dev Containers (Podman) ───────────────────────────────────────
   "dev.containers.dockerPath": "podman",
-  "telemetry.telemetryLevel": "off",
-  "telemetry.enableCrashReporter": false
+
+  // ── Telemetry ─────────────────────────────────────────────────────
+  "telemetry.telemetryLevel": "off"
 }
 ```
 
@@ -244,10 +262,11 @@ Use .devcontainer/devcontainer.json for standalone container creation.
     "target": "full"
   },
   "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/dev/.ssh,type=bind,readonly",
+    // SSH authentication: Use SSH agent socket forwarding instead of direct key file access.
+    // This approach is more secure and aligns with container.md SSH strategy.
+    // The SSH_AUTH_SOCK environment variable will be forwarded automatically by Dev Containers.
     "source=${localEnv:HOME}/.config/gh,target=/home/dev/.config/gh,type=bind",
-    "source=${localEnv:HOME}/.gitconfig,target=/home/dev/.gitconfig,type=bind,readonly",
-    "source=${localEnv:HOME}/.ssh/config,target=/home/dev/.ssh/config,type=bind,readonly"
+    "source=${localEnv:HOME}/.gitconfig,target=/home/dev/.gitconfig,type=bind,readonly"
   ],
   "remoteUser": "dev",
   "postCreateCommand": "git submodule update --init --recursive",
@@ -281,7 +300,7 @@ Use .devcontainer/devcontainer.json for standalone container creation.
 }
 ```
 
-The template MUST mount SSH keys and git configuration to enable authenticated git operations within the container.
+The template mounts GitHub CLI configuration and git configuration to enable authenticated operations within the container. SSH authentication uses agent socket forwarding for enhanced security.
 
 ## Known Keybind Limitations
 

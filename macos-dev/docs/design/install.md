@@ -61,6 +61,7 @@ brew "uv"
 # Go quality
 brew "golangci-lint"
 brew "gofumpt"
+brew "goimports"
 
 # Bash quality
 brew "shellcheck"
@@ -106,10 +107,11 @@ brew "bun"
 
 # Neovim
 brew "neovim"
-brew "node"
 
 # direnv
 brew "direnv"
+
+**Note on node:** Node is managed via mise (`nodejs = "lts"` in global config) to avoid PATH conflicts with Homebrew.
 
 # Taps
 tap "charmbracelet/tap"
@@ -247,12 +249,10 @@ New contributors MUST follow these consolidated steps for macOS setup:
 
 1. Clone repository
 2. Install Homebrew
-3. Execute `brew bundle --file=~/.dotfiles/Brewfile`
-4. Switch to Homebrew bash 5 via `chsh -s $(brew --prefix)/bin/bash`
-5. Execute `bash install-macos.sh`
-6. Install fzf shell bindings
-7. Execute `uv tool install ty@latest && uv tool install prek`
-8. Execute `bun install -g opencode-ai critique`
-9. Execute `opencode auth login` (GitHub Copilot)
-10. Execute `gcloud auth login`
-11. Restart terminal
+3. Switch to Homebrew bash 5 via `chsh -s $(brew --prefix)/bin/bash`
+4. Run `bash install-macos.sh`
+5. Execute `opencode auth login` (GitHub Copilot)
+6. Execute `gcloud auth login`
+7. Restart terminal
+
+The `install-macos.sh` script handles all remaining steps including `brew bundle`, fzf bindings, `uv tool install` commands, `bun install` commands, and configuration symlinking.
