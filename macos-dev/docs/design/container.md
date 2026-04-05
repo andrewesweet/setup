@@ -102,37 +102,81 @@ Optional --port for dev servers.
 
 On macOS, Podman runs rootless containers inside a Linux VM ("Podman Machine") backed by vfkit or QEMU. The VM MUST be running before any `podman` command can execute. On WSL2 and native Linux, Podman runs without a VM — this section does not apply.
 
+### Machine name
+
+The dotfiles setup MUST use a named Podman Machine called `dotfiles`. All commands target this name explicitly. Users MAY have other Podman Machines for other purposes — the `dotfiles` machine is dedicated to this setup and does not interfere.
+
 ### Machine detection and auto-start
 
-The `dev` script MUST check Podman Machine state before running any container command on macOS:
+The `dev` script MUST check the `dotfiles` machine state before running any container command on macOS. The `_ensure_machine()` helper:
 
-1. If no machine exists: print a message and offer to run `dev init-machine` (non-interactive runs SHOULD exit with a clear error).
-2. If a machine exists but is stopped: auto-start it via `podman machine start`.
-3. If a machine is running: proceed.
+```
+if uname is not Darwin: return 0
 
-The script MUST implement this as a `_ensure_machine()` helper called at the start of every command that needs container access (`shell`, `build`, `stop`, `rebuild`, `status`, `clean-sessions`).
+case $(podman machine inspect dotfiles --format '{{.State}}' 2>/dev/null || echo missing) in
+  running)           return 0 ;;
+  starting)          wait up to 60s polling inspect; return 0 when running ;;
+  stopped|configured) podman machine start dotfiles ;;
+  missing)           print "Run 'dev init-machine' to create." ; exit 1 ;;
+esac
+```
+
+Called at the start of every command that needs container access: `shell`, `build`, `stop`, `rebuild`, `status`, `clean-sessions`.
 
 ### `dev init-machine` command
 
-Creates a new Podman Machine with sensible defaults:
+Creates the `dotfiles` Podman Machine with sensible defaults:
 
 ```bash
-podman machine init \
+podman machine init dotfiles \
   --cpus 4 \
   --memory 8192 \
-  --disk-size 100 \
+  --disk-size 60 \
   --now
 ```
 
 - `--now` starts it immediately after creation
-- CPU/memory/disk defaults are starting points; users MAY override via flags to `dev init-machine --cpus 8 --memory 16384`
-- The script SHOULD print the resource limits and ask for confirmation before creating
+- Disk size default is 60GB. Podman Machine disks can be grown via `podman machine set --disk-size N dotfiles` but NOT shrunk without destroying the machine. The script SHOULD warn about this one-way operation.
+- Users MAY override defaults: `dev init-machine --cpus 8 --memory 16384 --disk-size 100`
+- The script MUST print the resource limits and ask for confirmation before creating
+- `podman machine set` command and syntax SHOULD be documented in the output for later resource adjustments
 
-After `init-machine` completes, the script SHOULD also install the LaunchAgent plist (see below) unless the user opts out with `--no-autostart`.
+This command is idempotent with respect to the LaunchAgent — if the agent is already installed, it is not reinstalled.
 
-### LaunchAgent for auto-start at login (macOS)
+### LaunchAgent wrapper script
 
-To ensure the machine is always running without manual intervention, `install-macos.sh` MUST install a LaunchAgent plist at `~/Library/LaunchAgents/io.podman.machine.plist`:
+The LaunchAgent MUST NOT call `podman machine start` directly. It calls a wrapper script that handles edge cases safely:
+
+```bash
+#!/bin/bash
+# container/podman-machine-start.sh
+# Wrapper for LaunchAgent — safe on first run, idempotent, no-loop on failure modes
+set -e
+
+# Platform guard (plist is only installed on macOS, but defence in depth)
+[[ "$(uname)" == "Darwin" ]] || exit 0
+
+# If podman isn't on PATH, exit cleanly rather than letting launchd loop
+PODMAN="@HOMEBREW_PREFIX@/bin/podman"
+[[ -x "$PODMAN" ]] || exit 0
+
+# If the dotfiles machine doesn't exist, exit cleanly (user hasn't run init-machine yet)
+"$PODMAN" machine list -q 2>/dev/null | grep -qx 'dotfiles' || exit 0
+
+# Check current state; only start if stopped/configured
+state=$("$PODMAN" machine inspect dotfiles --format '{{.State}}' 2>/dev/null || echo missing)
+case "$state" in
+  running|starting) exit 0 ;;
+  stopped|configured) exec "$PODMAN" machine start dotfiles ;;
+  *) exit 0 ;;
+esac
+```
+
+`@HOMEBREW_PREFIX@` is substituted by `install-macos.sh` at install time. This script lives at `container/podman-machine-start.sh` and is symlinked by `install-macos.sh` to `~/.local/bin/podman-machine-start`.
+
+### LaunchAgent plist
+
+Located at `container/io.podman.machine.plist`. The `@HOME@` and `@SCRIPT_PATH@` markers are substituted at install time:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -144,9 +188,7 @@ To ensure the machine is always running without manual intervention, `install-ma
   <string>io.podman.machine</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/opt/homebrew/bin/podman</string>
-    <string>machine</string>
-    <string>start</string>
+    <string>@SCRIPT_PATH@</string>
   </array>
   <key>RunAtLoad</key>
   <true/>
@@ -156,9 +198,9 @@ To ensure the machine is always running without manual intervention, `install-ma
     <false/>
   </dict>
   <key>StandardOutPath</key>
-  <string>/tmp/podman-machine.out.log</string>
+  <string>@HOME@/Library/Logs/io.podman.machine.out.log</string>
   <key>StandardErrorPath</key>
-  <string>/tmp/podman-machine.err.log</string>
+  <string>@HOME@/Library/Logs/io.podman.machine.err.log</string>
   <key>ThrottleInterval</key>
   <integer>30</integer>
 </dict>
@@ -166,37 +208,45 @@ To ensure the machine is always running without manual intervention, `install-ma
 ```
 
 Key behaviours:
-- `RunAtLoad`: starts the machine when the user logs in
-- `KeepAlive.SuccessfulExit = false`: relaunch `podman machine start` if it exits non-zero (crash, failed start). A successful `start` exits 0 once the machine is up; launchd will not loop in that case.
-- `ThrottleInterval`: minimum 30 seconds between restart attempts, preventing tight crash loops
-- Logs to `/tmp/` for diagnostics (SHOULD be rotated manually if needed)
-- Path is hardcoded to `/opt/homebrew/bin/podman` — the install script MUST verify this path exists and substitute if Homebrew is at a different prefix
+- `RunAtLoad`: runs the wrapper script when the user logs in
+- The wrapper exits 0 when no work is needed (no machine, already running, already starting) — launchd will not relaunch
+- `KeepAlive.SuccessfulExit = false`: relaunch the wrapper only if it exits non-zero (the `podman machine start` underneath failed)
+- `ThrottleInterval`: minimum 30 seconds between relaunches — prevents tight crash loops
+- Logs to `~/Library/Logs/` (user-scoped, not world-readable)
 
-The plist template lives at `container/io.podman.machine.plist` with `@HOMEBREW_PREFIX@` as a substitution marker. `install-macos.sh` substitutes the actual prefix at install time.
+Note that manual `podman machine stop` exits 0 and the machine stays stopped until next login. This is intentional: manual stop means "I want it stopped." Users SHOULD use `dev machine-start` or `dev shell` to restart when needed.
 
 ### Loading the LaunchAgent
 
 `install-macos.sh` MUST run:
 
 ```bash
+# Idempotent: bootout first if already loaded, then bootstrap
+launchctl bootout gui/$(id -u)/io.podman.machine 2>/dev/null || true
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.podman.machine.plist
-launchctl kickstart -k gui/$(id -u)/io.podman.machine
 ```
 
-`bootstrap` loads the plist. `kickstart -k` forcibly starts the service immediately (useful on first install before the next login).
+`bootstrap` loads the plist and `RunAtLoad=true` invokes the wrapper immediately. No `kickstart` is needed.
+
+On first install, if no `dotfiles` machine exists yet, the wrapper exits 0 harmlessly. Once the user runs `dev init-machine`, future logins will find the machine and start it automatically.
 
 ### Uninstall
 
-`install-macos.sh --restore` (or equivalent uninstall flow) MUST remove the LaunchAgent:
+`install-macos.sh --restore` is the single uninstall entry point. It MUST:
 
 ```bash
 launchctl bootout gui/$(id -u)/io.podman.machine 2>/dev/null || true
 rm -f ~/Library/LaunchAgents/io.podman.machine.plist
+rm -f ~/.local/bin/podman-machine-start
+# Leave the dotfiles machine itself — user may want to preserve VM state
+# To remove the machine too: podman machine rm dotfiles
 ```
+
+Leftover log files at `~/Library/Logs/io.podman.machine.{out,err}.log` are retained for post-uninstall diagnostics. Users MAY remove them manually.
 
 ### WSL2 and native Linux
 
-These platforms do not need lifecycle management — Podman is a daemonless local binary. The `_ensure_machine()` helper is a no-op on non-macOS platforms.
+These platforms do not need lifecycle management — Podman is a daemonless local binary. The `_ensure_machine()` helper MUST return 0 immediately on non-Darwin platforms (`[[ "$(uname)" == "Darwin" ]] || return 0`).
 
 ---
 
@@ -209,11 +259,15 @@ Commands:
 - `shell [--base] [--ref <path>] [--port <port>] [--skip-check]` — start/attach to dev container (runs `_ensure_machine` first on macOS)
 - `stop` — stop container for current repo
 - `rebuild [--clean]` — rebuild image and recreate container
-- `status` — show running dev containers
+- `status` — show running dev containers and (on macOS) Podman Machine status
 - `prune` — remove stopped containers + dangling images
 - `clean-sessions` — remove OpenCode session data from dev-data-opencode volume
-- `init-machine [--cpus N] [--memory MB] [--disk-size GB] [--no-autostart]` — macOS only: create a new Podman Machine and install the LaunchAgent
-- `uninstall` — restore backups and remove LaunchAgent
+- `init-machine [--cpus N] [--memory MB] [--disk-size GB]` — macOS only: create the `dotfiles` Podman Machine (defaults: 4 CPU, 8192 MB, 60 GB)
+- `machine-start` — macOS only: start the `dotfiles` Podman Machine (alias for `podman machine start dotfiles`)
+- `machine-stop` — macOS only: stop the `dotfiles` Podman Machine (alias for `podman machine stop dotfiles`)
+- `machine-status` — macOS only: show the `dotfiles` Podman Machine state
+
+Uninstall is handled by `install-macos.sh --restore`, not by `dev`. The dev script MAY alias `dev uninstall` to `install-macos.sh --restore` for discoverability, but ownership of the uninstall flow lives in the install script.
 
 Container naming: dev-<repo-dir-name>
 
@@ -250,10 +304,11 @@ brew "podman"
 
 ```
 container/
-├── Containerfile               # multi-stage build
-├── dev.sh                      # lifecycle script
-├── dev.env.example             # env var template
-├── io.podman.machine.plist     # LaunchAgent template (macOS)
-├── test-tool-installs.sh       # tool verification
+├── Containerfile                # multi-stage build
+├── dev.sh                       # lifecycle script
+├── dev.env.example              # env var template
+├── io.podman.machine.plist      # LaunchAgent template (macOS)
+├── podman-machine-start.sh      # LaunchAgent wrapper (macOS)
+├── test-tool-installs.sh        # tool verification
 └── .dockerignore
 ```

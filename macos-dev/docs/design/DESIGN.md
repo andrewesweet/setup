@@ -148,6 +148,7 @@ macos-dev/
 │   ├── dev.sh
 │   ├── dev.env.example
 │   ├── io.podman.machine.plist
+│   ├── podman-machine-start.sh
 │   ├── test-tool-installs.sh
 │   └── .dockerignore
 └── scripts/

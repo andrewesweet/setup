@@ -434,6 +434,16 @@ alias tfsum='tf-summarize'
 alias mdl='markdownlint-cli2'
 ```
 
+### Podman Machine (macOS only — aliases to `dev` subcommands)
+
+```bash
+alias pm-start='dev machine-start'
+alias pm-stop='dev machine-stop'
+alias pm-status='dev machine-status'
+```
+
+These wrap `podman machine <action> dotfiles` via the dev script, ensuring the named machine is targeted consistently. On non-macOS platforms the underlying `dev machine-*` commands are no-ops.
+
 ### Notifications
 
 ```bash

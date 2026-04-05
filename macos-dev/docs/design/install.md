@@ -161,12 +161,25 @@ The macOS installation script MUST perform the following steps in order:
    - vscode/extensions.json → "Library/Application Support/Code/User/extensions.json"
 9. Symlink container/dev.sh → ~/.local/bin/dev
 10. Install Podman Machine LaunchAgent (macOS only):
-    - Substitute `@HOMEBREW_PREFIX@` in `container/io.podman.machine.plist` with the detected prefix
-    - Write to `~/Library/LaunchAgents/io.podman.machine.plist`
-    - `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.podman.machine.plist`
-    - `launchctl kickstart -k gui/$(id -u)/io.podman.machine`
-    - Print instructions for `dev init-machine` if no Podman Machine exists yet (the LaunchAgent will auto-start it once created)
+    - Substitute `@HOMEBREW_PREFIX@` in `container/podman-machine-start.sh` with the detected prefix; write to `~/.local/bin/podman-machine-start`; `chmod +x`
+    - Substitute `@HOME@` and `@SCRIPT_PATH@` (the full path to `podman-machine-start`) in `container/io.podman.machine.plist`; write to `~/Library/LaunchAgents/io.podman.machine.plist`
+    - Ensure log directory exists: `mkdir -p ~/Library/Logs`
+    - Reload the LaunchAgent idempotently:
+      ```bash
+      launchctl bootout gui/$(id -u)/io.podman.machine 2>/dev/null || true
+      launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.podman.machine.plist
+      ```
+    - Print instructions for `dev init-machine` if no `dotfiles` Podman Machine exists yet (the LaunchAgent wrapper exits cleanly until a machine exists, and will auto-start it once created)
 11. Verify all bash configuration files with `bash -n`
+
+### `install-macos.sh --restore` (uninstall)
+
+The `--restore` flag is the single uninstall entry point. It MUST:
+- Unload the LaunchAgent: `launchctl bootout gui/$(id -u)/io.podman.machine 2>/dev/null || true`
+- Remove the plist: `rm -f ~/Library/LaunchAgents/io.podman.machine.plist`
+- Remove the wrapper script: `rm -f ~/.local/bin/podman-machine-start`
+- Restore symlinked config files from `~/.dotfiles-backup/<latest>/`
+- MUST NOT remove the `dotfiles` Podman Machine itself — users may want to preserve VM state. Document that manual removal uses `podman machine rm dotfiles`.
 
 ### link() Function
 
