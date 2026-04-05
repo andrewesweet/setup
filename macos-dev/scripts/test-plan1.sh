@@ -411,10 +411,20 @@ if $FULL; then
     wsl|linux)
       header "Test 5: install-wsl.sh apt install (SLOW, modifies system)"
       info "this runs 'sudo apt update' and 'sudo apt install' for ~10 packages"
-      if bash install-wsl.sh < /dev/null; then
+      # If stdin is a TTY, let sudo prompt for password interactively.
+      # Otherwise redirect from /dev/null so sudo fails fast rather than
+      # hanging (expected in background runs or CI without passwordless sudo).
+      if [[ -t 0 ]]; then
+        install_wsl_exit=0
+        bash install-wsl.sh || install_wsl_exit=$?
+      else
+        install_wsl_exit=0
+        bash install-wsl.sh < /dev/null || install_wsl_exit=$?
+      fi
+      if (( install_wsl_exit == 0 )); then
         pass "install-wsl.sh completed"
       else
-        fail "install-wsl.sh failed"
+        fail "install-wsl.sh failed (exit $install_wsl_exit)"
       fi
 
       header "Test 6: verify installed apt packages"
