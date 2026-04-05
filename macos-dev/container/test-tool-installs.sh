@@ -267,7 +267,7 @@ check_tool "typst"             "brew"       "typst --version"
 echo "── GCP ──"
 check_tool "gcloud"            "brew"       "gcloud --version"         "google-cloud-sdk"
 check_tool "cloud-sql-proxy"   "brew"       "cloud-sql-proxy --version"
-check_tool "bq"                "skip"       "bq help"
+check_tool "bq"                "skip"       "bq version"
 
 # ── Security ────────────────────────────────────────────────────────────────
 echo "── Security ──"
