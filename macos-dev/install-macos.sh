@@ -153,6 +153,9 @@ fi
 # Verify Homebrew is installed
 if ! command -v brew &>/dev/null; then
   err "Homebrew is not installed. Install it first:"
+  # shellcheck disable=SC2016
+  # Single quotes are intentional — we want to show the user the literal
+  # command to copy-paste, with $() unexpanded.
   err '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
   exit 1
 fi

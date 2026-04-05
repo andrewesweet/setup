@@ -87,6 +87,9 @@ check_tool() {
         diagnostics+=("  brew prefix: $prefix")
         if [[ -d "$prefix/bin" ]]; then
           diagnostics+=("  binaries in $prefix/bin/:")
+          # shellcheck disable=SC2012
+          # ls is intentional here — output is only for human-readable
+          # diagnostics (file metadata, permissions), not parsed by a script.
           diagnostics+=("$(ls -la "$prefix/bin/" 2>/dev/null | sed 's/^/    /')")
         else
           diagnostics+=("  no bin/ directory in prefix")
