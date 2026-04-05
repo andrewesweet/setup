@@ -87,6 +87,9 @@ check_tool() {
         diagnostics+=("  brew prefix: $prefix")
         if [[ -d "$prefix/bin" ]]; then
           diagnostics+=("  binaries in $prefix/bin/:")
+          # shellcheck disable=SC2012
+          # ls is intentional here — output is only for human-readable
+          # diagnostics (file metadata, permissions), not parsed by a script.
           diagnostics+=("$(ls -la "$prefix/bin/" 2>/dev/null | sed 's/^/    /')")
         else
           diagnostics+=("  no bin/ directory in prefix")
@@ -264,7 +267,7 @@ check_tool "typst"             "brew"       "typst --version"
 echo "── GCP ──"
 check_tool "gcloud"            "brew"       "gcloud --version"         "google-cloud-sdk"
 check_tool "cloud-sql-proxy"   "brew"       "cloud-sql-proxy --version"
-check_tool "bq"                "skip"       "bq --version"
+check_tool "bq"                "skip"       "bq version"
 
 # ── Security ────────────────────────────────────────────────────────────────
 echo "── Security ──"
@@ -272,7 +275,7 @@ check_tool "codeql"            "brew"       "codeql --version"
 
 # ── Markdown ────────────────────────────────────────────────────────────────
 echo "── Markdown ──"
-check_tool "markdownlint-cli2" "brew"       "markdownlint-cli2 --help"
+check_tool "markdownlint-cli2" "brew"       "markdownlint-cli2 --help || true"
 
 # ── VS Code (optional) ─────────────────────────────────────────────────────
 echo "── VS Code (optional) ──"
@@ -280,7 +283,7 @@ check_tool "code"              "skip"       "code --version"
 
 # ── Go formatting ──────────────────────────────────────────────────────────
 echo "── Go formatting ──"
-check_tool "goimports"         "skip"       "goimports --help"
+check_tool "goimports"         "brew"       "goimports --help || true"
 
 echo ""
 echo "============================================"

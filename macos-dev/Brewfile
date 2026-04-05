@@ -1,0 +1,132 @@
+# Brewfile — reproducible Homebrew installs for macOS
+# Usage: brew bundle --file=Brewfile
+#
+# Validated against tools.txt by scripts/check-tool-manifest.sh.
+# Keep categories in sync with tools.txt section headers.
+
+# ── Shell ────────────────────────────────────────────────────────────────────
+brew "bash"
+brew "bash-completion@2"
+brew "starship"
+
+# ── Git core ─────────────────────────────────────────────────────────────────
+brew "git"
+brew "git-delta"
+brew "difftastic"
+brew "lazygit"
+brew "git-cliff"
+brew "cocogitto"
+brew "gh"
+
+# ── Navigation & search ──────────────────────────────────────────────────────
+brew "fzf"
+brew "zoxide"
+brew "fd"
+brew "ripgrep"
+
+# ── File viewing ─────────────────────────────────────────────────────────────
+brew "bat"
+brew "glow"
+brew "lnav"
+
+# ── Process monitoring ───────────────────────────────────────────────────────
+brew "btop"
+
+# ── Terminal multiplexer ─────────────────────────────────────────────────────
+brew "tmux"
+
+# ── Data wrangling ───────────────────────────────────────────────────────────
+brew "jq"
+brew "yq"
+brew "miller"
+brew "httpie"
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+brew "tree"
+brew "wget"
+brew "pandoc"
+brew "typst"
+
+# ── Version management ───────────────────────────────────────────────────────
+brew "mise"
+
+# ── Python ───────────────────────────────────────────────────────────────────
+brew "uv"
+
+# ── Go quality ───────────────────────────────────────────────────────────────
+brew "golangci-lint"
+brew "gofumpt"
+brew "goimports"
+
+# ── Bash quality ─────────────────────────────────────────────────────────────
+brew "shellcheck"
+brew "shfmt"
+
+# ── Markdown quality ─────────────────────────────────────────────────────────
+brew "markdownlint-cli2"
+
+# ── Terraform ────────────────────────────────────────────────────────────────
+brew "tflint"
+
+# ── GitHub Actions ───────────────────────────────────────────────────────────
+brew "actionlint"
+brew "zizmor"
+brew "pinact"
+
+# ── Kubernetes ───────────────────────────────────────────────────────────────
+brew "kubernetes-cli"
+brew "k9s"
+brew "kubectx"
+
+# ── Container ────────────────────────────────────────────────────────────────
+brew "podman"
+brew "lazydocker"
+
+# ── Terraform extras ─────────────────────────────────────────────────────────
+# Note: tenv conflicts with atmos. If atmos is present, unlink it first:
+#   brew unlink atmos
+brew "tenv"
+brew "tf-summarize"
+
+# ── Terminal recording ───────────────────────────────────────────────────────
+brew "vhs"
+brew "asciinema"
+
+# ── GCP ──────────────────────────────────────────────────────────────────────
+# Note: gcloud SDK is NOT in the Brewfile. Homebrew migrated google-cloud-sdk
+# from a formula to the gcloud-cli cask, and the cask download (~400MB) is
+# unreliable on corporate networks with TLS-inspecting proxies. install-macos.sh
+# handles gcloud separately with idempotent install and manual-fallback on
+# network failure.
+brew "cloud-sql-proxy"
+
+# ── Security ─────────────────────────────────────────────────────────────────
+# codeql is distributed as a Homebrew cask (~3.4GB), not a formula.
+# On fresh installs with a restrictive corporate proxy, the cask download
+# may also fail. If brew bundle errors here, install codeql manually via
+# GitHub releases: https://github.com/github/codeql-cli-binaries/releases
+cask "codeql"
+
+# ── OpenCode runtime ─────────────────────────────────────────────────────────
+# Bun is used instead of node. OpenCode and critique are installed via
+# `bun install -g opencode-ai critique` by install-macos.sh.
+#
+# Note: bun was removed from homebrew-core and is now distributed only via
+# the official oven-sh/bun tap. See https://bun.sh/docs/installation
+tap "oven-sh/bun"
+brew "oven-sh/bun/bun"
+
+# ── Neovim ───────────────────────────────────────────────────────────────────
+# Note: node is intentionally NOT installed via Homebrew. It is managed
+# via mise (nodejs = "lts" in global config) to avoid PATH conflicts.
+brew "neovim"
+
+# ── direnv ───────────────────────────────────────────────────────────────────
+brew "direnv"
+
+# ── Taps ─────────────────────────────────────────────────────────────────────
+tap "charmbracelet/tap"
+brew "charmbracelet/tap/freeze"
+
+# ── VS Code (macOS cask) ─────────────────────────────────────────────────────
+cask "visual-studio-code"

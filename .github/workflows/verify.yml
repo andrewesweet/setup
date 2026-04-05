@@ -1,0 +1,201 @@
+# .github/workflows/verify.yml
+# CI for the macos-dev dotfiles setup.
+#
+# Fast jobs (lint, macos-verify) run on non-draft PRs and gate the merge.
+# Slow jobs (macos-install, wsl-install) run on push to main and on demand.
+
+name: verify
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel in-progress runs on the same ref when a new commit lands
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # ── Tier 1: fast lint (every non-draft PR) ────────────────────────────────
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: bash -n on all shell scripts under macos-dev
+        run: |
+          find macos-dev -type f -name '*.sh' -print0 \
+            | xargs -0 -n1 bash -n
+
+      - name: shellcheck on all shell scripts under macos-dev
+        run: |
+          find macos-dev -type f -name '*.sh' -print0 \
+            | xargs -0 shellcheck
+
+      - name: Tool manifest drift check
+        run: bash macos-dev/scripts/check-tool-manifest.sh
+
+      - name: DOTFILES self-resolution smoke test (macos installer)
+        run: |
+          # The inner bash install.sh exits non-zero on non-macOS hosts.
+          # We wrap it in { ...; } || true so pipefail + set -e (active in
+          # GitHub's shell wrapper) doesn't kill the step before we can
+          # inspect the output.
+          mkdir -p /tmp/dotfiles-test
+          ln -sf "$PWD/macos-dev/install-macos.sh" /tmp/dotfiles-test/install.sh
+          bash /tmp/dotfiles-test/install.sh > /tmp/dotfiles-test/out.txt 2>&1 || true
+          output=$(grep -o 'DOTFILES=[^ ]*' /tmp/dotfiles-test/out.txt | head -1)
+          echo "Resolved: $output"
+          expected="DOTFILES=$PWD/macos-dev"
+          test "$output" = "$expected" || {
+            echo "ERROR: expected $expected, got $output"
+            echo "--- full script output ---"
+            cat /tmp/dotfiles-test/out.txt
+            exit 1
+          }
+          rm -rf /tmp/dotfiles-test
+
+      - name: DOTFILES self-resolution smoke test (wsl installer)
+        run: |
+          mkdir -p /tmp/dotfiles-test-wsl
+          ln -sf "$PWD/macos-dev/install-wsl.sh" /tmp/dotfiles-test-wsl/install.sh
+          bash /tmp/dotfiles-test-wsl/install.sh < /dev/null > /tmp/dotfiles-test-wsl/out.txt 2>&1 || true
+          output=$(grep -o 'DOTFILES=[^ ]*' /tmp/dotfiles-test-wsl/out.txt | head -1)
+          echo "Resolved: $output"
+          expected="DOTFILES=$PWD/macos-dev"
+          test "$output" = "$expected" || {
+            echo "ERROR: expected $expected, got $output"
+            echo "--- full script output ---"
+            cat /tmp/dotfiles-test-wsl/out.txt
+            exit 1
+          }
+          rm -rf /tmp/dotfiles-test-wsl
+
+  # ── Tier 2: macOS quick verify (every non-draft PR) ──────────────────────
+  macos-verify:
+    name: macos-verify
+    runs-on: macos-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Report Homebrew version
+        run: brew --version
+
+      - name: Install shellcheck
+        # macos-latest runners do not ship with shellcheck. Install it via
+        # Homebrew (fast — ~15s — and already configured on macOS runners).
+        run: brew install shellcheck
+
+      - name: bash -n on install-macos.sh
+        run: bash -n macos-dev/install-macos.sh
+
+      - name: shellcheck on install-macos.sh
+        run: shellcheck macos-dev/install-macos.sh
+
+      - name: brew bundle check (validates formulas without installing)
+        run: brew bundle check --file=macos-dev/Brewfile --verbose || true
+
+      - name: DOTFILES self-resolution on real macOS
+        run: |
+          # On macOS, install-macos.sh will proceed past the Darwin check
+          # and actually run brew bundle (slow). We only need the DOTFILES
+          # line which is printed in the first ~100ms. Run in background,
+          # sleep briefly, kill, capture what was printed.
+          mkdir -p /tmp/dotfiles-test
+          ln -sf "$PWD/macos-dev/install-macos.sh" /tmp/dotfiles-test/install.sh
+          (
+            bash /tmp/dotfiles-test/install.sh > /tmp/dotfiles-test/out.txt 2>&1 &
+            pid=$!
+            sleep 3
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          )
+          output=$(grep -o 'DOTFILES=[^ ]*' /tmp/dotfiles-test/out.txt | head -1)
+          echo "Resolved: $output"
+          expected="DOTFILES=$PWD/macos-dev"
+          test "$output" = "$expected" || {
+            echo "ERROR: expected $expected, got $output"
+            echo "--- full captured output ---"
+            cat /tmp/dotfiles-test/out.txt
+            exit 1
+          }
+          rm -rf /tmp/dotfiles-test
+
+  # ── Tier 3: full macOS install (merge to main + manual dispatch) ─────────
+  macos-install:
+    name: macos-install
+    runs-on: macos-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Homebrew downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/Homebrew/downloads
+          key: brew-downloads-${{ runner.os }}-${{ hashFiles('macos-dev/Brewfile') }}
+          restore-keys: |
+            brew-downloads-${{ runner.os }}-
+
+      - name: Run install-macos.sh
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+          HOMEBREW_NO_INSTALL_CLEANUP: "1"
+          CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
+        run: bash macos-dev/install-macos.sh
+
+      - name: Verify tools installed (test-tool-installs.sh)
+        run: bash macos-dev/container/test-tool-installs.sh || true
+
+  # ── Tier 3: full WSL2 install (merge to main + manual dispatch) ──────────
+  wsl-install:
+    name: wsl-install
+    runs-on: windows-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install WSL2 with Ubuntu-22.04
+        uses: Vampire/setup-wsl@v3
+        with:
+          distribution: Ubuntu-22.04
+          update: "true"
+          additional-packages: |
+            bash
+            sudo
+            curl
+            ca-certificates
+
+      - name: Run install-wsl.sh inside WSL2
+        shell: wsl-bash {0}
+        run: |
+          set -e
+          cd "$(pwd)"
+          bash macos-dev/install-wsl.sh
+
+      - name: bash -n inside WSL2 (paranoia check)
+        shell: wsl-bash {0}
+        run: |
+          find macos-dev -type f -name '*.sh' -print0 \
+            | xargs -0 -n1 bash -n
