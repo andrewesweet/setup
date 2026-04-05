@@ -255,7 +255,10 @@ else
   BACKUP_DIR="$test_backup"
 
   # link() calls warn() for missing sources; stub it to a no-op.
-  # shellcheck disable=SC2317
+  # SC2317: unreachable — shellcheck can't see that link() calls warn
+  #         through the eval'd function body.
+  # SC2329: never invoked — same reason; invoked only via eval.
+  # shellcheck disable=SC2317,SC2329
   warn() { :; }
 
   # Load the function into this shell's scope
