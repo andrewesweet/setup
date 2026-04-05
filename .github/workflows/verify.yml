@@ -52,13 +52,20 @@ jobs:
 
       - name: DOTFILES self-resolution smoke test (macos installer)
         run: |
+          # The inner bash install.sh exits non-zero on non-macOS hosts.
+          # We wrap it in { ...; } || true so pipefail + set -e (active in
+          # GitHub's shell wrapper) doesn't kill the step before we can
+          # inspect the output.
           mkdir -p /tmp/dotfiles-test
           ln -sf "$PWD/macos-dev/install-macos.sh" /tmp/dotfiles-test/install.sh
-          output=$(bash /tmp/dotfiles-test/install.sh 2>&1 | grep -o 'DOTFILES=[^ ]*' | head -1)
+          bash /tmp/dotfiles-test/install.sh > /tmp/dotfiles-test/out.txt 2>&1 || true
+          output=$(grep -o 'DOTFILES=[^ ]*' /tmp/dotfiles-test/out.txt | head -1)
           echo "Resolved: $output"
           expected="DOTFILES=$PWD/macos-dev"
           test "$output" = "$expected" || {
             echo "ERROR: expected $expected, got $output"
+            echo "--- full script output ---"
+            cat /tmp/dotfiles-test/out.txt
             exit 1
           }
           rm -rf /tmp/dotfiles-test
@@ -67,11 +74,14 @@ jobs:
         run: |
           mkdir -p /tmp/dotfiles-test-wsl
           ln -sf "$PWD/macos-dev/install-wsl.sh" /tmp/dotfiles-test-wsl/install.sh
-          output=$(bash /tmp/dotfiles-test-wsl/install.sh </dev/null 2>&1 | grep -o 'DOTFILES=[^ ]*' | head -1)
+          bash /tmp/dotfiles-test-wsl/install.sh < /dev/null > /tmp/dotfiles-test-wsl/out.txt 2>&1 || true
+          output=$(grep -o 'DOTFILES=[^ ]*' /tmp/dotfiles-test-wsl/out.txt | head -1)
           echo "Resolved: $output"
           expected="DOTFILES=$PWD/macos-dev"
           test "$output" = "$expected" || {
             echo "ERROR: expected $expected, got $output"
+            echo "--- full script output ---"
+            cat /tmp/dotfiles-test-wsl/out.txt
             exit 1
           }
           rm -rf /tmp/dotfiles-test-wsl
@@ -104,12 +114,26 @@ jobs:
 
       - name: DOTFILES self-resolution on real macOS
         run: |
+          # On macOS, install-macos.sh will proceed past the Darwin check
+          # and actually run brew bundle (slow). We only need the DOTFILES
+          # line which is printed in the first ~100ms. Run in background,
+          # sleep briefly, kill, capture what was printed.
           mkdir -p /tmp/dotfiles-test
           ln -sf "$PWD/macos-dev/install-macos.sh" /tmp/dotfiles-test/install.sh
-          output=$(bash /tmp/dotfiles-test/install.sh 2>&1 | grep -o 'DOTFILES=[^ ]*' | head -1)
+          (
+            bash /tmp/dotfiles-test/install.sh > /tmp/dotfiles-test/out.txt 2>&1 &
+            pid=$!
+            sleep 3
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          )
+          output=$(grep -o 'DOTFILES=[^ ]*' /tmp/dotfiles-test/out.txt | head -1)
+          echo "Resolved: $output"
           expected="DOTFILES=$PWD/macos-dev"
           test "$output" = "$expected" || {
             echo "ERROR: expected $expected, got $output"
+            echo "--- full captured output ---"
+            cat /tmp/dotfiles-test/out.txt
             exit 1
           }
           rm -rf /tmp/dotfiles-test
