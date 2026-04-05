@@ -93,7 +93,11 @@ brew "vhs"
 brew "asciinema"
 
 # ── GCP ──────────────────────────────────────────────────────────────────────
-brew "google-cloud-sdk"
+# Note: gcloud SDK is NOT in the Brewfile. Homebrew migrated google-cloud-sdk
+# from a formula to the gcloud-cli cask, and the cask download (~400MB) is
+# unreliable on corporate networks with TLS-inspecting proxies. install-macos.sh
+# handles gcloud separately with idempotent install and manual-fallback on
+# network failure.
 brew "cloud-sql-proxy"
 
 # ── Security ─────────────────────────────────────────────────────────────────

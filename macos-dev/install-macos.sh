@@ -197,6 +197,33 @@ else
   warn "bun not available, skipping opencode/critique install"
 fi
 
+# gcloud SDK — handled separately from brew bundle because:
+#   (a) Homebrew migrated google-cloud-sdk from a formula to the gcloud-cli
+#       cask, and the cask download (~400MB from Google's servers) is
+#       unreliable on corporate networks with TLS-inspecting proxies.
+#   (b) gcloud is typically a long-lived install — once present, it should
+#       not be re-downloaded on every install-macos.sh run.
+#
+# Strategy: skip if already installed, attempt cask install otherwise, fall
+# back to clear manual instructions on failure. MUST NOT abort the script —
+# the rest of the dotfiles work without gcloud.
+if command -v gcloud &>/dev/null; then
+  log "gcloud already installed: $(gcloud --version 2>/dev/null | head -1)"
+else
+  log "installing gcloud SDK via Homebrew cask"
+  if brew install --cask gcloud-cli; then
+    log "gcloud install succeeded"
+  else
+    warn "gcloud install failed (likely a corporate proxy dropping the download)"
+    warn "manual install:"
+    warn "  1. Download SDK tarball from https://cloud.google.com/sdk/docs/install-sdk"
+    warn "  2. Extract to a stable location (e.g. ~/google-cloud-sdk)"
+    warn "  3. Run ./google-cloud-sdk/install.sh"
+    warn "  4. Re-run this script to install components"
+    warn "continuing without gcloud — the rest of the install proceeds normally"
+  fi
+fi
+
 # gcloud components — only if gcloud is available AND installed via Homebrew
 # (Homebrew-installed google-cloud-sdk supports `gcloud components install`;
 # apt/apk versions do not.)
