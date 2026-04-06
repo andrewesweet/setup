@@ -182,7 +182,11 @@ fi
 
 # ── Step 4: Symlink configs (deferred) ───────────────────────────────────────
 log "symlinking configs"
-printf "  (no config files to link yet — added by later plans)\n"
+# bash config (Plan 2)
+link bash/.bash_profile .bash_profile
+link bash/.bashrc       .bashrc
+link bash/.bash_aliases .bash_aliases
+link bash/.inputrc      .inputrc
 
 # ── Step 5: Next steps ───────────────────────────────────────────────────────
 log "install complete"
