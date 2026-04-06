@@ -250,6 +250,10 @@ link bash/.bashrc       .bashrc
 link bash/.bash_aliases .bash_aliases
 link bash/.inputrc      .inputrc
 
+# git config (Plan 3)
+link git/.gitconfig         .gitconfig
+link git/.gitignore_global  .gitignore_global
+
 # ── Step 4: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
@@ -258,13 +262,16 @@ Next steps:
   1. Switch shell to Homebrew bash 5:
        echo "$HOMEBREW_PREFIX/bin/bash" | sudo tee -a /etc/shells
        chsh -s $HOMEBREW_PREFIX/bin/bash
-  2. Install fzf shell bindings (one-time, interactive):
+  2. Create ~/.gitconfig.local with your identity:
+       git config --file ~/.gitconfig.local user.name "Your Name"
+       git config --file ~/.gitconfig.local user.email "you@example.com"
+  3. Install fzf shell bindings (one-time, interactive):
        $HOMEBREW_PREFIX/opt/fzf/install --all --no-update-rc
-  3. Authenticate tools:
+  4. Authenticate tools:
        opencode auth login   # select GitHub Copilot
        gh auth login
        gcloud auth login     # only if gcloud is installed (see prerequisites)
-  4. Restart terminal.
+  5. Restart terminal.
 
 Prerequisites NOT installed by this script:
   - Google Cloud SDK (gcloud) — see warnings above if missing. The
