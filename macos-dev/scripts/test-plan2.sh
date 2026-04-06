@@ -117,6 +117,7 @@ check "bash 4+ shopt guard"                 grep -q 'BASH_VERSINFO\[0\] >= 4' "$
 check "OSC 9 terminal guard"                grep -q 'TERM_PROGRAM' "$REPO_ROOT/bash/.bashrc"
 check "OSC 9 NOTIFY_OSC9 override"          grep -q 'NOTIFY_OSC9' "$REPO_ROOT/bash/.bashrc"
 check "OSC 9 NOTIFY_THRESHOLD default"      grep -q 'NOTIFY_THRESHOLD.*:-10' "$REPO_ROOT/bash/.bashrc"
+# shellcheck disable=SC2016
 check "OSC 9 duplication guard"             grep -qF '[[ "$PROMPT_COMMAND" != *"__cmd_timer_notify"' "$REPO_ROOT/bash/.bashrc"
 check "OSC 9 _osc9_supported cleanup"       grep -q 'unset _osc9_supported' "$REPO_ROOT/bash/.bashrc"
 check "OSC 9 DEBUG trap"                    grep -q "trap '__cmd_timer_start' DEBUG" "$REPO_ROOT/bash/.bashrc"
