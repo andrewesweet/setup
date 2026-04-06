@@ -62,8 +62,12 @@ echo "Syntax checks:"
 check ".bash_profile syntax"  bash -n "$REPO_ROOT/bash/.bash_profile"
 check ".bashrc syntax"        bash -n "$REPO_ROOT/bash/.bashrc"
 # .bash_aliases needs _OS defined (set by .bashrc which sources it)
+# shellcheck disable=SC2016
 check ".bash_aliases syntax (macos)" bash -n <(echo '_OS=macos'; cat "$REPO_ROOT/bash/.bash_aliases")
+# shellcheck disable=SC2016
 check ".bash_aliases syntax (linux)" bash -n <(echo '_OS=linux'; cat "$REPO_ROOT/bash/.bash_aliases")
+# shellcheck disable=SC2016
+check ".bash_aliases syntax (wsl)"   bash -n <(echo '_OS=wsl'; cat "$REPO_ROOT/bash/.bash_aliases")
 
 # ── .bashrc structure ──────────────────────────────────────────────────────
 echo ""
@@ -90,7 +94,7 @@ check ".bashrc has interactive guard"     grep -qF '[[ $- != *i* ]] && return' "
 check ".bashrc has platform detection"    grep -q 'case.*OSTYPE' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc has _OS fallback"          grep -q '_OS=unknown' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc has DOTFILES default"      grep -q 'DOTFILES=.*HOME/.dotfiles' "$REPO_ROOT/bash/.bashrc"
-check ".bashrc has expanded HISTIGNORE"   grep -q 'HISTIGNORE.*BEARER.*ANTHROPIC.*OPENAI' "$REPO_ROOT/bash/.bashrc"
+check ".bashrc has expanded HISTIGNORE"   grep -q 'HISTIGNORE.*GH_TOKEN.*GITHUB_PAT.*BEARER.*ANTHROPIC.*OPENAI' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc sources .bash_aliases"     grep -q 'source.*\.bash_aliases' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc sources .bashrc.local"     grep -q 'source.*\.bashrc\.local' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc has starship eval"         grep -q 'starship init bash' "$REPO_ROOT/bash/.bashrc"
@@ -154,7 +158,7 @@ check "prek: pk=prek run"         grep -q "^alias pk='prek run'" "$REPO_ROOT/bas
 check "gcloud: gx=gcloud"        grep -q "^alias gx='gcloud'" "$REPO_ROOT/bash/.bash_aliases"
 check "gcloud: gxa=activate"     grep -q "^alias gxa='gcloud config configurations activate'" "$REPO_ROOT/bash/.bash_aliases"
 check "codeql: cql"              grep -q "^alias cql='codeql'" "$REPO_ROOT/bash/.bash_aliases"
-check "markdown: mdv=glow"       grep -q "^alias mdv='glow" "$REPO_ROOT/bash/.bash_aliases"
+check "markdown: mdv=glow"       grep -q "^alias mdv='glow -s dark'" "$REPO_ROOT/bash/.bash_aliases"
 
 # No collisions
 if grep -qE "^alias fd=" "$REPO_ROOT/bash/.bash_aliases"; then
@@ -176,11 +180,6 @@ else
 fi
 
 # gha-* must be functions, not aliases (security.md)
-if grep -q "^alias gha-pin=" "$REPO_ROOT/bash/.bash_aliases"; then
-  nok "gha-pin is a function, not an alias"
-else
-  ok "gha-pin is not an alias"
-fi
 check "gha-pin() function exists"   grep -qE '^gha-pin[[:space:]]*\(\)' "$REPO_ROOT/bash/.bash_aliases"
 check "gha-check() function exists" grep -qE '^gha-check[[:space:]]*\(\)' "$REPO_ROOT/bash/.bash_aliases"
 check "gha-update() function exists" grep -qE '^gha-update[[:space:]]*\(\)' "$REPO_ROOT/bash/.bash_aliases"
@@ -217,12 +216,7 @@ check "completion-map-case"          grep -q 'completion-map-case on' "$REPO_ROO
 check "show-all-if-ambiguous"        grep -q 'show-all-if-ambiguous on' "$REPO_ROOT/bash/.inputrc"
 check "mark-symlinked-directories"   grep -q 'mark-symlinked-directories on' "$REPO_ROOT/bash/.inputrc"
 
-set_count=$(grep -c '^set ' "$REPO_ROOT/bash/.inputrc")
-if [[ "$set_count" -eq 7 ]]; then
-  ok ".inputrc has exactly 7 settings"
-else
-  nok ".inputrc has $set_count settings, expected 7"
-fi
+# Individual settings are tested above; a count test would be a change-detector.
 
 # ── Install script link() calls ───────────────────────────────────────────
 echo ""
@@ -267,8 +261,9 @@ echo ""
 
 # Sanity check: if the test count drops significantly, a test was likely
 # deleted by accident. Adjust this floor when adding new tests.
-if (( total < 60 )); then
-  echo "WARNING: only $total tests ran (expected >= 60). Were tests deleted?"
+# Current count: ~83 tests. Floor should be within ~10% of actual.
+if (( total < 75 )); then
+  echo "WARNING: only $total tests ran (expected >= 75). Were tests deleted?"
   exit 1
 fi
 

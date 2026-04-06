@@ -69,7 +69,7 @@ export HISTCONTROL=ignoreboth:erasedups
 export HISTTIMEFORMAT='%F %T '
 shopt -s histappend
 shopt -s cmdhist
-export HISTIGNORE="*GITHUB_TOKEN*:*TOKEN*:*SECRET*:*PASSWORD*:*KEY*:*BEARER*:*AUTHORIZATION*:*AWS_ACCESS*:*AWS_SECRET*:*AWS_SESSION*:*ANTHROPIC*:*OPENAI*"
+export HISTIGNORE="*GITHUB_TOKEN*:*GH_TOKEN*:*GITHUB_PAT*:*TOKEN*:*SECRET*:*PASSWORD*:*KEY*:*BEARER*:*AUTHORIZATION*:*AWS_ACCESS*:*AWS_SECRET*:*AWS_SESSION*:*ANTHROPIC*:*OPENAI*"
 
 # ── 7. Shell options ───────────────────────────────────────────────────────
 shopt -s checkwinsize

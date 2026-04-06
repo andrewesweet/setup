@@ -93,7 +93,10 @@ alias drd='direnv deny'
 # ── GitHub Actions — prefix: gha ───────────────────────────────────────────
 # Functions (not aliases) so GITHUB_TOKEN is passed as an env var prefix
 # rather than expanded into the command line visible in /proc/*/cmdline.
-# See security.md § "GITHUB_TOKEN in shell history".
+# Note: the token is still visible in /proc/<pid>/environ during the
+# lifetime of the pinact process. This is an inherent limitation of
+# shell-based env var injection. See security.md § "GITHUB_TOKEN in
+# shell history".
 gha-pin() {
   gh auth status &>/dev/null || { echo "gh: not authenticated. Run: gh auth login" >&2; return 1; }
   GITHUB_TOKEN=$(gh auth token) pinact run "$@"
