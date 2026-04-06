@@ -81,13 +81,15 @@ check "delta decorations feature"     grep -q 'features.*=.*decorations' "$REPO_
 check "interactive.diffFilter delta"  grep -q 'diffFilter.*=.*delta' "$REPO_ROOT/git/.gitconfig"
 
 # Diff tools
-check "diff.tool = difftastic"       grep -q 'tool.*=.*difftastic' "$REPO_ROOT/git/.gitconfig"
+check "diff.tool = difftastic"       grep -qE '^\s*tool\s*=.*difftastic' "$REPO_ROOT/git/.gitconfig"
 check "difftool difft cmd"           grep -q 'cmd.*=.*difft' "$REPO_ROOT/git/.gitconfig"
 
 # Merge
 check "merge.conflictstyle = diff3"  grep -q 'conflictstyle.*=.*diff3' "$REPO_ROOT/git/.gitconfig"
-check "merge.tool = vscode"          grep -q 'tool.*=.*vscode' "$REPO_ROOT/git/.gitconfig"
+check "merge.tool = vscode"          grep -qE '^\s*tool\s*=.*vscode' "$REPO_ROOT/git/.gitconfig"
 check "mergetool vscode cmd"         grep -q 'code --wait --merge' "$REPO_ROOT/git/.gitconfig"
+# shellcheck disable=SC2016
+check "mergetool vars quoted"        grep -qF '"$REMOTE" "$LOCAL" "$BASE" "$MERGED"' "$REPO_ROOT/git/.gitconfig"
 check "mergetool.keepBackup = false" grep -q 'keepBackup.*=.*false' "$REPO_ROOT/git/.gitconfig"
 
 # Workflow settings
@@ -105,6 +107,7 @@ check "stash.showPatch = true"      grep -q 'showPatch.*=.*true' "$REPO_ROOT/git
 check "alias: undo"                 grep -q 'undo.*=.*reset HEAD~1' "$REPO_ROOT/git/.gitconfig"
 check "alias: wip"                  grep -q 'wip.*=.*!git add -A' "$REPO_ROOT/git/.gitconfig"
 check "alias: unwip"                grep -q 'unwip.*=.*WIP' "$REPO_ROOT/git/.gitconfig"
+check "alias: unwip feedback"       grep -qF 'No WIP commit found' "$REPO_ROOT/git/.gitconfig"
 check "alias: aliases"              grep -q 'aliases.*=.*config --get-regexp' "$REPO_ROOT/git/.gitconfig"
 
 # ── .gitignore_global ──────────────────────────────────────────────────────
@@ -123,7 +126,7 @@ check "ignores .idea/"             grep -qF '.idea/' "$REPO_ROOT/git/.gitignore_
 check "ignores *.swp"              grep -qF '*.swp' "$REPO_ROOT/git/.gitignore_global"
 check "ignores *.swo"              grep -qF '*.swo' "$REPO_ROOT/git/.gitignore_global"
 check "ignores *~"                 grep -qF '*~' "$REPO_ROOT/git/.gitignore_global"
-check "ignores .aider*"            grep -qF '.aider' "$REPO_ROOT/git/.gitignore_global"
+check "ignores .aider*"            grep -qF '.aider*' "$REPO_ROOT/git/.gitignore_global"
 
 # OS/tools
 check "ignores Thumbs.db"          grep -qF 'Thumbs.db' "$REPO_ROOT/git/.gitignore_global"
