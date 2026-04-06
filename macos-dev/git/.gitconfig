@@ -37,7 +37,7 @@
 
 [merge]
     conflictstyle = diff3
-    tool          = vscode
+    tool          = nvimdiff
 
 [mergetool "vscode"]
     cmd = code --wait --merge "$REMOTE" "$LOCAL" "$BASE" "$MERGED"

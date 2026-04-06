@@ -86,7 +86,8 @@ check "difftool difft cmd"           grep -q 'cmd.*=.*difft' "$REPO_ROOT/git/.gi
 
 # Merge
 check "merge.conflictstyle = diff3"  grep -q 'conflictstyle.*=.*diff3' "$REPO_ROOT/git/.gitconfig"
-check "merge.tool = vscode"          grep -qE '^\s*tool\s*=.*vscode' "$REPO_ROOT/git/.gitconfig"
+check "merge.tool = nvimdiff"        grep -qE '^\s*tool\s*=.*nvimdiff' "$REPO_ROOT/git/.gitconfig"
+check "mergetool vscode stanza"      grep -qF '[mergetool "vscode"]' "$REPO_ROOT/git/.gitconfig"
 check "mergetool vscode cmd"         grep -q 'code --wait --merge' "$REPO_ROOT/git/.gitconfig"
 # shellcheck disable=SC2016
 check "mergetool vars quoted"        grep -qF '"$REMOTE" "$LOCAL" "$BASE" "$MERGED"' "$REPO_ROOT/git/.gitconfig"
