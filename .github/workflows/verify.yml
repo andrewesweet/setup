@@ -50,6 +50,9 @@ jobs:
       - name: Tool manifest drift check
         run: bash macos-dev/scripts/check-tool-manifest.sh
 
+      - name: Plan 2 bash config smoke tests
+        run: bash macos-dev/scripts/test-plan2.sh
+
       - name: DOTFILES self-resolution smoke test (macos installer)
         run: |
           # The inner bash install.sh exits non-zero on non-macOS hosts.
