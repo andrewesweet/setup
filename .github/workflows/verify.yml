@@ -65,6 +65,9 @@ jobs:
       - name: Plans 6-8 starship/lazygit/mise config smoke tests
         run: bash macos-dev/scripts/test-plan6-8.sh
 
+      - name: Plan 9 opencode config smoke tests
+        run: bash macos-dev/scripts/test-plan9.sh
+
       - name: DOTFILES self-resolution smoke test (macos installer)
         run: |
           # The inner bash install.sh exits non-zero on non-macOS hosts.
@@ -138,6 +141,9 @@ jobs:
 
       - name: Plans 6-8 starship/lazygit/mise config smoke tests
         run: bash macos-dev/scripts/test-plan6-8.sh
+
+      - name: Plan 9 opencode config smoke tests
+        run: bash macos-dev/scripts/test-plan9.sh
 
       - name: brew bundle check (validates formulas without installing)
         run: brew bundle check --file=macos-dev/Brewfile --verbose || true
