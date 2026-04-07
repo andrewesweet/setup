@@ -59,6 +59,9 @@ jobs:
       - name: Plan 4 kitty config smoke tests
         run: bash macos-dev/scripts/test-plan4.sh
 
+      - name: Plan 5 tmux config smoke tests
+        run: bash macos-dev/scripts/test-plan5.sh
+
       - name: DOTFILES self-resolution smoke test (macos installer)
         run: |
           # The inner bash install.sh exits non-zero on non-macOS hosts.
@@ -126,6 +129,9 @@ jobs:
 
       - name: Plan 4 kitty config smoke tests
         run: bash macos-dev/scripts/test-plan4.sh
+
+      - name: Plan 5 tmux config smoke tests
+        run: bash macos-dev/scripts/test-plan5.sh
 
       - name: brew bundle check (validates formulas without installing)
         run: brew bundle check --file=macos-dev/Brewfile --verbose || true
