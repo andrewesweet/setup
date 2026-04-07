@@ -139,6 +139,8 @@ check "session_export = leader+X"       grep -qF '"session_export": "<leader>X"'
 check "sidebar_toggle = leader+b"       grep -qF '"sidebar_toggle": "<leader>b"' "$REPO_ROOT/opencode/tui.jsonc"
 check "session_child_cycle = leader+right"  grep -qF '"session_child_cycle": "<leader>right"' "$REPO_ROOT/opencode/tui.jsonc"
 check "session_parent = leader+up"      grep -qF '"session_parent": "<leader>up"' "$REPO_ROOT/opencode/tui.jsonc"
+check "session_child_first = leader+down"         grep -qF '"session_child_first": "<leader>down"' "$REPO_ROOT/opencode/tui.jsonc"
+check "session_child_cycle_reverse = leader+left" grep -qF '"session_child_cycle_reverse": "<leader>left"' "$REPO_ROOT/opencode/tui.jsonc"
 
 # ── Instruction files ─────────────────────────────────────────────────────
 echo ""
@@ -187,9 +189,9 @@ if [[ "$fail" -gt 0 ]]; then
 fi
 echo ""
 
-# Current count: 80 tests. Floor should be within ~10% of actual.
-if (( total < 72 )); then
-  echo "WARNING: only $total tests ran (expected >= 72). Were tests deleted?"
+# Current count: 82 tests. Floor should be within ~10% of actual.
+if (( total < 74 )); then
+  echo "WARNING: only $total tests ran (expected >= 74). Were tests deleted?"
   exit 1
 fi
 

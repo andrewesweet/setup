@@ -38,7 +38,7 @@
       "which *": "allow", "type *": "allow",
       "pwd": "allow", "date *": "allow", "date": "allow",
       "npm list *": "allow", "brew list *": "allow",
-      "rm -rf /tmp/opencode-*": "allow",
+      "rm -rf /tmp/opencode-*": "allow", // Scoped exception for scratch cleanup (specificity-wins)
       "rm -rf *": "deny", "rm -fr *": "deny",
       "sudo *": "deny", "chmod 777 *": "deny"
     },
