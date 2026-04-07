@@ -274,6 +274,9 @@ link opencode/instructions/scratch-dirs.md      .config/opencode/instructions/sc
 # nvim (Plan 10)
 link nvim  .config/nvim
 
+# prek (Plan 11)
+link prek/.pre-commit-config.yaml  .pre-commit-config.yaml
+
 # ── Step 4: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
