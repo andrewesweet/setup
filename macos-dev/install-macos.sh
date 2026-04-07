@@ -254,6 +254,9 @@ link bash/.inputrc      .inputrc
 link git/.gitconfig         .gitconfig
 link git/.gitignore_global  .gitignore_global
 
+# kitty terminal (Plan 4)
+link kitty/kitty.conf  .config/kitty/kitty.conf
+
 # ── Step 4: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
