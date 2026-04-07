@@ -142,8 +142,8 @@ check "prevItem = k"                  grep -q 'prevItem:.*k' "$REPO_ROOT/lazygit
 check "nextItem = j"                  grep -q 'nextItem:.*j' "$REPO_ROOT/lazygit/config.yml"
 check "scrollLeft = h"                grep -q 'scrollLeft:.*h' "$REPO_ROOT/lazygit/config.yml"
 check "scrollRight = l"               grep -q 'scrollRight:.*l' "$REPO_ROOT/lazygit/config.yml"
-check "nextTab = ]"                   grep -qF 'nextTab' "$REPO_ROOT/lazygit/config.yml"
-check "prevTab = ["                   grep -qF 'prevTab' "$REPO_ROOT/lazygit/config.yml"
+check "nextTab = ]"                   grep -qF 'nextTab:         "]"' "$REPO_ROOT/lazygit/config.yml"
+check "prevTab = ["                   grep -qF 'prevTab:         "["' "$REPO_ROOT/lazygit/config.yml"
 check "openRecentRepos = c-r"         grep -q 'openRecentRepos.*c-r' "$REPO_ROOT/lazygit/config.yml"
 
 # ══════════════════════════════════════════════════════════════════════════
