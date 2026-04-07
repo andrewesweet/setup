@@ -195,6 +195,9 @@ link git/.gitignore_global  .gitignore_global
 # kitty terminal (Plan 4)
 link kitty/kitty.conf  .config/kitty/kitty.conf
 
+# tmux (Plan 5)
+link tmux/.tmux.conf  .tmux.conf
+
 # ── Step 5: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
