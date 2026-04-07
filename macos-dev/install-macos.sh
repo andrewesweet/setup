@@ -265,6 +265,12 @@ link starship/starship.toml  .config/starship.toml
 link lazygit/config.yml      .config/lazygit/config.yml
 link mise/config.toml        .config/mise/config.toml
 
+# opencode (Plan 9)
+link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc
+link opencode/tui.jsonc                         .config/opencode/tui.jsonc
+link opencode/instructions/git-conventions.md   .config/opencode/instructions/git-conventions.md
+link opencode/instructions/scratch-dirs.md      .config/opencode/instructions/scratch-dirs.md
+
 # ── Step 4: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
