@@ -209,6 +209,9 @@ link opencode/tui.jsonc                         .config/opencode/tui.jsonc
 link opencode/instructions/git-conventions.md   .config/opencode/instructions/git-conventions.md
 link opencode/instructions/scratch-dirs.md      .config/opencode/instructions/scratch-dirs.md
 
+# nvim (Plan 10)
+link nvim  .config/nvim
+
 # ── Step 5: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
