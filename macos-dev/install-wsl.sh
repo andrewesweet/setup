@@ -215,6 +215,10 @@ link nvim  .config/nvim
 # prek (Plan 11)
 link prek/.pre-commit-config.yaml  .pre-commit-config.yaml
 
+# vscode (Plan 12) — WSL settings path
+link vscode/settings.json    .vscode-server/data/Machine/settings.json
+link vscode/extensions.json  .vscode-server/data/Machine/extensions.json
+
 # ── Step 5: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
