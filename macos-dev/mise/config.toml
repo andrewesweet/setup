@@ -1,0 +1,12 @@
+# config.toml — mise global configuration
+# See docs/design/languages.md for the specification.
+#
+# This is the global config installed to ~/.config/mise/config.toml.
+# Per-project .mise.toml files override these versions.
+
+[tools]
+python = "3.13"
+go     = "1.24"
+
+[settings]
+auto_install = false  # Interactive machines: false. CI: override to true.
