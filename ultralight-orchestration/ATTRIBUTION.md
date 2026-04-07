@@ -8,7 +8,7 @@ These VS Code agent configuration files were copied from the following GitHub Gi
 - **Gist URL:** https://gist.github.com/burkeholland/0e68481f96e94bbb98134fa6efd00436
 - **Title:** Ultralight Orchestration
 - **Date copied:** 2026-02-18
-- **Gist last updated:** 2026-02-18
+- **Gist last updated:** 2026-04-07
 
 ## Files
 

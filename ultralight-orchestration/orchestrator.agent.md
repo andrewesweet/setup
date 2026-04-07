@@ -1,7 +1,7 @@
 ---
 name: Orchestrator
-description: GPT-5.2, GPT-5.2-Codex
-model: GPT-5.2 (copilot)
+description: Sonnet, Codex, Gemini
+model: Claude Opus 4.6 (copilot)
 tools: ['read/readFile', 'agent', 'memory']
 ---
 
