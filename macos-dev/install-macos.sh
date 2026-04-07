@@ -111,6 +111,12 @@ restore() {
   local backup="$HOME/.dotfiles-backup/$latest"
   log "restoring from $backup"
 
+  # Unload LaunchAgent if present
+  launchctl bootout "gui/$(id -u)/io.podman.machine" 2>/dev/null || true
+  rm -f "$HOME/Library/LaunchAgents/io.podman.machine.plist"
+  rm -f "$HOME/.local/bin/podman-machine-start"
+  rm -f "$HOME/.local/bin/dev"
+
   # Walk the backup tree and restore each file.
   # Note the explicit grouping with \( ... \) — without it, find's operator
   # precedence parses "-type f -o -type l" as "(-type f) -o (-type l -print)"
@@ -280,6 +286,32 @@ link prek/.pre-commit-config.yaml  .pre-commit-config.yaml
 # vscode (Plan 12) — macOS settings path
 link vscode/settings.json    "Library/Application Support/Code/User/settings.json"
 link vscode/extensions.json  "Library/Application Support/Code/User/extensions.json"
+
+# container dev script (Plan 13)
+mkdir -p "$HOME/.local/bin"
+link container/dev.sh  .local/bin/dev
+
+# Podman Machine LaunchAgent (macOS only)
+if [[ "$(uname)" == "Darwin" ]]; then
+  # Substitute markers in LaunchAgent wrapper
+  wrapper_src="$DOTFILES/container/podman-machine-start.sh"
+  wrapper_dst="$HOME/.local/bin/podman-machine-start"
+  sed "s|@HOMEBREW_PREFIX@|$HOMEBREW_PREFIX|g" "$wrapper_src" > "$wrapper_dst"
+  chmod +x "$wrapper_dst"
+  printf "  linked    %s\n" "$wrapper_dst"
+
+  # Substitute markers in plist and install
+  mkdir -p "$HOME/Library/LaunchAgents"
+  plist_src="$DOTFILES/container/io.podman.machine.plist"
+  plist_dst="$HOME/Library/LaunchAgents/io.podman.machine.plist"
+  sed -e "s|@HOME@|$HOME|g" -e "s|@SCRIPT_PATH@|$wrapper_dst|g" "$plist_src" > "$plist_dst"
+  printf "  linked    %s\n" "$plist_dst"
+
+  # Load LaunchAgent (idempotent)
+  launchctl bootout "gui/$(id -u)/io.podman.machine" 2>/dev/null || true
+  launchctl bootstrap "gui/$(id -u)" "$plist_dst"
+  log "Podman Machine LaunchAgent loaded"
+fi
 
 # ── Step 4: Next steps ───────────────────────────────────────────────────────
 log "install complete"
