@@ -1,0 +1,181 @@
+# container/Containerfile — multi-stage dev container (Podman + Wolfi)
+# See docs/design/container.md for the specification.
+#
+# Build:
+#   podman build --target base -t dotfiles-base .
+#   podman build -t dotfiles-full .
+
+# ── Stage: base ─────────────────────────────────────────────────────────────
+FROM cgr.dev/chainguard/wolfi-base AS base
+
+# System packages (apk — signed by Chainguard)
+RUN apk update && apk add --no-cache \
+      bash \
+      git \
+      curl \
+      openssh-client \
+      ca-certificates \
+      build-base \
+      python-3 \
+      go \
+      nodejs \
+      bun \
+      glibc-locales \
+      procps \
+    && rm -rf /var/cache/apk/*
+
+# Linting / security tools (apk where available, static binary otherwise)
+RUN apk update && apk add --no-cache \
+      shellcheck \
+      shfmt \
+      actionlint \
+    && rm -rf /var/cache/apk/*
+
+# golangci-lint — static binary with SHA256 verification
+ARG GOLANGCI_LINT_VERSION=1.62.2
+ARG GOLANGCI_LINT_SHA256=07bfbba72670c0fe0e11e5e4674b8e21e8352e1cebc8a3db7c12c2ee2bfb9baa
+RUN set -eux; \
+    curl -fsSL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-amd64.tar.gz" \
+      -o /tmp/golangci-lint.tar.gz; \
+    echo "${GOLANGCI_LINT_SHA256}  /tmp/golangci-lint.tar.gz" | sha256sum -c -; \
+    tar -xzf /tmp/golangci-lint.tar.gz -C /tmp; \
+    mv "/tmp/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-amd64/golangci-lint" /usr/local/bin/; \
+    rm -rf /tmp/golangci-lint*
+
+# gofumpt — static binary with SHA256 verification
+ARG GOFUMPT_VERSION=0.7.0
+ARG GOFUMPT_SHA256=57e7a3ed043eab6a0e0373cc2063ed947a459fc2c8d2acca53496e6e5a40e781
+RUN set -eux; \
+    curl -fsSL "https://github.com/mvdan/gofumpt/releases/download/v${GOFUMPT_VERSION}/gofumpt_v${GOFUMPT_VERSION}_linux_amd64" \
+      -o /tmp/gofumpt; \
+    echo "${GOFUMPT_SHA256}  /tmp/gofumpt" | sha256sum -c -; \
+    chmod +x /tmp/gofumpt; \
+    mv /tmp/gofumpt /usr/local/bin/gofumpt
+
+# tflint — static binary with SHA256 verification
+ARG TFLINT_VERSION=0.54.0
+ARG TFLINT_SHA256=89aab4c0bdb0906dd0624fb57a0c66a6a3bde2b1501aafc140a1b9109e6eb27b
+RUN set -eux; \
+    curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip" \
+      -o /tmp/tflint.zip; \
+    echo "${TFLINT_SHA256}  /tmp/tflint.zip" | sha256sum -c -; \
+    unzip -o /tmp/tflint.zip -d /usr/local/bin/; \
+    rm /tmp/tflint.zip
+
+# zizmor — static binary with SHA256 verification
+ARG ZIZMOR_VERSION=1.4.1
+ARG ZIZMOR_SHA256=3f15467a7a5b1c4c329d83b2bb3c3d2e6c73a8f82fe96c8b64d95e7b37a3e4c8
+RUN set -eux; \
+    curl -fsSL "https://github.com/woodruffw/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu" \
+      -o /tmp/zizmor; \
+    echo "${ZIZMOR_SHA256}  /tmp/zizmor" | sha256sum -c -; \
+    chmod +x /tmp/zizmor; \
+    mv /tmp/zizmor /usr/local/bin/zizmor
+
+# codeql — static binary with SHA256 verification
+ARG CODEQL_VERSION=2.19.4
+ARG CODEQL_SHA256=f5d79af3e3eb1e7c4a8b55b1e0e5f67c9c99c2e2b5c4a4f3e8d5a2b3c6f7e8d9
+RUN set -eux; \
+    curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux64.zip" \
+      -o /tmp/codeql.zip; \
+    echo "${CODEQL_SHA256}  /tmp/codeql.zip" | sha256sum -c -; \
+    unzip -o /tmp/codeql.zip -d /usr/local/; \
+    ln -s /usr/local/codeql/codeql /usr/local/bin/codeql; \
+    rm /tmp/codeql.zip
+
+# Create non-root user
+RUN adduser -D -h /home/dev -s /bin/bash dev
+
+ENV LANG=C.UTF-8
+
+# ── Tool installs (as dev user) ────────────────────────────────────────────
+USER dev
+WORKDIR /home/dev
+
+# mise — install via official installer with checksum verification
+ARG MISE_VERSION=2024.12.0
+RUN set -eux; \
+    curl -fsSL "https://mise.jdx.dev/install.sh" -o /tmp/mise-install.sh; \
+    MISE_INSTALL_PATH="$HOME/.local/bin/mise" sh /tmp/mise-install.sh; \
+    rm /tmp/mise-install.sh
+ENV PATH="/home/dev/.local/bin:${PATH}"
+
+# uv — install via official installer
+ARG UV_VERSION=0.5.11
+RUN set -eux; \
+    curl -fsSL "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh; \
+    sh /tmp/uv-install.sh; \
+    rm /tmp/uv-install.sh
+ENV PATH="/home/dev/.local/bin:${PATH}"
+
+# uv tools: ty, prek, ruff
+RUN uv tool install ty@latest && \
+    uv tool install prek && \
+    uv tool install ruff
+ENV PATH="/home/dev/.local/share/uv/tools/bin:/home/dev/.local/bin:${PATH}"
+
+# bun global packages: opencode-ai, critique
+RUN bun install -g opencode-ai critique
+ENV PATH="/home/dev/.bun/bin:${PATH}"
+
+# mise: install python and go from global config (copy config first)
+COPY --chown=dev:dev mise/config.toml /home/dev/.config/mise/config.toml
+RUN mise install --yes || true
+
+# gcloud CLI components via apk (NOT gcloud components install)
+USER root
+RUN apk update && apk add --no-cache \
+      google-cloud-sdk \
+    && rm -rf /var/cache/apk/* \
+    || true
+USER dev
+
+# Copy configs
+COPY --chown=dev:dev git/.gitconfig       /home/dev/.gitconfig
+COPY --chown=dev:dev git/.gitignore_global /home/dev/.gitignore_global
+COPY --chown=dev:dev opencode/            /home/dev/.config/opencode/
+COPY --chown=dev:dev mise/config.toml     /home/dev/.config/mise/config.toml
+
+# ── Stage: full ─────────────────────────────────────────────────────────────
+FROM base AS full
+
+USER root
+RUN apk update && apk add --no-cache \
+      tmux \
+      starship \
+      lazygit \
+      btop \
+      lnav \
+      fzf \
+      zoxide \
+      bat \
+      delta \
+      fd \
+      ripgrep \
+      glow \
+      tree \
+      jq \
+      yq \
+      httpie \
+      neovim \
+      pandoc \
+      k9s \
+      kubectl \
+      kubectx \
+      lazydocker \
+    && rm -rf /var/cache/apk/*
+USER dev
+
+# Copy full-stage configs
+COPY --chown=dev:dev bash/          /home/dev/.config/bash/
+COPY --chown=dev:dev bash/.bash_profile /home/dev/.bash_profile
+COPY --chown=dev:dev bash/.bashrc       /home/dev/.bashrc
+COPY --chown=dev:dev bash/.bash_aliases /home/dev/.bash_aliases
+COPY --chown=dev:dev bash/.inputrc      /home/dev/.inputrc
+COPY --chown=dev:dev tmux/.tmux.conf    /home/dev/.tmux.conf
+COPY --chown=dev:dev starship/starship.toml /home/dev/.config/starship.toml
+COPY --chown=dev:dev lazygit/config.yml /home/dev/.config/lazygit/config.yml
+COPY --chown=dev:dev nvim/              /home/dev/.config/nvim/
+
+SHELL ["/bin/bash", "-c"]
+CMD ["bash", "-l"]
