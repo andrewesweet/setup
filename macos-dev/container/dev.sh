@@ -90,17 +90,16 @@ _load_env() {
 
 # ── Auto-set git identity from host ────────────────────────────────────────
 _git_env_args() {
-  local args=()
+  # Outputs null-delimited args to preserve spaces in names
   local name email
   name="$(git config user.name 2>/dev/null || true)"
   email="$(git config user.email 2>/dev/null || true)"
   if [[ -n "$name" ]]; then
-    args+=(-e "GIT_AUTHOR_NAME=$name" -e "GIT_COMMITTER_NAME=$name")
+    printf '%s\0' "-e" "GIT_AUTHOR_NAME=$name" "-e" "GIT_COMMITTER_NAME=$name"
   fi
   if [[ -n "$email" ]]; then
-    args+=(-e "GIT_AUTHOR_EMAIL=$email" -e "GIT_COMMITTER_EMAIL=$email")
+    printf '%s\0' "-e" "GIT_AUTHOR_EMAIL=$email" "-e" "GIT_COMMITTER_EMAIL=$email"
   fi
-  echo "${args[@]}"
 }
 
 # ── Security flags ──────────────────────────────────────────────────────────
@@ -312,7 +311,8 @@ cmd_shell() {
   # shellcheck disable=SC2207
   local cred_mounts=($(_credential_mounts))
   # shellcheck disable=SC2207
-  local git_env=($(_git_env_args))
+  local git_env=()
+  mapfile -d '' git_env < <(_git_env_args)
 
   local ref_mounts=()
   for ref in "${ref_paths[@]+"${ref_paths[@]}"}"; do

@@ -12,7 +12,7 @@ echo ""
 # Base tools
 echo "Base tools:"
 for tool in bash git curl ssh mise uv python3 go node bun opencode critique ruff ty prek \
-            shellcheck shfmt golangci-lint gofumpt actionlint tflint zizmor; do
+            shellcheck shfmt golangci-lint gofumpt actionlint tflint zizmor codeql; do
   check "$tool"
 done
 
