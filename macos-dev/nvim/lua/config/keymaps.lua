@@ -1,0 +1,3 @@
+-- keymaps.lua — custom keymaps
+-- See docs/design/editor-neovim.md for the specification.
+-- LazyVim provides extensive default keymaps. Only add overrides here.
