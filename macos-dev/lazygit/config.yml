@@ -1,0 +1,37 @@
+# config.yml — lazygit configuration
+# See docs/design/git.md for the specification.
+
+gui:
+  theme:
+    activeBorderColor:
+      - '#89b4fa'
+      - bold
+    selectedLineBgColor:
+      - '#313244'
+  sidePanelWidth: 0.25
+  expandFocusedSidePanel: true
+  showFileTree: true
+  nerdFontsVersion: "3"
+
+git:
+  paging:
+    colorArg: always
+    pager: delta --paging=never --syntax-theme='Monokai Extended'
+  commit:
+    signOff: false
+  fetching:
+    interval: 60
+
+keybinding:
+  universal:
+    quit:            q
+    return:          "<esc>"
+    scrollUpMain:    k
+    scrollDownMain:  j
+    prevItem:        k
+    nextItem:        j
+    scrollLeft:      h
+    scrollRight:     l
+    nextTab:         "]"
+    prevTab:         "["
+    openRecentRepos: "<c-r>"
