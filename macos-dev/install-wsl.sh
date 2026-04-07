@@ -188,13 +188,20 @@ link bash/.bashrc       .bashrc
 link bash/.bash_aliases .bash_aliases
 link bash/.inputrc      .inputrc
 
+# git config (Plan 3)
+link git/.gitconfig         .gitconfig
+link git/.gitignore_global  .gitignore_global
+
 # ── Step 5: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
 
 Next steps:
   1. Restart your shell.
-  2. Authenticate tools (once bun/opencode are available in a later plan):
+  2. Create ~/.gitconfig.local with your identity:
+       git config --file ~/.gitconfig.local user.name "Your Name"
+       git config --file ~/.gitconfig.local user.email "you@example.com"
+  3. Authenticate tools (once bun/opencode are available in a later plan):
        opencode auth login
        gh auth login
        gcloud auth login

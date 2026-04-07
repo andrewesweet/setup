@@ -53,6 +53,9 @@ jobs:
       - name: Plan 2 bash config smoke tests
         run: bash macos-dev/scripts/test-plan2.sh
 
+      - name: Plan 3 git config smoke tests
+        run: bash macos-dev/scripts/test-plan3.sh
+
       - name: DOTFILES self-resolution smoke test (macos installer)
         run: |
           # The inner bash install.sh exits non-zero on non-macOS hosts.
@@ -114,6 +117,9 @@ jobs:
 
       - name: Plan 2 bash config smoke tests
         run: bash macos-dev/scripts/test-plan2.sh
+
+      - name: Plan 3 git config smoke tests
+        run: bash macos-dev/scripts/test-plan3.sh
 
       - name: brew bundle check (validates formulas without installing)
         run: brew bundle check --file=macos-dev/Brewfile --verbose || true

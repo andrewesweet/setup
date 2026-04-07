@@ -5,6 +5,7 @@ nvim/lazy-lock.json.bak
 # ── Local overrides (never committed) ────────────────────────────────────────
 container/dev.env
 .bashrc.local
+.gitconfig.local
 
 # ── Backup directories created by install scripts ─────────────────────────────
 .dotfiles-backup/
