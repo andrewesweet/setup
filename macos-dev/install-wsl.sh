@@ -219,6 +219,10 @@ link prek/.pre-commit-config.yaml  .pre-commit-config.yaml
 link vscode/settings.json    .vscode-server/data/Machine/settings.json
 link vscode/extensions.json  .vscode-server/data/Machine/extensions.json
 
+# container dev script (Plan 13)
+mkdir -p "$HOME/.local/bin"
+link container/dev.sh  .local/bin/dev
+
 # ── Step 5: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
