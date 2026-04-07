@@ -80,6 +80,9 @@ jobs:
       - name: Plan 13 container config smoke tests
         run: bash macos-dev/scripts/test-plan13.sh
 
+      - name: Plans 14-16 scripts/cheatsheet/readme smoke tests
+        run: bash macos-dev/scripts/test-plan14-16.sh
+
       - name: DOTFILES self-resolution smoke test (macos installer)
         run: |
           # The inner bash install.sh exits non-zero on non-macOS hosts.
@@ -168,6 +171,9 @@ jobs:
 
       - name: Plan 13 container config smoke tests
         run: bash macos-dev/scripts/test-plan13.sh
+
+      - name: Plans 14-16 scripts/cheatsheet/readme smoke tests
+        run: bash macos-dev/scripts/test-plan14-16.sh
 
       - name: brew bundle check (validates formulas without installing)
         run: brew bundle check --file=macos-dev/Brewfile --verbose || true
