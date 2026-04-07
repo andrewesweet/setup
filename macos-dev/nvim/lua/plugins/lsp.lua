@@ -2,8 +2,8 @@
 -- See docs/design/editor-neovim.md for the specification.
 --
 -- CRITICAL: vim.g assignments MUST be before the return statement.
--- ty MUST NOT be in Mason's ensure_installed (installed via uv tool).
--- Do NOT use require("lspconfig") — use vim.lsp.config / vim.lsp.enable.
+-- ty is installed via uv tool, not Mason.
+-- Use vim.lsp.config / vim.lsp.enable instead of direct lspconfig calls.
 
 vim.g.lazyvim_python_lsp       = "ty"
 vim.g.lazyvim_python_formatter = "ruff"
@@ -17,8 +17,7 @@ return {
         pyright      = { enabled = false },
         pylsp        = { enabled = false },
         ty = { enabled = true, autostart = true },
-        ruff = {
-          enabled = true, autostart = true,
+        ruff = { enabled = true, autostart = true,
           init_options = {
             settings = { fixAll = true, organizeImports = true },
           },
@@ -54,8 +53,7 @@ return {
             },
           },
         },
-        gh_actions_ls = {
-          filetypes = { "yaml.github" },
+        gh_actions_ls = { filetypes = { "yaml.github" },
           root_dir = function(fname)
             return vim.fs.root(fname, ".git")
           end,

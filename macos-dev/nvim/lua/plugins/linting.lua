@@ -1,7 +1,7 @@
 -- linting.lua — nvim-lint configuration
 -- See docs/design/editor-neovim.md for the specification.
 --
--- Note: InsertLeave removed from events to prevent lag from slow linters.
+-- Note: Lint only on save/read (not on insert exit) to prevent lag.
 -- Fast linting feedback comes from LSP servers (bashls, ruff, ty).
 
 return {

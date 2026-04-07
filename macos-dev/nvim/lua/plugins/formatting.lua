@@ -1,7 +1,7 @@
 -- formatting.lua — conform.nvim configuration
 -- See docs/design/editor-neovim.md for the specification.
 --
--- Note: markdownlint-cli2 is a linter (not a formatter). Use prettier for markdown.
+-- Note: md lint tools belong in linting.lua (not here). Use prettier for markdown.
 
 return {
   {
