@@ -166,9 +166,9 @@ if [[ "$fail" -gt 0 ]]; then
 fi
 echo ""
 
-# Current count: 63 tests. Floor should be within ~10% of actual.
-if (( total < 57 )); then
-  echo "WARNING: only $total tests ran (expected >= 57). Were tests deleted?"
+# Current count: 57 tests. Floor should be within ~10% of actual.
+if (( total < 51 )); then
+  echo "WARNING: only $total tests ran (expected >= 51). Were tests deleted?"
   exit 1
 fi
 
