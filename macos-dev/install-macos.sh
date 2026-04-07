@@ -277,6 +277,10 @@ link nvim  .config/nvim
 # prek (Plan 11)
 link prek/.pre-commit-config.yaml  .pre-commit-config.yaml
 
+# vscode (Plan 12) — macOS settings path
+link vscode/settings.json    "Library/Application Support/Code/User/settings.json"
+link vscode/extensions.json  "Library/Application Support/Code/User/extensions.json"
+
 # ── Step 4: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF
