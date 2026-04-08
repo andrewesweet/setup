@@ -8,7 +8,10 @@
 # ── Stage: base ─────────────────────────────────────────────────────────────
 FROM cgr.dev/chainguard/wolfi-base AS base
 
-# System packages (apk — signed by Chainguard)
+# System packages + linting/security tools (apk — signed by Chainguard)
+# All tools installed via apk get automatic version updates from Wolfi.
+# If any package name is unavailable, the build fails here — fix by
+# checking `apk search <name>` or falling back to binary download.
 RUN apk update && apk add --no-cache \
       bash \
       git \
@@ -22,61 +25,17 @@ RUN apk update && apk add --no-cache \
       bun \
       glibc-locales \
       procps \
-    && rm -rf /var/cache/apk/*
-
-# Linting / security tools (apk where available, static binary otherwise)
-RUN apk update && apk add --no-cache \
+      golangci-lint \
+      gofumpt \
       shellcheck \
       shfmt \
+      tflint \
       actionlint \
+      zizmor \
     && rm -rf /var/cache/apk/*
 
-# golangci-lint — verified via release checksum file
-ARG GOLANGCI_LINT_VERSION=1.62.2
-RUN set -eux; \
-    curl -fsSL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-amd64.tar.gz" \
-      -o /tmp/golangci-lint.tar.gz; \
-    curl -fsSL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-checksums.txt" \
-      -o /tmp/golangci-lint-checksums.txt; \
-    grep "linux-amd64.tar.gz" /tmp/golangci-lint-checksums.txt | sed 's|  .*|  /tmp/golangci-lint.tar.gz|' | sha256sum -c -; \
-    tar -xzf /tmp/golangci-lint.tar.gz -C /tmp; \
-    mv "/tmp/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-amd64/golangci-lint" /usr/local/bin/; \
-    rm -rf /tmp/golangci-lint*
-
-# gofumpt — no release checksum file; pin hash (update on version bump)
-ARG GOFUMPT_VERSION=0.7.0
-ARG GOFUMPT_SHA256=57e7a3ed043eab6a0e0373cc2063ed947a459fc2c8d2acca53496e6e5a40e781
-RUN set -eux; \
-    curl -fsSL "https://github.com/mvdan/gofumpt/releases/download/v${GOFUMPT_VERSION}/gofumpt_v${GOFUMPT_VERSION}_linux_amd64" \
-      -o /tmp/gofumpt; \
-    echo "${GOFUMPT_SHA256}  /tmp/gofumpt" | sha256sum -c -; \
-    chmod +x /tmp/gofumpt; \
-    mv /tmp/gofumpt /usr/local/bin/gofumpt
-
-# tflint — verified via release checksum file
-ARG TFLINT_VERSION=0.54.0
-RUN set -eux; \
-    curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip" \
-      -o /tmp/tflint.zip; \
-    curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt" \
-      -o /tmp/tflint-checksums.txt; \
-    grep "linux_amd64.zip" /tmp/tflint-checksums.txt | sed 's|  .*|  /tmp/tflint.zip|' | sha256sum -c -; \
-    unzip -o /tmp/tflint.zip -d /usr/local/bin/; \
-    rm -rf /tmp/tflint*
-
-# zizmor — verified via release checksum file
-ARG ZIZMOR_VERSION=1.4.1
-RUN set -eux; \
-    curl -fsSL "https://github.com/woodruffw/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu" \
-      -o /tmp/zizmor; \
-    curl -fsSL "https://github.com/woodruffw/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu.sha256" \
-      -o /tmp/zizmor.sha256; \
-    cd /tmp && sha256sum -c zizmor.sha256; \
-    chmod +x /tmp/zizmor; \
-    mv /tmp/zizmor /usr/local/bin/zizmor
-
-# codeql — verified via release checksum file
-ARG CODEQL_VERSION=2.19.4
+# codeql — not typically in apk; verified via release checksum file
+ARG CODEQL_VERSION=2.25.1
 RUN set -eux; \
     curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux64.zip" \
       -o /tmp/codeql.zip; \
@@ -110,7 +69,7 @@ RUN set -eux; \
 ENV PATH="/home/dev/.local/bin:${PATH}"
 
 # uv — verified via release checksum file
-ARG UV_VERSION=0.6.14
+ARG UV_VERSION=0.11.4
 RUN set -eux; \
     curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" \
       -o /tmp/uv.tar.gz; \
@@ -125,8 +84,7 @@ RUN set -eux; \
 ENV PATH="/home/dev/.local/bin:${PATH}"
 
 # uv tools: ty, prek, ruff
-# Pin ty version for reproducibility (update deliberately)
-RUN uv tool install ty==0.0.0a6 && \
+RUN uv tool install ty && \
     uv tool install prek && \
     uv tool install ruff
 ENV PATH="/home/dev/.local/share/uv/tools/bin:/home/dev/.local/bin:${PATH}"
@@ -139,7 +97,7 @@ ENV PATH="/home/dev/.bun/bin:${PATH}"
 COPY --chown=dev:dev mise/config.toml /home/dev/.config/mise/config.toml
 RUN mise install --yes || true
 
-# gcloud CLI components via apk (NOT gcloud components install)
+# gcloud CLI via apk (NOT gcloud components install)
 USER root
 RUN apk update && apk add --no-cache \
       google-cloud-sdk \
