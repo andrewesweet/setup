@@ -14,4 +14,6 @@ if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
   unset _brew_bash
 fi
 
-[[ -f "$HOME/.bashrc" ]] && source "$HOME/.bashrc"
+if [[ -f "$HOME/.bashrc" ]]; then
+  source "$HOME/.bashrc"
+fi
