@@ -6,7 +6,7 @@
 #   podman build -t dotfiles-full .
 
 # ── Stage: base ─────────────────────────────────────────────────────────────
-FROM cgr.dev/chainguard/wolfi-base AS base
+FROM docker.io/chainguard/wolfi-base:latest AS base
 
 # System packages + linting/security tools (apk — signed by Chainguard)
 # All tools installed via apk get automatic version updates from Wolfi.
