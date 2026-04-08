@@ -45,6 +45,13 @@ export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 [[ -d "$HOME/.bun/bin" ]] && export PATH="$HOME/.bun/bin:$PATH"
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
 
+# OpenCode personal overrides (layers between global and project config).
+# Create these to customize without modifying the team baseline:
+#   ~/.config/opencode/opencode.local.jsonc  — config overrides (model, permissions)
+#   ~/.config/opencode/local/                — agents, commands, modes, plugins
+export OPENCODE_CONFIG="$HOME/.config/opencode/opencode.local.jsonc"
+export OPENCODE_CONFIG_DIR="$HOME/.config/opencode/local"
+
 # ── 4. Bash completion ─────────────────────────────────────────────────────
 if [[ $_OS == macos ]] && [[ -n "${HOMEBREW_PREFIX:-}" ]]; then
   [[ -f "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh" ]] && \
