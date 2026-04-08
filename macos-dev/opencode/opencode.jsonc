@@ -56,6 +56,6 @@
     },
     "doom_loop": "ask"
   },
-  "share": { "mode": "manual" },
+  "share": "disabled",
   "autoupdate": false // Pin version for supply-chain security. Update deliberately.
 }

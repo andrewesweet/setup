@@ -116,7 +116,7 @@ fi
 # ── opencode.jsonc — sharing and updates ──────────────────────────────────
 echo ""
 echo "opencode.jsonc — sharing and updates:"
-check "share mode = manual"              grep -qF '"mode": "manual"' "$REPO_ROOT/opencode/opencode.jsonc"
+check "share = disabled"                 grep -qF '"share": "disabled"' "$REPO_ROOT/opencode/opencode.jsonc"
 check "autoupdate = false"               grep -q 'autoupdate.*false' "$REPO_ROOT/opencode/opencode.jsonc"
 
 # ── opencode.jsonc — instruction paths ────────────────────────────────────
