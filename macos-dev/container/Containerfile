@@ -1,22 +1,23 @@
 # container/Containerfile — multi-stage dev container (Podman + Wolfi)
 # See docs/design/container.md for the specification.
 #
-# Build:
-#   podman build --target base -t dotfiles-base .
-#   podman build -t dotfiles-full .
+# Build (from macos-dev/ directory):
+#   podman build -f container/Containerfile --target base -t dotfiles-base .
+#   podman build -f container/Containerfile -t dotfiles-full .
 
 # ── Stage: base ─────────────────────────────────────────────────────────────
 FROM docker.io/chainguard/wolfi-base:latest AS base
 
 # Optional custom CA certificates (e.g., corporate TLS-inspecting proxy).
 # Place your CA bundle at container/custom-ca.pem (gitignored) and build with:
-#   podman build --build-arg CUSTOM_CA=custom-ca.pem --target base -t dotfiles-base container/
+#   cd macos-dev && podman build --build-arg CUSTOM_CA=container/custom-ca.pem --target base -t dotfiles-base .
 # If omitted, this is a no-op — backwards compatible with default builds.
 ARG CUSTOM_CA=""
-COPY ${CUSTOM_CA:-.dockerignore} /tmp/custom-ca-or-noop
+COPY ${CUSTOM_CA:-container/.dockerignore} /tmp/custom-ca-or-noop
 RUN if [ -n "${CUSTOM_CA}" ]; then \
+      mkdir -p /usr/local/share/ca-certificates; \
       cp /tmp/custom-ca-or-noop /usr/local/share/ca-certificates/custom-ca.crt; \
-      cat /usr/local/share/ca-certificates/custom-ca.crt >> /etc/ssl/certs/ca-certificates.crt; \
+      cat /tmp/custom-ca-or-noop >> /etc/ssl/certs/ca-certificates.crt; \
     fi; \
     rm -f /tmp/custom-ca-or-noop
 
