@@ -86,15 +86,23 @@ macos-dev/
 
 ### Local overrides
 
-Three files allow machine-specific customization without modifying tracked dotfiles:
+These files allow machine-specific customization without modifying tracked dotfiles.
+All are in `.gitignore` and never committed. The installer scaffolds empty defaults where needed.
 
-| File | Purpose |
-|------|---------|
+| File / Directory | Purpose |
+|-----------------|---------|
 | `~/.bashrc.local` | Extra shell config, aliases, exports |
 | `~/.gitconfig.local` | Work-specific Git author, signing key |
+| `~/.config/opencode-local/opencode.jsonc` | Personal OpenCode config overrides (model, permissions) |
+| `~/.config/opencode-local/` | Personal OpenCode agents, commands, modes, plugins |
 | `container/dev.env` | Environment variables for dev container |
+| `container/custom-ca.pem` | Corporate TLS proxy CA certificate (for container builds) |
 
-These files are in `.gitignore` and never committed.
+**OpenCode override precedence:**
+Remote (org) -> Global (team baseline in `~/.config/opencode/`) -> Custom (personal in `~/.config/opencode-local/`) -> Project (`./opencode.jsonc`).
+Each layer overrides the previous. To change where personal overrides are stored, set `OPENCODE_CONFIG` and `OPENCODE_CONFIG_DIR` in `~/.bashrc.local`.
+
+**VS Code-primary users:** Add `export EDITOR='code --wait'` to `~/.bashrc.local` to use VS Code as the default editor instead of Neovim.
 
 ### Environment variables
 
@@ -103,6 +111,8 @@ These files are in `.gitignore` and never committed.
 | `DOTFILES` | Path to the macos-dev directory (auto-detected) |
 | `EDITOR` | Set to `nvim` if available, falls back to `code --wait` |
 | `HOMEBREW_PREFIX` | Detected dynamically via `brew --prefix` |
+| `OPENCODE_CONFIG` | Personal OpenCode config path (default: `~/.config/opencode-local/opencode.jsonc`) |
+| `OPENCODE_CONFIG_DIR` | Personal OpenCode directory for agents/commands/modes/plugins (default: `~/.config/opencode-local/`) |
 
 ## Container development
 
