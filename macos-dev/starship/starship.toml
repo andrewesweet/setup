@@ -30,7 +30,7 @@ diverged   = "⇕"
 modified = "*"
 staged = "+"
 untracked = "?"
-stashed = "$"
+stashed = "\\$"
 
 [character]
 vicmd_symbol   = "[N](bold green) "

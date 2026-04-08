@@ -73,7 +73,7 @@ check "git_status diverged"           grep -qF 'diverged   = "⇕"' "$REPO_ROOT/
 check "git_status modified"           grep -qF 'modified = "*"' "$REPO_ROOT/starship/starship.toml"
 check "git_status staged"             grep -qF 'staged = "+"' "$REPO_ROOT/starship/starship.toml"
 check "git_status untracked"          grep -qF 'untracked = "?"' "$REPO_ROOT/starship/starship.toml"
-check "git_status stashed"            grep -qF 'stashed = "$"' "$REPO_ROOT/starship/starship.toml"
+check "git_status stashed"            grep -qF 'stashed = "\\$"' "$REPO_ROOT/starship/starship.toml"
 
 echo ""
 echo "Starship — character module:"

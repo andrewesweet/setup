@@ -110,7 +110,9 @@ if command -v gh &>/dev/null; then
 fi
 
 # starship (MUST be last eval in section 8 — it sets PROMPT_COMMAND)
-if command -v starship &>/dev/null; then
+# Only initialize for interactive shells with a non-dumb TERM.
+# Avoids breakage when tools like OpenCode run shell commands non-interactively.
+if command -v starship &>/dev/null && [[ "${TERM:-dumb}" != "dumb" ]]; then
   eval "$(starship init bash)"
 fi
 
@@ -127,9 +129,7 @@ if command -v cog &>/dev/null; then
   eval "$(cog generate-completions bash)"
 fi
 
-if command -v git-cliff &>/dev/null; then
-  eval "$(git-cliff completions bash)"
-fi
+# git-cliff: no shell completions command as of v2.12.0
 
 # gcloud (platform-specific path)
 if [[ $_OS == macos ]] && [[ -n "${HOMEBREW_PREFIX:-}" ]]; then
