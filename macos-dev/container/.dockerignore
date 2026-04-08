@@ -2,3 +2,4 @@
 docs/
 *.md
 container/dev.env
+# custom-ca.pem is NOT ignored — it must be in the build context when used

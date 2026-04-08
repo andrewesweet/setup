@@ -4,6 +4,7 @@ nvim/lazy-lock.json.bak
 
 # ── Local overrides (never committed) ────────────────────────────────────────
 container/dev.env
+container/custom-ca.pem
 .bashrc.local
 .gitconfig.local
 

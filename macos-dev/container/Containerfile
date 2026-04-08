@@ -8,6 +8,18 @@
 # ── Stage: base ─────────────────────────────────────────────────────────────
 FROM docker.io/chainguard/wolfi-base:latest AS base
 
+# Optional custom CA certificates (e.g., corporate TLS-inspecting proxy).
+# Place your CA bundle at container/custom-ca.pem (gitignored) and build with:
+#   podman build --build-arg CUSTOM_CA=custom-ca.pem --target base -t dotfiles-base container/
+# If omitted, this is a no-op — backwards compatible with default builds.
+ARG CUSTOM_CA=""
+COPY ${CUSTOM_CA:-.dockerignore} /tmp/custom-ca-or-noop
+RUN if [ -n "${CUSTOM_CA}" ]; then \
+      cp /tmp/custom-ca-or-noop /usr/local/share/ca-certificates/custom-ca.crt; \
+      cat /usr/local/share/ca-certificates/custom-ca.crt >> /etc/ssl/certs/ca-certificates.crt; \
+    fi; \
+    rm -f /tmp/custom-ca-or-noop
+
 # System packages + linting/security tools (apk — signed by Chainguard)
 # All tools installed via apk get automatic version updates from Wolfi.
 # If any package name is unavailable, the build fails here — fix by
