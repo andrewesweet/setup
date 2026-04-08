@@ -12,6 +12,7 @@ $line_break\
 $character"""
 
 scan_timeout = 30
+command_timeout = 1000
 
 [directory]
 truncation_length = 4
