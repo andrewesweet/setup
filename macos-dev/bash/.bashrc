@@ -46,11 +46,10 @@ export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
 
 # OpenCode personal overrides (layers between global and project config).
-# Create these to customize without modifying the team baseline:
-#   ~/.config/opencode/opencode.local.jsonc  — config overrides (model, permissions)
-#   ~/.config/opencode/local/                — agents, commands, modes, plugins
-export OPENCODE_CONFIG="$HOME/.config/opencode/opencode.local.jsonc"
-export OPENCODE_CONFIG_DIR="$HOME/.config/opencode/local"
+# Team baseline:  ~/.config/opencode/         (symlinked from dotfiles)
+# Personal:       ~/.config/opencode-local/   (gitignored, scaffolded by installer)
+export OPENCODE_CONFIG="$HOME/.config/opencode-local/opencode.jsonc"
+export OPENCODE_CONFIG_DIR="$HOME/.config/opencode-local"
 
 # ── 4. Bash completion ─────────────────────────────────────────────────────
 if [[ $_OS == macos ]] && [[ -n "${HOMEBREW_PREFIX:-}" ]]; then

@@ -45,5 +45,5 @@ terraform.tfstate*
 # Dotfiles local overrides
 .bashrc.local
 .gitconfig.local
-opencode.local.jsonc
+opencode-local/
 dev.env

@@ -7,8 +7,7 @@ container/dev.env
 container/custom-ca.pem
 .bashrc.local
 .gitconfig.local
-opencode/opencode.local.jsonc
-opencode/local/
+opencode-local/
 
 # ── Backup directories created by install scripts ─────────────────────────────
 .dotfiles-backup/

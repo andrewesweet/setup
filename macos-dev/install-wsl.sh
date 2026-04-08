@@ -209,12 +209,13 @@ link opencode/tui.jsonc                         .config/opencode/tui.jsonc
 link opencode/instructions/git-conventions.md   .config/opencode/instructions/git-conventions.md
 link opencode/instructions/scratch-dirs.md      .config/opencode/instructions/scratch-dirs.md
 
-# OpenCode personal overrides (no-op scaffolds — create if absent)
-if [[ ! -f "$HOME/.config/opencode/opencode.local.jsonc" ]]; then
-  echo '{}' > "$HOME/.config/opencode/opencode.local.jsonc"
-  printf "  created  %s\n" "$HOME/.config/opencode/opencode.local.jsonc"
+# OpenCode personal overrides (peer directory, scaffolded if absent)
+if [[ ! -f "$HOME/.config/opencode-local/opencode.jsonc" ]]; then
+  mkdir -p "$HOME/.config/opencode-local"
+  echo '{}' > "$HOME/.config/opencode-local/opencode.jsonc"
+  printf "  created  %s\n" "$HOME/.config/opencode-local/opencode.jsonc"
 fi
-mkdir -p "$HOME/.config/opencode/local"
+mkdir -p "$HOME/.config/opencode-local"
 
 # nvim (Plan 10)
 link nvim  .config/nvim
