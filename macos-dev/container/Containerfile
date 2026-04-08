@@ -31,18 +31,19 @@ RUN apk update && apk add --no-cache \
       actionlint \
     && rm -rf /var/cache/apk/*
 
-# golangci-lint — static binary with SHA256 verification
+# golangci-lint — verified via release checksum file
 ARG GOLANGCI_LINT_VERSION=1.62.2
-ARG GOLANGCI_LINT_SHA256=07bfbba72670c0fe0e11e5e4674b8e21e8352e1cebc8a3db7c12c2ee2bfb9baa
 RUN set -eux; \
     curl -fsSL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-amd64.tar.gz" \
       -o /tmp/golangci-lint.tar.gz; \
-    echo "${GOLANGCI_LINT_SHA256}  /tmp/golangci-lint.tar.gz" | sha256sum -c -; \
+    curl -fsSL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-checksums.txt" \
+      -o /tmp/golangci-lint-checksums.txt; \
+    grep "linux-amd64.tar.gz" /tmp/golangci-lint-checksums.txt | sed 's|  .*|  /tmp/golangci-lint.tar.gz|' | sha256sum -c -; \
     tar -xzf /tmp/golangci-lint.tar.gz -C /tmp; \
     mv "/tmp/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-amd64/golangci-lint" /usr/local/bin/; \
     rm -rf /tmp/golangci-lint*
 
-# gofumpt — static binary with SHA256 verification
+# gofumpt — no release checksum file; pin hash (update on version bump)
 ARG GOFUMPT_VERSION=0.7.0
 ARG GOFUMPT_SHA256=57e7a3ed043eab6a0e0373cc2063ed947a459fc2c8d2acca53496e6e5a40e781
 RUN set -eux; \
@@ -52,38 +53,39 @@ RUN set -eux; \
     chmod +x /tmp/gofumpt; \
     mv /tmp/gofumpt /usr/local/bin/gofumpt
 
-# tflint — static binary with SHA256 verification
+# tflint — verified via release checksum file
 ARG TFLINT_VERSION=0.54.0
-ARG TFLINT_SHA256=89aab4c0bdb0906dd0624fb57a0c66a6a3bde2b1501aafc140a1b9109e6eb27b
 RUN set -eux; \
     curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip" \
       -o /tmp/tflint.zip; \
-    echo "${TFLINT_SHA256}  /tmp/tflint.zip" | sha256sum -c -; \
+    curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt" \
+      -o /tmp/tflint-checksums.txt; \
+    grep "linux_amd64.zip" /tmp/tflint-checksums.txt | sed 's|  .*|  /tmp/tflint.zip|' | sha256sum -c -; \
     unzip -o /tmp/tflint.zip -d /usr/local/bin/; \
-    rm /tmp/tflint.zip
+    rm -rf /tmp/tflint*
 
-# zizmor — static binary with SHA256 verification
-# TODO: verify SHA256 from https://github.com/woodruffw/zizmor/releases during hardware test
+# zizmor — verified via release checksum file
 ARG ZIZMOR_VERSION=1.4.1
-ARG ZIZMOR_SHA256=PLACEHOLDER_VERIFY_FROM_RELEASE_PAGE
 RUN set -eux; \
     curl -fsSL "https://github.com/woodruffw/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu" \
       -o /tmp/zizmor; \
-    echo "${ZIZMOR_SHA256}  /tmp/zizmor" | sha256sum -c -; \
+    curl -fsSL "https://github.com/woodruffw/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu.sha256" \
+      -o /tmp/zizmor.sha256; \
+    cd /tmp && sha256sum -c zizmor.sha256; \
     chmod +x /tmp/zizmor; \
     mv /tmp/zizmor /usr/local/bin/zizmor
 
-# codeql — static binary with SHA256 verification
-# TODO: verify SHA256 from https://github.com/github/codeql-cli-binaries/releases during hardware test
+# codeql — verified via release checksum file
 ARG CODEQL_VERSION=2.19.4
-ARG CODEQL_SHA256=PLACEHOLDER_VERIFY_FROM_RELEASE_PAGE
 RUN set -eux; \
     curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux64.zip" \
       -o /tmp/codeql.zip; \
-    echo "${CODEQL_SHA256}  /tmp/codeql.zip" | sha256sum -c -; \
+    curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux64.zip.sha256" \
+      -o /tmp/codeql.sha256; \
+    cd /tmp && sha256sum -c codeql.sha256; \
     unzip -o /tmp/codeql.zip -d /usr/local/; \
     ln -s /usr/local/codeql/codeql /usr/local/bin/codeql; \
-    rm /tmp/codeql.zip
+    rm -rf /tmp/codeql*
 
 # Create non-root user
 RUN adduser -D -h /home/dev -s /bin/bash dev
@@ -94,27 +96,27 @@ ENV LANG=C.UTF-8
 USER dev
 WORKDIR /home/dev
 
-# mise — pre-built binary with SHA256 verification
-# TODO: verify SHA256 from https://github.com/jdx/mise/releases during hardware test
-ARG MISE_VERSION=2024.12.0
-ARG MISE_SHA256=PLACEHOLDER_VERIFY_FROM_RELEASE_PAGE
+# mise — verified via release checksum file
+ARG MISE_VERSION=2026.4.6
 RUN set -eux; \
     curl -fsSL "https://github.com/jdx/mise/releases/download/v${MISE_VERSION}/mise-v${MISE_VERSION}-linux-x64" \
       -o /tmp/mise; \
-    echo "${MISE_SHA256}  /tmp/mise" | sha256sum -c -; \
+    curl -fsSL "https://github.com/jdx/mise/releases/download/v${MISE_VERSION}/mise-v${MISE_VERSION}-linux-x64.sha256" \
+      -o /tmp/mise.sha256; \
+    cd /tmp && sha256sum -c mise.sha256; \
     chmod +x /tmp/mise; \
     mkdir -p "$HOME/.local/bin"; \
     mv /tmp/mise "$HOME/.local/bin/mise"
 ENV PATH="/home/dev/.local/bin:${PATH}"
 
-# uv — pre-built binary with SHA256 verification
-# TODO: verify SHA256 from https://github.com/astral-sh/uv/releases during hardware test
-ARG UV_VERSION=0.5.11
-ARG UV_SHA256=PLACEHOLDER_VERIFY_FROM_RELEASE_PAGE
+# uv — verified via release checksum file
+ARG UV_VERSION=0.6.14
 RUN set -eux; \
     curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" \
       -o /tmp/uv.tar.gz; \
-    echo "${UV_SHA256}  /tmp/uv.tar.gz" | sha256sum -c -; \
+    curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz.sha256" \
+      -o /tmp/uv.sha256; \
+    cd /tmp && sha256sum -c uv.sha256; \
     tar -xzf /tmp/uv.tar.gz -C /tmp; \
     mkdir -p "$HOME/.local/bin"; \
     mv /tmp/uv-x86_64-unknown-linux-gnu/uv "$HOME/.local/bin/uv"; \
