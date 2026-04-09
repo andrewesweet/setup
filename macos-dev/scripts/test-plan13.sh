@@ -120,7 +120,7 @@ check "plist has RunAtLoad"             grep -q 'RunAtLoad' "$REPO_ROOT/containe
 check "plist has ThrottleInterval"      grep -q 'ThrottleInterval' "$REPO_ROOT/container/io.podman.machine.plist"
 check "wrapper has @HOMEBREW_PREFIX@"   grep -q '@HOMEBREW_PREFIX@' "$REPO_ROOT/container/podman-machine-start.sh"
 check "wrapper has platform guard"      grep -q 'Darwin' "$REPO_ROOT/container/podman-machine-start.sh"
-check "wrapper has dotfiles machine check" grep -q 'dotfiles' "$REPO_ROOT/container/podman-machine-start.sh"
+check "wrapper has machine list check"   grep -q 'machine list' "$REPO_ROOT/container/podman-machine-start.sh"
 check "test-tool-installs.sh executable" test -x "$REPO_ROOT/container/test-tool-installs.sh"
 check "test-tool-installs.sh has --full" grep -q '\-\-full' "$REPO_ROOT/container/test-tool-installs.sh"
 check ".dockerignore has .git"          grep -q '^\.git$' "$REPO_ROOT/container/.dockerignore"

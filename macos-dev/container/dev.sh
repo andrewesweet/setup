@@ -35,36 +35,51 @@ _is_macos() { [[ "$(uname)" == "Darwin" ]]; }
 _is_wsl()   { [[ -n "${WSL_DISTRO_NAME:-}" ]]; }
 
 # ── Podman Machine helpers (macOS only) ─────────────────────────────────────
+# Uses the default Podman Machine. Override with DEV_MACHINE_NAME in .bashrc.local.
+MACHINE_NAME="${DEV_MACHINE_NAME:-}"
+
 _ensure_machine() {
   [[ "$(uname)" == "Darwin" ]] || return 0
 
+  # If no machine name specified, use podman's default machine
+  if [[ -z "$MACHINE_NAME" ]]; then
+    # Check if any machine is running
+    if podman machine info &>/dev/null 2>&1; then
+      return 0
+    fi
+    # Try to start the default machine
+    log "Starting default Podman Machine..."
+    podman machine start || {
+      err "No Podman Machine available. Run 'podman machine init && podman machine start'."
+      exit 1
+    }
+    return 0
+  fi
+
+  # Named machine path (for users who set DEV_MACHINE_NAME)
   local state
-  state="$(podman machine inspect dotfiles --format '{{.State}}' 2>/dev/null || echo missing)"
+  state="$(podman machine inspect "$MACHINE_NAME" --format '{{.State}}' 2>/dev/null || echo missing)"
 
   case "$state" in
-    running)
-      return 0
-      ;;
+    running) return 0 ;;
     starting)
-      log "Podman Machine 'dotfiles' is starting, waiting..."
+      log "Podman Machine '$MACHINE_NAME' is starting, waiting..."
       local i=0
       while (( i < 60 )); do
         sleep 1
-        state="$(podman machine inspect dotfiles --format '{{.State}}' 2>/dev/null || echo missing)"
-        if [[ "$state" == "running" ]]; then
-          return 0
-        fi
+        state="$(podman machine inspect "$MACHINE_NAME" --format '{{.State}}' 2>/dev/null || echo missing)"
+        [[ "$state" == "running" ]] && return 0
         ((i++))
       done
-      err "Podman Machine 'dotfiles' did not start within 60 seconds."
+      err "Podman Machine '$MACHINE_NAME' did not start within 60 seconds."
       exit 1
       ;;
     stopped|configured)
-      log "Starting Podman Machine 'dotfiles'..."
-      podman machine start dotfiles
+      log "Starting Podman Machine '$MACHINE_NAME'..."
+      podman machine start "$MACHINE_NAME"
       ;;
     missing)
-      err "Podman Machine 'dotfiles' not found. Run 'dev init-machine' to create it."
+      err "Podman Machine '$MACHINE_NAME' not found. Run 'podman machine init $MACHINE_NAME'."
       exit 1
       ;;
   esac
@@ -429,7 +444,7 @@ cmd_status() {
   if _is_macos; then
     echo ""
     log "Podman Machine status:"
-    podman machine inspect dotfiles --format '{{.Name}}: {{.State}}' 2>/dev/null || echo "  dotfiles: not found"
+    podman machine info --format '{{.Host.MachineState}}' 2>/dev/null || echo "  no machine found"
   fi
 }
 
@@ -480,21 +495,23 @@ cmd_init_machine() {
     esac
   done
 
+  local name="${MACHINE_NAME:-podman-machine-default}"
+
   # Check if machine already exists
-  if podman machine inspect dotfiles &>/dev/null; then
-    log "Podman Machine 'dotfiles' already exists."
-    podman machine inspect dotfiles --format '  State: {{.State}}'
+  if podman machine inspect "$name" &>/dev/null; then
+    log "Podman Machine '$name' already exists."
+    podman machine inspect "$name" --format '  State: {{.State}}'
     return 0
   fi
 
-  log "Creating Podman Machine 'dotfiles':"
+  log "Creating Podman Machine '$name':"
   log "  CPUs:      $cpus"
   log "  Memory:    ${memory} MB"
   log "  Disk size: ${disk_size} GB"
   echo ""
   warn "Disk size can be grown later but NOT shrunk without destroying the machine."
-  warn "  To grow: podman machine set --disk-size N dotfiles"
-  warn "  To change CPUs/memory: podman machine set --cpus N --memory M dotfiles"
+  warn "  To grow: podman machine set --disk-size N $name"
+  warn "  To change CPUs/memory: podman machine set --cpus N --memory M $name"
   echo ""
   read -rp "Create machine with these settings? [y/N] " confirm
   if [[ "${confirm,,}" != "y" ]]; then
@@ -502,13 +519,13 @@ cmd_init_machine() {
     return 0
   fi
 
-  podman machine init dotfiles \
+  podman machine init "$name" \
     --cpus "$cpus" \
     --memory "$memory" \
     --disk-size "$disk_size" \
     --now
 
-  log "Podman Machine 'dotfiles' created and started."
+  log "Podman Machine '$name' created and started."
 }
 
 cmd_machine_start() {
@@ -516,7 +533,7 @@ cmd_machine_start() {
     log "Podman Machine is only needed on macOS."
     return 0
   fi
-  podman machine start dotfiles
+  podman machine start ${MACHINE_NAME:-}
 }
 
 cmd_machine_stop() {
@@ -524,7 +541,7 @@ cmd_machine_stop() {
     log "Podman Machine is only needed on macOS."
     return 0
   fi
-  podman machine stop dotfiles
+  podman machine stop ${MACHINE_NAME:-}
 }
 
 cmd_machine_status() {
@@ -532,7 +549,7 @@ cmd_machine_status() {
     log "Podman Machine is only needed on macOS."
     return 0
   fi
-  podman machine inspect dotfiles --format 'dotfiles: {{.State}}' 2>/dev/null || echo "dotfiles: not found"
+  podman machine info --format 'Machine: {{.Host.MachineState}}' 2>/dev/null || echo "no machine found"
 }
 
 # ── Usage ───────────────────────────────────────────────────────────────────

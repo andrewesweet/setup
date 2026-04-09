@@ -10,13 +10,12 @@ set -e
 PODMAN="@HOMEBREW_PREFIX@/bin/podman"
 [[ -x "$PODMAN" ]] || exit 0
 
-# If the dotfiles machine doesn't exist, exit cleanly (user hasn't run init-machine yet)
-"$PODMAN" machine list -q 2>/dev/null | grep -qx 'dotfiles' || exit 0
+# If no machines exist, exit cleanly
+"$PODMAN" machine list -q 2>/dev/null | grep -q . || exit 0
 
-# Check current state; only start if stopped/configured
-state=$("$PODMAN" machine inspect dotfiles --format '{{.State}}' 2>/dev/null || echo missing)
+# Check if default machine is already running
+state=$("$PODMAN" machine info --format '{{.Host.MachineState}}' 2>/dev/null || echo unknown)
 case "$state" in
-  running|starting) exit 0 ;;
-  stopped|configured) exec "$PODMAN" machine start dotfiles ;;
-  *) exit 0 ;;
+  Running|running) exit 0 ;;
+  *) exec "$PODMAN" machine start ;;
 esac
