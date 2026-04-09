@@ -102,6 +102,26 @@ _git_env_args() {
   fi
 }
 
+# ── Proxy build args (auto-forward host proxy to container build) ──────────
+# If the host has http_proxy/https_proxy set, pass them as build args.
+# Loopback addresses (127.0.0.1, localhost, 0.0.0.0) are rewritten to
+# host.containers.internal so the Podman Machine VM can reach the host proxy.
+_proxy_build_args() {
+  local args=()
+  local var val
+  for var in http_proxy https_proxy HTTP_PROXY HTTPS_PROXY; do
+    val="${!var:-}"
+    [[ -z "$val" ]] && continue
+    # Rewrite loopback to Podman Machine host address
+    val=$(echo "$val" | sed -E 's#(https?://)(localhost|127\.0\.0\.1|0\.0\.0\.0)(:[0-9]+)#\1host.containers.internal\3#')
+    args+=(--build-arg "$var=$val")
+  done
+  if [[ ${#args[@]} -gt 0 ]]; then
+    args+=(--build-arg "no_proxy=localhost,127.0.0.1,host.containers.internal")
+  fi
+  printf '%s\0' "${args[@]}"
+}
+
 # ── Security flags ──────────────────────────────────────────────────────────
 _security_flags() {
   local flags=(
@@ -224,11 +244,23 @@ cmd_build() {
 
   _ensure_machine
 
+  # Collect proxy build args (auto-forwards host proxy, rewrites loopback)
+  local proxy_args=()
+  mapfile -d '' proxy_args < <(_proxy_build_args)
+
+  # Collect custom CA build arg if the file exists
+  local ca_args=()
+  if [[ -f "$DOTFILES/container/custom-ca.pem" ]]; then
+    ca_args=(--build-arg "CUSTOM_CA=container/custom-ca.pem")
+  fi
+
   log "Building $image (target=$target)..."
   podman build \
     --target "$target" \
     -t "$image" \
     -f "$DOTFILES/container/Containerfile" \
+    "${proxy_args[@]+"${proxy_args[@]}"}" \
+    "${ca_args[@]+"${ca_args[@]}"}" \
     "$DOTFILES"
 }
 
