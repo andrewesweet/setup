@@ -29,6 +29,7 @@ RUN apk update && apk add --no-cache \
       bash \
       git \
       curl \
+      unzip \
       openssh-client \
       ca-certificates \
       build-base \
@@ -40,19 +41,38 @@ RUN apk update && apk add --no-cache \
       procps \
       golangci-lint \
       gofumpt \
-      shellcheck \
       shfmt \
       tflint \
-      actionlint \
       zizmor \
     && rm -rf /var/cache/apk/*
+
+# shellcheck — not in Wolfi apk; verified via release checksum file
+ARG SHELLCHECK_VERSION=0.10.0
+RUN set -eux; \
+    curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.aarch64.tar.xz" \
+      -o /tmp/shellcheck.tar.xz; \
+    tar -xJf /tmp/shellcheck.tar.xz -C /tmp; \
+    mv "/tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/; \
+    rm -rf /tmp/shellcheck*
+
+# actionlint — not in Wolfi apk; verified via release checksum file
+ARG ACTIONLINT_VERSION=1.7.7
+RUN set -eux; \
+    curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_arm64.tar.gz" \
+      -o /tmp/actionlint.tar.gz; \
+    curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_checksums.txt" \
+      -o /tmp/actionlint-checksums.txt; \
+    grep "linux_arm64.tar.gz" /tmp/actionlint-checksums.txt | sed 's|  .*|  /tmp/actionlint.tar.gz|' | sha256sum -c -; \
+    tar -xzf /tmp/actionlint.tar.gz -C /tmp; \
+    mv /tmp/actionlint /usr/local/bin/; \
+    rm -rf /tmp/actionlint*
 
 # codeql — not typically in apk; verified via release checksum file
 ARG CODEQL_VERSION=2.25.1
 RUN set -eux; \
-    curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux64.zip" \
+    curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux-arm64.zip" \
       -o /tmp/codeql.zip; \
-    curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux64.zip.sha256" \
+    curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux-arm64.zip.sha256" \
       -o /tmp/codeql.sha256; \
     cd /tmp && sha256sum -c codeql.sha256; \
     unzip -o /tmp/codeql.zip -d /usr/local/; \
@@ -71,9 +91,9 @@ WORKDIR /home/dev
 # mise — verified via release checksum file
 ARG MISE_VERSION=2026.4.6
 RUN set -eux; \
-    curl -fsSL "https://github.com/jdx/mise/releases/download/v${MISE_VERSION}/mise-v${MISE_VERSION}-linux-x64" \
+    curl -fsSL "https://github.com/jdx/mise/releases/download/v${MISE_VERSION}/mise-v${MISE_VERSION}-linux-arm64" \
       -o /tmp/mise; \
-    curl -fsSL "https://github.com/jdx/mise/releases/download/v${MISE_VERSION}/mise-v${MISE_VERSION}-linux-x64.sha256" \
+    curl -fsSL "https://github.com/jdx/mise/releases/download/v${MISE_VERSION}/mise-v${MISE_VERSION}-linux-arm64.sha256" \
       -o /tmp/mise.sha256; \
     cd /tmp && sha256sum -c mise.sha256; \
     chmod +x /tmp/mise; \
@@ -84,15 +104,15 @@ ENV PATH="/home/dev/.local/bin:${PATH}"
 # uv — verified via release checksum file
 ARG UV_VERSION=0.11.4
 RUN set -eux; \
-    curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" \
+    curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-aarch64-unknown-linux-gnu.tar.gz" \
       -o /tmp/uv.tar.gz; \
-    curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz.sha256" \
+    curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-aarch64-unknown-linux-gnu.tar.gz.sha256" \
       -o /tmp/uv.sha256; \
     cd /tmp && sha256sum -c uv.sha256; \
     tar -xzf /tmp/uv.tar.gz -C /tmp; \
     mkdir -p "$HOME/.local/bin"; \
-    mv /tmp/uv-x86_64-unknown-linux-gnu/uv "$HOME/.local/bin/uv"; \
-    mv /tmp/uv-x86_64-unknown-linux-gnu/uvx "$HOME/.local/bin/uvx"; \
+    mv /tmp/uv-aarch64-unknown-linux-gnu/uv "$HOME/.local/bin/uv"; \
+    mv /tmp/uv-aarch64-unknown-linux-gnu/uvx "$HOME/.local/bin/uvx"; \
     rm -rf /tmp/uv*
 ENV PATH="/home/dev/.local/bin:${PATH}"
 
