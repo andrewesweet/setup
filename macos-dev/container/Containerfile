@@ -109,7 +109,8 @@ RUN set -eux; \
       -o /tmp/uv.tar.gz; \
     curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-aarch64-unknown-linux-gnu.tar.gz.sha256" \
       -o /tmp/uv.sha256; \
-    cd /tmp && sha256sum -c uv.sha256; \
+    sed -i 's|  .*|  /tmp/uv.tar.gz|' /tmp/uv.sha256; \
+    sha256sum -c /tmp/uv.sha256; \
     tar -xzf /tmp/uv.tar.gz -C /tmp; \
     mkdir -p "$HOME/.local/bin"; \
     mv /tmp/uv-aarch64-unknown-linux-gnu/uv "$HOME/.local/bin/uv"; \
