@@ -130,6 +130,14 @@ dev prune                  # Clean up old images
 
 The container runs Wolfi Linux with all CLI tools pre-installed. It mounts your workspace and SSH agent, with read-only filesystem and dropped capabilities for security.
 
+**Corporate proxy:** If your network uses a TLS-inspecting proxy, place your CA bundle at `container/custom-ca.pem` (gitignored). The `dev build` command auto-detects it and injects it into the build. Host `http_proxy`/`https_proxy` env vars are auto-forwarded with loopback addresses rewritten for Podman Machine.
+
+### Known limitations
+
+| Tool | Container | Host | Reason |
+|------|-----------|------|--------|
+| codeql | Not available | Homebrew cask | No arm64 Linux build; x86_64 only |
+
 ## Cheatsheet
 
 A built-in cheatsheet covers key bindings and tool commands:

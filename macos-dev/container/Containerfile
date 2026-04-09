@@ -76,17 +76,8 @@ RUN set -eux; \
     mv /tmp/actionlint /usr/local/bin/; \
     rm -rf /tmp/actionlint*
 
-# codeql — not typically in apk; verified via release checksum file
-ARG CODEQL_VERSION=2.25.1
-RUN set -eux; \
-    curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux-arm64.zip" \
-      -o /tmp/codeql.zip; \
-    curl -fsSL "https://github.com/github/codeql-cli-binaries/releases/download/v${CODEQL_VERSION}/codeql-linux-arm64.zip.sha256" \
-      -o /tmp/codeql.sha256; \
-    cd /tmp && sha256sum -c codeql.sha256; \
-    unzip -o /tmp/codeql.zip -d /usr/local/; \
-    ln -s /usr/local/codeql/codeql /usr/local/bin/codeql; \
-    rm -rf /tmp/codeql*
+# codeql — NOT installed in container (no arm64 Linux build available).
+# Use codeql on the macOS host via Homebrew cask instead.
 
 # Create non-root user
 RUN adduser -D -h /home/dev -s /bin/bash dev
