@@ -62,8 +62,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
       tree \
       jq \
       yq \
-      kubectl \
-      pandoc
+      kubectl
 
 # shellcheck — not in Wolfi apk; verified via release checksum file
 ARG SHELLCHECK_VERSION=0.10.0

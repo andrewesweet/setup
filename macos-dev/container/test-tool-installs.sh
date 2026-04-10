@@ -13,7 +13,7 @@ echo ""
 echo "Base tools:"
 for tool in bash git curl ssh mise uv python3 go node bun opencode critique ruff ty prek \
             shellcheck shfmt golangci-lint gofumpt actionlint tflint zizmor \
-            fd rg tree jq yq kubectl pandoc gcloud; do
+            fd rg tree jq yq kubectl gcloud; do
   check "$tool"
 done
 
