@@ -34,6 +34,9 @@ RUN if [ -n "${CUSTOM_CA}" ]; then \
 # If any package name is unavailable, the build fails here — fix by
 # checking `apk search <name>` or falling back to binary download.
 # Cache mount persists apk packages across builds (~1 GB saved per rebuild).
+#
+# Note: python-3 is a runtime dependency of google-cloud-sdk. Agent project
+# work uses mise-managed Python 3.13 (installed below), not this one.
 RUN --mount=type=cache,target=/var/cache/apk \
     apk update && apk add \
       bash \
@@ -53,7 +56,14 @@ RUN --mount=type=cache,target=/var/cache/apk \
       gofumpt \
       shfmt \
       tflint \
-      zizmor
+      zizmor \
+      fd \
+      ripgrep \
+      tree \
+      jq \
+      yq \
+      kubectl \
+      pandoc
 
 # shellcheck — not in Wolfi apk; verified via release checksum file
 ARG SHELLCHECK_VERSION=0.10.0
@@ -149,6 +159,8 @@ COPY --chown=dev:dev mise/config.toml     /home/dev/.config/mise/config.toml
 FROM base AS full
 
 USER root
+# Full stage = interactive human dev environment on top of the agent base.
+# Everything here is TUI or interactive; agent-useful CLIs live in base.
 RUN --mount=type=cache,target=/var/cache/apk \
     apk update && apk add \
       tmux \
@@ -160,17 +172,9 @@ RUN --mount=type=cache,target=/var/cache/apk \
       zoxide \
       bat \
       delta \
-      fd \
-      ripgrep \
       glow \
-      tree \
-      jq \
-      yq \
-      httpie \
       neovim \
-      pandoc \
       k9s \
-      kubectl \
       kubectx \
       lazydocker
 USER dev

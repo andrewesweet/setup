@@ -9,18 +9,19 @@ check() { if command -v "$1" >/dev/null 2>&1; then echo "  ✓ $1"; ((pass++)); 
 echo "Container tool verification"
 echo ""
 
-# Base tools
+# Base tools (agent-usable CLIs)
 echo "Base tools:"
 for tool in bash git curl ssh mise uv python3 go node bun opencode critique ruff ty prek \
-            shellcheck shfmt golangci-lint gofumpt actionlint tflint zizmor; do
+            shellcheck shfmt golangci-lint gofumpt actionlint tflint zizmor \
+            fd rg tree jq yq kubectl pandoc gcloud; do
   check "$tool"
 done
 
-# Full tools (only checked with --full flag)
+# Full tools (human TUI layer, only checked with --full flag)
 if [[ "${1:-}" == "--full" ]]; then
   echo ""
   echo "Full tools:"
-  for tool in tmux starship lazygit btop lnav fzf zoxide bat delta fd rg nvim jq yq; do
+  for tool in tmux starship lazygit btop lnav fzf zoxide bat delta glow nvim k9s kubectx lazydocker; do
     check "$tool"
   done
 fi
