@@ -138,6 +138,8 @@ The container runs Wolfi Linux with all CLI tools pre-installed. It mounts your 
 |------|-----------|------|--------|
 | codeql | Not available | Homebrew cask | No arm64 Linux build; x86_64 only |
 | pandoc | Not available | Homebrew | Not in Wolfi apk; used on host for cheatsheet PDF generation |
+| lnav | Not available | Homebrew | Not in Wolfi apk |
+| kubectx | Not available | Homebrew | Not in Wolfi apk |
 
 ## Cheatsheet
 

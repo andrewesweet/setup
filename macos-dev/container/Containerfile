@@ -160,13 +160,16 @@ FROM base AS full
 USER root
 # Full stage = interactive human dev environment on top of the agent base.
 # Everything here is TUI or interactive; agent-useful CLIs live in base.
+#
+# Host-only (not in Wolfi apk, use Homebrew on macOS):
+#   lnav    — log file navigator
+#   kubectx — kubectl context/namespace switcher
 RUN --mount=type=cache,target=/var/cache/apk \
     apk update && apk add \
       tmux \
       starship \
       lazygit \
       btop \
-      lnav \
       fzf \
       zoxide \
       bat \
@@ -174,7 +177,6 @@ RUN --mount=type=cache,target=/var/cache/apk \
       glow \
       neovim \
       k9s \
-      kubectx \
       lazydocker
 USER dev
 
