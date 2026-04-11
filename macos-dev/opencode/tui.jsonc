@@ -3,7 +3,7 @@
   "keybinds": {
     "leader": "ctrl+x",
     "session_new": "<leader>n",
-    "session_list": "<leader>l",
+    "session_list": "<leader>L",
     "session_timeline": "<leader>g",
     "session_compact": "<leader>c",
     "session_interrupt": "escape",
@@ -31,10 +31,10 @@
     "scrollbar_toggle": "none",
     "username_toggle": "none",
     "tool_details": "none",
-    "session_child_first": "<leader>down",
-    "session_child_cycle": "<leader>right",
-    "session_child_cycle_reverse": "<leader>left",
-    "session_parent": "<leader>up",
+    "session_child_first": "<leader>j",
+    "session_child_cycle": "<leader>l",
+    "session_child_cycle_reverse": "<leader>h",
+    "session_parent": "<leader>k",
     "display_thinking": "none"
   }
 }

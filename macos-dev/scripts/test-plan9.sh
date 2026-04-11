@@ -135,12 +135,16 @@ check "session_interrupt = escape"       grep -qF '"session_interrupt": "escape"
 check "command_list = ctrl+p"            grep -qF '"command_list": "ctrl+p"' "$REPO_ROOT/opencode/tui.jsonc"
 check "agent_cycle = tab"               grep -qF '"agent_cycle": "tab"' "$REPO_ROOT/opencode/tui.jsonc"
 check "session_new = leader+n"          grep -qF '"session_new": "<leader>n"' "$REPO_ROOT/opencode/tui.jsonc"
+check "session_list = leader+L"         grep -qF '"session_list": "<leader>L"' "$REPO_ROOT/opencode/tui.jsonc"
 check "session_export = leader+X"       grep -qF '"session_export": "<leader>X"' "$REPO_ROOT/opencode/tui.jsonc"
 check "sidebar_toggle = leader+b"       grep -qF '"sidebar_toggle": "<leader>b"' "$REPO_ROOT/opencode/tui.jsonc"
-check "session_child_cycle = leader+right"  grep -qF '"session_child_cycle": "<leader>right"' "$REPO_ROOT/opencode/tui.jsonc"
-check "session_parent = leader+up"      grep -qF '"session_parent": "<leader>up"' "$REPO_ROOT/opencode/tui.jsonc"
-check "session_child_first = leader+down"         grep -qF '"session_child_first": "<leader>down"' "$REPO_ROOT/opencode/tui.jsonc"
-check "session_child_cycle_reverse = leader+left" grep -qF '"session_child_cycle_reverse": "<leader>left"' "$REPO_ROOT/opencode/tui.jsonc"
+# Subagent navigation: vim hjkl, NOT arrow keys.
+# Arrow chords (ctrl+x then arrow) collide with macOS Mission Control,
+# which intercepts ctrl+arrow before the terminal sees it.
+check "session_child_first = leader+j (down)"         grep -qF '"session_child_first": "<leader>j"' "$REPO_ROOT/opencode/tui.jsonc"
+check "session_parent = leader+k (up)"                grep -qF '"session_parent": "<leader>k"' "$REPO_ROOT/opencode/tui.jsonc"
+check "session_child_cycle_reverse = leader+h (left)" grep -qF '"session_child_cycle_reverse": "<leader>h"' "$REPO_ROOT/opencode/tui.jsonc"
+check "session_child_cycle = leader+l (right)"        grep -qF '"session_child_cycle": "<leader>l"' "$REPO_ROOT/opencode/tui.jsonc"
 
 # ── Instruction files ─────────────────────────────────────────────────────
 echo ""
