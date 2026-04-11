@@ -191,5 +191,4 @@ COPY --chown=dev:dev starship/starship.toml /home/dev/.config/starship.toml
 COPY --chown=dev:dev lazygit/config.yml /home/dev/.config/lazygit/config.yml
 COPY --chown=dev:dev nvim/              /home/dev/.config/nvim/
 
-SHELL ["/bin/bash", "-c"]
 CMD ["bash", "-l"]
