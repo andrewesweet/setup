@@ -146,7 +146,7 @@ bash container/dev.sh shell
 
 That agent's socket lives under `/tmp/ssh-XXXXXXXX/agent.NNN`, which is a regular directory Podman Machine can share. Add the two commands to a shell alias or `.bashrc.local` if you want them to run automatically.
 
-If you only push to GitHub, `gh auth login` + HTTPS remotes is a lower-friction alternative — `gh` uses its own token via the mounted `~/.config/gh` directory, no SSH agent required.
+If you only push to GitHub, `gh auth login` + HTTPS remotes is a lower-friction alternative — `gh` uses its own credentials via the mounted `~/.config/gh` directory, no SSH agent required.
 
 ### Known limitations
 
