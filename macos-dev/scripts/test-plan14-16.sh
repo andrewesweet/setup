@@ -115,6 +115,19 @@ echo ""
 echo "Gitignore:"
 check "cheatsheet.pdf in .gitignore"      grep -q 'cheatsheet\.pdf' "$REPO_ROOT/.gitignore"
 
+# ── Cheatsheet PDF generation (4 checks) ──────────────────────────────────
+# Locks in current behavior: pandoc + typst are declared in Brewfile and
+# README documents a generation command. Does NOT validate the PDF's page
+# geometry — the spec calls for landscape A4 but the current command uses
+# typst defaults (portrait A4). Intentional: we're pinning current state,
+# not the spec's ideal.
+echo ""
+echo "Cheatsheet PDF generation:"
+check "Brewfile has pandoc"               grep -q '^brew "pandoc"' "$REPO_ROOT/Brewfile"
+check "Brewfile has typst"                grep -q '^brew "typst"' "$REPO_ROOT/Brewfile"
+check "README has pandoc PDF command"     grep -q 'pandoc docs/cheatsheet.md' "$REPO_ROOT/README.md"
+check "README PDF command uses typst"     grep -q 'pdf-engine=typst' "$REPO_ROOT/README.md"
+
 # ── Regression: design doc links in README (1 check) ──────────────────────
 echo ""
 echo "Regression — design doc links:"
