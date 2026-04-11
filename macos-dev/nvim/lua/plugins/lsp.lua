@@ -73,7 +73,12 @@ return {
   -- while schemaStore.enable = false in yamlls/jsonls above.
   { "b0o/schemastore.nvim", lazy = true, version = false },
   {
-    "williamboman/mason.nvim",
+    -- mason.nvim moved orgs from williamboman to mason-org in 2025.
+    -- Pinning the new URL keeps lazy.nvim from emitting an "origin
+    -- changed" error against existing local clones (LazyVim's spec
+    -- already points here, but a bare repo name is robust to future
+    -- reorgs and matches the upstream LazyVim convention).
+    "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
         "bash-language-server", "gopls", "terraform-ls",

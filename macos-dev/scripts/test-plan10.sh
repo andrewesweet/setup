@@ -147,6 +147,11 @@ check "gh_actions_ls configured"   grep -q 'gh_actions_ls' "$REPO_ROOT/nvim/lua/
 check "jsonls configured"          grep -q 'jsonls' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
 check "schemastore.nvim"           grep -q 'schemastore.nvim' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
 check "gh_actions_ls yaml.github"  grep -q 'gh_actions_ls.*yaml\.github' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
+# mason.nvim moved orgs from williamboman to mason-org. Pin the new
+# URL so lazy.nvim doesn't error with "origin has changed" against
+# fresh installs that pull the new URL via LazyVim's transitive spec.
+check "mason.nvim uses mason-org"  grep -q '"mason-org/mason.nvim"' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
+check "no williamboman/mason"      bash -c "! grep -q 'williamboman/mason' '$REPO_ROOT/nvim/lua/plugins/lsp.lua'"
 
 # ── formatting.lua ────────────────────────────────────────────────────────
 echo ""
