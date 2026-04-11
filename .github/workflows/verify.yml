@@ -37,6 +37,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
 
+      - name: Install Python YAML support
+        # check-configs.sh validates YAML files via `python3 -c "import yaml"`.
+        # PyYAML is not in stdlib; install it explicitly so the check works on
+        # any runner image regardless of pre-installed Python packages.
+        run: python3 -c "import yaml" 2>/dev/null || pip3 install --user --break-system-packages pyyaml
+
       - name: bash -n on all shell scripts under macos-dev
         run: |
           find macos-dev -type f -name '*.sh' -print0 \
@@ -135,6 +141,11 @@ jobs:
         # macos-latest runners do not ship with shellcheck. Install it via
         # Homebrew (fast — ~15s — and already configured on macOS runners).
         run: brew install shellcheck
+
+      - name: Install Python YAML support
+        # check-configs.sh imports yaml. PyYAML is not bundled with the
+        # macOS runner's python3, so install it explicitly.
+        run: python3 -c "import yaml" 2>/dev/null || pip3 install --user --break-system-packages pyyaml
 
       - name: bash -n on install-macos.sh
         run: bash -n macos-dev/install-macos.sh

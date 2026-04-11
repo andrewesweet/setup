@@ -97,6 +97,7 @@ check ".bashrc has DOTFILES default"      grep -q 'DOTFILES=.*HOME/.dotfiles' "$
 # Self-resolution: .bashrc walks its own symlink chain to discover
 # the repo location, so the user can clone anywhere (not only ~/.dotfiles).
 check ".bashrc self-resolves DOTFILES"    grep -q 'BASH_SOURCE\[0\]' "$REPO_ROOT/bash/.bashrc"
+# shellcheck disable=SC2016 # grep pattern is a literal substring, not a shell var
 check ".bashrc walks symlink chain"       grep -q 'while \[\[ -L "$_src" \]\]' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc has expanded HISTIGNORE"   grep -q 'HISTIGNORE.*GH_TOKEN.*GITHUB_PAT.*BEARER.*ANTHROPIC.*OPENAI' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc sources .bash_aliases"     grep -q 'source.*\.bash_aliases' "$REPO_ROOT/bash/.bashrc"

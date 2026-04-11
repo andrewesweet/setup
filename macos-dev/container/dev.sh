@@ -139,6 +139,7 @@ _proxy_build_args() {
 
 # ── Security flags ──────────────────────────────────────────────────────────
 _security_flags() {
+  # shellcheck disable=SC2054 # commas are inside podman flag values, not array separators
   local flags=(
     --read-only
     --cap-drop=ALL
@@ -149,6 +150,7 @@ _security_flags() {
 
   # On macOS Podman Machine, use deterministic UID mapping
   if _is_macos; then
+    # shellcheck disable=SC2054
     flags=(
       --read-only
       --cap-drop=ALL
@@ -479,9 +481,9 @@ cmd_prune() {
 cmd_clean_sessions() {
   _ensure_machine
 
-  printf "${C_YELLOW}WARNING:${C_RESET} This will remove OpenCode session data from the dev-data-opencode volume.\n"
-  printf "${C_YELLOW}WARNING:${C_RESET} Session history may contain sensitive data (user-pasted secrets, credentials).\n"
-  printf "${C_YELLOW}WARNING:${C_RESET} This operation is irreversible.\n"
+  printf '%bWARNING:%b This will remove OpenCode session data from the dev-data-opencode volume.\n' "$C_YELLOW" "$C_RESET"
+  printf '%bWARNING:%b Session history may contain sensitive data (user-pasted secrets, credentials).\n' "$C_YELLOW" "$C_RESET"
+  printf '%bWARNING:%b This operation is irreversible.\n' "$C_YELLOW" "$C_RESET"
   echo ""
   read -rp "Continue? [y/N] " confirm
   if [[ "${confirm,,}" != "y" ]]; then
@@ -551,7 +553,12 @@ cmd_machine_start() {
     log "Podman Machine is only needed on macOS."
     return 0
   fi
-  podman machine start ${MACHINE_NAME:-}
+  # MACHINE_NAME may be empty (default machine). Quoting "$MACHINE_NAME"
+  # would pass an empty string and break the call, so we conditionally
+  # add it as a positional arg via an array.
+  local args=()
+  [[ -n "${MACHINE_NAME:-}" ]] && args=("$MACHINE_NAME")
+  podman machine start "${args[@]}"
 }
 
 cmd_machine_stop() {
@@ -559,7 +566,9 @@ cmd_machine_stop() {
     log "Podman Machine is only needed on macOS."
     return 0
   fi
-  podman machine stop ${MACHINE_NAME:-}
+  local args=()
+  [[ -n "${MACHINE_NAME:-}" ]] && args=("$MACHINE_NAME")
+  podman machine stop "${args[@]}"
 }
 
 cmd_machine_status() {

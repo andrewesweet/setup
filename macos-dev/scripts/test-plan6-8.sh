@@ -53,6 +53,7 @@ check "mise config.toml exists"  test -f "$REPO_ROOT/mise/config.toml"
 
 echo ""
 echo "Starship — prompt format:"
+# shellcheck disable=SC2016 # grep pattern is a literal regex, not a shell var
 check "format string present"         grep -q '^\$directory' "$REPO_ROOT/starship/starship.toml"
 check "scan_timeout = 30"             grep -q 'scan_timeout.*30' "$REPO_ROOT/starship/starship.toml"
 
@@ -67,7 +68,9 @@ echo "Starship — git modules:"
 check "git_branch symbol"             grep -qF 'symbol = " "' "$REPO_ROOT/starship/starship.toml"
 check "git_branch style bold purple"  grep -q 'style.*bold purple' "$REPO_ROOT/starship/starship.toml"
 check "git_status conflicted"         grep -qF 'conflicted = "⚡"' "$REPO_ROOT/starship/starship.toml"
+# shellcheck disable=SC2016 # ${count} is a literal starship template token, not a shell var
 check "git_status ahead"              grep -qF 'ahead      = "↑${count}"' "$REPO_ROOT/starship/starship.toml"
+# shellcheck disable=SC2016
 check "git_status behind"             grep -qF 'behind     = "↓${count}"' "$REPO_ROOT/starship/starship.toml"
 check "git_status diverged"           grep -qF 'diverged   = "⇕"' "$REPO_ROOT/starship/starship.toml"
 check "git_status modified"           grep -qF 'modified = "*"' "$REPO_ROOT/starship/starship.toml"
