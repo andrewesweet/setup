@@ -132,6 +132,22 @@ The container runs Wolfi Linux with all CLI tools pre-installed. It mounts your 
 
 **Corporate proxy:** If your network uses a TLS-inspecting proxy, place your CA bundle at `container/custom-ca.pem` (gitignored). The `dev build` command auto-detects it and injects it into the build. Host `http_proxy`/`https_proxy` env vars are auto-forwarded with loopback addresses rewritten for Podman Machine.
 
+### Container SSH forwarding (macOS)
+
+macOS ships with a launchd-managed `ssh-agent` whose socket lives under `/private/tmp/com.apple.launchd.*`. Those sockets live in per-process launchd namespaces that Podman Machine's virtiofs **cannot** forward into the VM (bind-mounting fails with `statfs: operation not supported`). `dev shell` detects this pattern and skips the mount with a warning — the container still starts, but `ssh-add -l` will be unavailable inside.
+
+To get SSH forwarding working, run a standalone `ssh-agent` in your host shell before launching the container:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519     # or whichever key you use
+bash container/dev.sh shell
+```
+
+That agent's socket lives under `/tmp/ssh-XXXXXXXX/agent.NNN`, which is a regular directory Podman Machine can share. Add the two commands to a shell alias or `.bashrc.local` if you want them to run automatically.
+
+If you only push to GitHub, `gh auth login` + HTTPS remotes is a lower-friction alternative — `gh` uses its own token via the mounted `~/.config/gh` directory, no SSH agent required.
+
 ### Known limitations
 
 | Tool | Container | Host | Reason |

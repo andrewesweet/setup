@@ -226,8 +226,21 @@ _credential_mounts() {
     flags+=(-v "$HOME/.codeql:/home/dev/.codeql:ro")
   fi
 
-  # SSH agent — validate socket exists, warn and skip if absent
-  if [[ -n "${SSH_AUTH_SOCK:-}" ]] && [[ -S "$SSH_AUTH_SOCK" ]]; then
+  # SSH agent — validate socket exists, warn and skip if absent.
+  #
+  # macOS note: launchd-managed ssh-agent sockets live under
+  # /private/tmp/com.apple.launchd.* in per-process namespaces that
+  # Podman Machine's virtiofs cannot statfs across the VM boundary
+  # (fails with "operation not supported" on `podman run`). We detect
+  # that pattern and skip the mount rather than crashing. Users who
+  # need SSH forwarding should start a standalone agent — see README.
+  if [[ -n "${SSH_AUTH_SOCK:-}" ]] && [[ "$SSH_AUTH_SOCK" == /private/tmp/com.apple.launchd.* ]]; then
+    warn "SSH_AUTH_SOCK is a launchd-managed socket ($SSH_AUTH_SOCK)."
+    warn "Podman Machine cannot forward launchd sockets into the VM."
+    warn "To enable SSH forwarding, run in your host shell:"
+    warn "  eval \"\$(ssh-agent -s)\" && ssh-add ~/.ssh/id_ed25519"
+    warn "then relaunch 'dev shell'. See README 'Container SSH forwarding' for details."
+  elif [[ -n "${SSH_AUTH_SOCK:-}" ]] && [[ -S "$SSH_AUTH_SOCK" ]]; then
     flags+=(-v "$SSH_AUTH_SOCK:/run/ssh-agent.sock:ro" -e "SSH_AUTH_SOCK=/run/ssh-agent.sock")
   else
     warn "SSH_AUTH_SOCK not set or socket not found — SSH agent will not be available in container."
