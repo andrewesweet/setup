@@ -56,6 +56,7 @@ check "lsp.lua exists"            test -f "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
 check "formatting.lua exists"      test -f "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
 check "linting.lua exists"        test -f "$REPO_ROOT/nvim/lua/plugins/linting.lua"
 check "integrations.lua exists"    test -f "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
+check "learning.lua exists"        test -f "$REPO_ROOT/nvim/lua/plugins/learning.lua"
 
 # ── init.lua ──────────────────────────────────────────────────────────────
 echo ""
@@ -210,6 +211,15 @@ check "C-h tmux navigate"          grep -q 'C-h.*TmuxNavigateLeft' "$REPO_ROOT/n
 check "leader+gg = LazyGit"        grep -q 'leader>gg.*LazyGit' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
 check "gitsigns stage_hunk"        grep -q 'stage_hunk' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
 check "gitsigns blame_line"        grep -q 'blame_line' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
+
+# ── learning.lua — vim training plugins ──────────────────────────────────
+echo ""
+echo "learning.lua:"
+check "hardtime.nvim plugin"       grep -q 'm4xshen/hardtime.nvim' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+check "hardtime nui dependency"    grep -q 'MunifTanjim/nui.nvim' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+check "precognition.nvim plugin"   grep -q 'tris203/precognition.nvim' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+check "vim-be-good plugin"         grep -q 'ThePrimeagen/vim-be-good' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+check "vim-be-good cmd loaded"     grep -q 'cmd = "VimBeGood"' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
 
 # ── Install script link() calls ──────────────────────────────────────────
 echo ""

@@ -108,3 +108,12 @@ Tool for the job — quick commands and aliases.
 | Build image | dev | `dev build` | — |
 | Container TUI | lazydocker | `lazydocker` | `lzd` |
 | Kubernetes TUI | k9s | `k9s` | — |
+
+### Vim training
+
+| Task | Tool | Command |
+|------|------|---------|
+| Block bad-habit keys (hjkl spam, arrows, mouse) | hardtime.nvim | `:Hardtime toggle` / `:Hardtime report` |
+| Show motion hints on the current line | precognition.nvim | `:Precognition toggle` / `:Precognition peek` |
+| Practice game (delete-me, ci{, whackamole, …) | vim-be-good | `:VimBeGood` |
+| Built-in interactive tutor | vimtutor | `:Tutor` (or `vimtutor` from shell) |

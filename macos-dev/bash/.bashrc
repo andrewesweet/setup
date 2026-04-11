@@ -36,7 +36,27 @@ if [[ $_OS == macos ]]; then
   fi
 fi
 
-# Set by install script. Defaults to script's own directory.
+# DOTFILES — self-resolve from this file's symlink target.
+# .bashrc is a symlink: $HOME/.bashrc -> $DOTFILES/bash/.bashrc.
+# Following the symlink and walking up one level gives us $DOTFILES.
+# This means the repo can live anywhere — no need for ~/.dotfiles.
+# Falls back to $HOME/.dotfiles if BASH_SOURCE is somehow empty
+# (e.g., bashrc executed instead of sourced).
+if [[ -z "${DOTFILES:-}" ]]; then
+  _src="${BASH_SOURCE[0]:-}"
+  if [[ -n "$_src" ]]; then
+    # Resolve symlinks portably (BSD readlink lacks -f).
+    while [[ -L "$_src" ]]; do
+      _dir="$(cd -P "$(dirname "$_src")" && pwd)"
+      _src="$(readlink "$_src")"
+      [[ "$_src" != /* ]] && _src="$_dir/$_src"
+    done
+    _dir="$(cd -P "$(dirname "$_src")" && pwd)"
+    # _dir is $DOTFILES/bash; DOTFILES is its parent.
+    DOTFILES="$(cd -P "$_dir/.." && pwd)"
+    unset _src _dir
+  fi
+fi
 export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 
 # User-local tool paths. Prepended so user-installed versions take priority.

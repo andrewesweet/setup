@@ -94,6 +94,10 @@ check ".bashrc has interactive guard"     grep -qF '[[ $- != *i* ]] && return' "
 check ".bashrc has platform detection"    grep -q 'case.*OSTYPE' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc has _OS fallback"          grep -q '_OS=unknown' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc has DOTFILES default"      grep -q 'DOTFILES=.*HOME/.dotfiles' "$REPO_ROOT/bash/.bashrc"
+# Self-resolution: .bashrc walks its own symlink chain to discover
+# the repo location, so the user can clone anywhere (not only ~/.dotfiles).
+check ".bashrc self-resolves DOTFILES"    grep -q 'BASH_SOURCE\[0\]' "$REPO_ROOT/bash/.bashrc"
+check ".bashrc walks symlink chain"       grep -q 'while \[\[ -L "$_src" \]\]' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc has expanded HISTIGNORE"   grep -q 'HISTIGNORE.*GH_TOKEN.*GITHUB_PAT.*BEARER.*ANTHROPIC.*OPENAI' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc sources .bash_aliases"     grep -q 'source.*\.bash_aliases' "$REPO_ROOT/bash/.bashrc"
 check ".bashrc sources .bashrc.local"     grep -q 'source.*\.bashrc\.local' "$REPO_ROOT/bash/.bashrc"
