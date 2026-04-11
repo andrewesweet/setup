@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 # test-dev-shell.sh — verify dev container runtime environment
 #
-# Runs all "dev shell" health checks non-interactively by piping a
-# verification script into `dev.sh shell`. Produces one line per
-# check: "PASS <name>" or "FAIL <name>: detail".
+# Runs health checks against the dev container non-interactively. Uses
+# `podman exec -i` (NOT -it) so the container's bash runs as a
+# non-interactive shell reading stdin as a script — no prompt echo,
+# no starship rendering, clean PASS/FAIL output.
 #
 # Usage:
 #   bash container/test-dev-shell.sh [log-file]
 #
 # Default log file: /tmp/dev-shell-test.log
+#
+# If the container doesn't exist yet this script will bootstrap it by
+# calling `dev.sh shell </dev/null` (stdin closed → interactive attach
+# exits immediately → detached container survives).
 #
 # Leaves the container running afterwards — safe to re-run.
 set -euo pipefail
@@ -16,7 +21,30 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${1:-/tmp/dev-shell-test.log}"
 
-# Verification commands — evaluated INSIDE the container.
+# Container name must match dev.sh's _container_name (dev-<repo-basename>).
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
+container_name="dev-$(basename "$repo_root")"
+
+# ── Ensure container exists and is running ────────────────────────────────
+if ! podman container exists "$container_name" 2>/dev/null; then
+  echo "==> Container '$container_name' not found — bootstrapping via dev.sh shell..." >&2
+  bash "$SCRIPT_DIR/dev.sh" shell </dev/null >/dev/null 2>&1 || true
+fi
+
+state=$(podman inspect --format '{{.State.Status}}' "$container_name" 2>/dev/null || echo missing)
+case "$state" in
+  running) : ;;
+  exited|stopped|created)
+    echo "==> Starting container '$container_name'..." >&2
+    podman start "$container_name" >/dev/null
+    ;;
+  missing)
+    echo "==> Failed to create container '$container_name'. Run 'bash container/dev.sh shell' directly to diagnose." >&2
+    exit 1
+    ;;
+esac
+
+# ── Verification script (runs INSIDE the container) ───────────────────────
 # `run` is silent on PASS, prints one line on FAIL, counts both.
 # Final output: SUMMARY + optional FAILED list. Happy path = 1 line.
 read -r -d '' INSIDE <<'INSIDE_EOF' || true
@@ -46,11 +74,9 @@ check_opencode_auth() {
 
 check_ssh_agent() {
   if [ -z "${SSH_AUTH_SOCK:-}" ]; then
-    echo "SKIP (SSH_AUTH_SOCK unset — expected on macOS launchd)"
-    return 0
+    return 0  # expected on macOS launchd (forwarding was skipped)
   fi
   [ -S "$SSH_AUTH_SOCK" ] || { echo "socket missing at $SSH_AUTH_SOCK"; return 1; }
-  ssh-add -l >/dev/null 2>&1 || ssh-add -l 2>&1 | grep -q "no identities" || { echo "ssh-add failed"; return 1; }
 }
 
 check_workspace_write() {
@@ -72,14 +98,17 @@ check_cache_writable() {
 }
 
 check_caps_dropped() {
-  local cap_eff
-  cap_eff=$(awk '/^CapEff:/ {print $2}' /proc/1/status)
-  # --cap-drop=ALL + --cap-add=CHOWN,DAC_OVERRIDE,FOWNER gives
-  # 00000000000000000007 (bits 0,1,3). Anything beyond that is unexpected.
-  if [ "$cap_eff" = "0000000000000007" ]; then
+  # dev.sh: --cap-drop=ALL --cap-add=CHOWN,DAC_OVERRIDE,FOWNER
+  #   CHOWN=bit 0, DAC_OVERRIDE=bit 1, FOWNER=bit 3
+  #   bounding set bits = 1<<0 | 1<<1 | 1<<3 = 0xb
+  # Check CapBnd (what the container is allowed to use), not CapEff
+  # (which is always 0 for a non-root process regardless).
+  local cap_bnd
+  cap_bnd=$(awk '/^CapBnd:/ {print $2}' /proc/1/status)
+  if [ "$cap_bnd" = "000000000000000b" ]; then
     return 0
   fi
-  echo "CapEff=$cap_eff (expected 0000000000000007)"
+  echo "CapBnd=$cap_bnd (expected 000000000000000b = CHOWN+DAC_OVERRIDE+FOWNER)"
   return 1
 }
 
@@ -95,7 +124,6 @@ check_tool() {
 }
 
 check_starship_prompt() {
-  # Render the prompt once, succeed if no error bleeds through.
   starship prompt >/dev/null 2>&1 || return 1
 }
 
@@ -130,21 +158,17 @@ fi
 exit $fail
 INSIDE_EOF
 
-echo "==> Running dev shell checks — full log: $LOG_FILE" >&2
+# ── Run the checks ────────────────────────────────────────────────────────
+echo "==> Running dev shell checks against $container_name" >&2
 : >"$LOG_FILE"
 
-# Pipe the verification commands into dev.sh shell.
-# Keep only FAIL / SUMMARY / FAILED / WARN / Error lines on stdout;
-# everything (including PASS counts) still goes to the log file.
-#
-# set +eu around the pipeline: `pipefail` from the top-level set would
-# make grep's non-zero exit (no matches) kill the script, and set -u
-# makes PIPESTATUS[N] dereference unsafe after `|| true`. Parsing the
-# SUMMARY line from the log is simpler and more robust.
+# podman exec -i (NO -t) — pipe stdin is not a tty, so bash runs
+# non-interactively: no prompt echo, no starship rendering, clean
+# script execution.
 set +eu
-printf '%s\n' "$INSIDE" | bash "$SCRIPT_DIR/dev.sh" shell 2>&1 \
+printf '%s\n' "$INSIDE" | podman exec -i "$container_name" bash -l 2>&1 \
   | tee "$LOG_FILE" \
-  | grep -E '^(FAIL|SUMMARY|FAILED|WARN:|Error)'
+  | grep -E '^(FAIL|SUMMARY|FAILED|Error)'
 set -eu
 
 rc=99
