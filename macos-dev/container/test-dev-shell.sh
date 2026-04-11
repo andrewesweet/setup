@@ -17,22 +17,20 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${1:-/tmp/dev-shell-test.log}"
 
 # Verification commands — evaluated INSIDE the container.
-# Each check is a function. `run` prints PASS/FAIL + captures stderr
-# for failure detail only. At the end: counts + exit code.
+# `run` is silent on PASS, prints one line on FAIL, counts both.
+# Final output: SUMMARY + optional FAILED list. Happy path = 1 line.
 read -r -d '' INSIDE <<'INSIDE_EOF' || true
 set +e
 pass=0
 fail=0
 fails=()
 
-# run NAME COMMAND...   — runs COMMAND, prints one line, records failures.
 run() {
   local name="$1"; shift
   local out
   out=$("$@" 2>&1)
   local rc=$?
   if [ $rc -eq 0 ]; then
-    echo "PASS $name"
     pass=$((pass+1))
   else
     echo "FAIL $name: ${out:-exit $rc}"
@@ -136,20 +134,30 @@ echo "==> Running dev shell checks — full log: $LOG_FILE" >&2
 : >"$LOG_FILE"
 
 # Pipe the verification commands into dev.sh shell.
-# Filter host-side noise: keep only lines from INSIDE the container
-# plus the final summary. Everything still goes to the log file.
+# Keep only FAIL / SUMMARY / FAILED / WARN / Error lines on stdout;
+# everything (including PASS counts) still goes to the log file.
 #
-# Exit code reflects the container-side check count (fail count).
-set +e
+# set +eu around the pipeline: `pipefail` from the top-level set would
+# make grep's non-zero exit (no matches) kill the script, and set -u
+# makes PIPESTATUS[N] dereference unsafe after `|| true`. Parsing the
+# SUMMARY line from the log is simpler and more robust.
+set +eu
 printf '%s\n' "$INSIDE" | bash "$SCRIPT_DIR/dev.sh" shell 2>&1 \
   | tee "$LOG_FILE" \
-  | grep -E '^(PASS|FAIL|SUMMARY|FAILED|---|WARN:|Error)' || true
-rc=${PIPESTATUS[1]}
-set -e
+  | grep -E '^(FAIL|SUMMARY|FAILED|WARN:|Error)'
+set -eu
+
+rc=99
+summary=$(grep -E '^SUMMARY:' "$LOG_FILE" | tail -1 || true)
+if [ -n "$summary" ] && [[ "$summary" =~ ([0-9]+)\ failed ]]; then
+  rc="${BASH_REMATCH[1]}"
+fi
 
 echo "" >&2
-if [ "$rc" -eq 0 ]; then
+if [ "$rc" = "0" ]; then
   echo "==> All checks passed. Log: $LOG_FILE" >&2
+elif [ "$rc" = "99" ]; then
+  echo "==> No SUMMARY line — container never finished. Full log: $LOG_FILE" >&2
 else
   echo "==> $rc check(s) failed. Full log: $LOG_FILE" >&2
 fi
