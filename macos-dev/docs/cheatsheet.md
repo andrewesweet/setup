@@ -51,6 +51,7 @@ Key bindings by action across all tools. Vi-mode everywhere except OpenCode inpu
 | btop uses d/u not Ctrl+D/U | No fix — btop's default, not configurable |
 | Ctrl+P/K captured by VS Code | Use OpenCode leader bindings in VS Code terminal |
 | Delta n/N jumps hunks not search results | Use `less` search separately, or disable `navigate=true` in delta |
+| Stale Neovim float obscures buffer | `:fclose!` (closes orphaned floating windows from cmdline popup / hover / etc.) |
 
 ## Tool reference
 
