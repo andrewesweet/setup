@@ -1,0 +1,61 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "github-copilot/claude-sonnet-4-6",
+  "small_model": "github-copilot/gpt-4o-mini",
+  "instructions": [
+    "~/.config/opencode/instructions/git-conventions.md",
+    "~/.config/opencode/instructions/scratch-dirs.md"
+  ],
+  "permission": {
+    "*": "ask",
+    "read": {
+      "*": "ask",
+      "~/workspace/**": "allow",
+      "/home/dev/workspace/**": "allow",
+      "/tmp/**": "allow",
+      "~/.config/opencode/**": "allow",
+      "~/.config/mise/**": "allow"
+    },
+    "grep": "allow",
+    "glob": "allow",
+    "list": "allow",
+    "skill": "allow",
+    "todowrite": "allow",
+    "bash": {
+      "*": "ask",
+      "git status *": "allow", "git status": "allow",
+      "git diff *": "allow", "git diff": "allow",
+      "git log *": "allow", "git log": "allow",
+      "git show *": "allow",
+      "git branch *": "allow", "git branch": "allow",
+      "git stash list": "allow",
+      "rg *": "allow", "fd *": "allow",
+      "bat /home/dev/workspace/*": "allow",
+      "bat /tmp/*": "allow",
+      "cat /home/dev/workspace/*": "allow",
+      "cat /tmp/*": "allow",
+      "ls *": "allow", "ls": "allow",
+      "which *": "allow", "type *": "allow",
+      "pwd": "allow", "date *": "allow", "date": "allow",
+      "npm list *": "allow", "brew list *": "allow",
+      "rm -rf /tmp/opencode-*": "allow", // Scoped exception for scratch cleanup (specificity-wins)
+      "rm -rf *": "deny", "rm -fr *": "deny",
+      "sudo *": "deny", "chmod 777 *": "deny"
+    },
+    "edit": {
+      "*": "ask",
+      "~/workspace/**": "allow",
+      "/home/dev/workspace/**": "allow",
+      "/tmp/**": "allow"
+    },
+    "webfetch": "ask",
+    "websearch": "ask",
+    "external_directory": {
+      "*": "ask",
+      "/tmp/**": "allow"
+    },
+    "doom_loop": "ask"
+  },
+  "share": "disabled",
+  "autoupdate": false // Pin version for supply-chain security. Update deliberately.
+}

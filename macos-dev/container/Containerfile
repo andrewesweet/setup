@@ -1,0 +1,194 @@
+# container/Containerfile — multi-stage dev container (Podman + Wolfi)
+# See docs/design/container.md for the specification.
+#
+# Build (from macos-dev/ directory):
+#   podman build -f container/Containerfile --target base -t dotfiles-base .
+#   podman build -f container/Containerfile -t dotfiles-full .
+
+# ── Stage: base ─────────────────────────────────────────────────────────────
+FROM docker.io/chainguard/wolfi-base:latest AS base
+
+# Optional custom CA certificates (e.g., corporate TLS-inspecting proxy).
+# Place your CA bundle at container/custom-ca.pem (gitignored) and build with:
+#   cd macos-dev && podman build --build-arg CUSTOM_CA=container/custom-ca.pem --target base -t dotfiles-base .
+# If omitted, this is a no-op — backwards compatible with default builds.
+# Optional proxy configuration (auto-detected by dev.sh from host env).
+# Loopback addresses are rewritten to host.containers.internal for Podman Machine.
+ARG http_proxy=""
+ARG https_proxy=""
+ARG HTTP_PROXY=""
+ARG HTTPS_PROXY=""
+ARG no_proxy=""
+
+ARG CUSTOM_CA=""
+COPY ${CUSTOM_CA:-container/.dockerignore} /tmp/custom-ca-or-noop
+RUN if [ -n "${CUSTOM_CA}" ]; then \
+      mkdir -p /usr/local/share/ca-certificates; \
+      cp /tmp/custom-ca-or-noop /usr/local/share/ca-certificates/custom-ca.crt; \
+      cat /tmp/custom-ca-or-noop >> /etc/ssl/certs/ca-certificates.crt; \
+    fi; \
+    rm -f /tmp/custom-ca-or-noop
+
+# System packages + linting/security tools (apk — signed by Chainguard)
+# All tools installed via apk get automatic version updates from Wolfi.
+# If any package name is unavailable, the build fails here — fix by
+# checking `apk search <name>` or falling back to binary download.
+# Cache mount persists apk packages across builds (~1 GB saved per rebuild).
+#
+# Note: python-3 is a runtime dependency of google-cloud-sdk. Agent project
+# work uses mise-managed Python 3.13 (installed below), not this one.
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk update && apk add \
+      bash \
+      git \
+      curl \
+      unzip \
+      openssh-client \
+      ca-certificates \
+      build-base \
+      python-3 \
+      go \
+      nodejs \
+      bun \
+      glibc-locales \
+      procps \
+      golangci-lint \
+      gofumpt \
+      shfmt \
+      tflint \
+      zizmor \
+      fd \
+      ripgrep \
+      tree \
+      jq \
+      yq \
+      kubectl
+
+# shellcheck — not in Wolfi apk; verified via release checksum file
+ARG SHELLCHECK_VERSION=0.10.0
+RUN set -eux; \
+    curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.aarch64.tar.xz" \
+      -o /tmp/shellcheck.tar.xz; \
+    tar -xJf /tmp/shellcheck.tar.xz -C /tmp; \
+    mv "/tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/; \
+    rm -rf /tmp/shellcheck*
+
+# actionlint — not in Wolfi apk; verified via release checksum file
+ARG ACTIONLINT_VERSION=1.7.7
+RUN set -eux; \
+    curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_arm64.tar.gz" \
+      -o /tmp/actionlint.tar.gz; \
+    curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_checksums.txt" \
+      -o /tmp/actionlint-checksums.txt; \
+    grep "linux_arm64.tar.gz" /tmp/actionlint-checksums.txt | sed 's|  .*|  /tmp/actionlint.tar.gz|' | sha256sum -c -; \
+    tar -xzf /tmp/actionlint.tar.gz -C /tmp; \
+    mv /tmp/actionlint /usr/local/bin/; \
+    rm -rf /tmp/actionlint*
+
+# codeql — NOT installed in container (no arm64 Linux build available).
+# Use codeql on the macOS host via Homebrew cask instead.
+
+# Create non-root user
+RUN adduser -D -h /home/dev -s /bin/bash dev
+
+ENV LANG=C.UTF-8
+
+# ── Tool installs (as dev user) ────────────────────────────────────────────
+USER dev
+WORKDIR /home/dev
+
+# mise — verified via release checksum file
+ARG MISE_VERSION=2026.4.6
+RUN set -eux; \
+    curl -fsSL "https://github.com/jdx/mise/releases/download/v${MISE_VERSION}/mise-v${MISE_VERSION}-linux-arm64" \
+      -o /tmp/mise; \
+    curl -fsSL "https://github.com/jdx/mise/releases/download/v${MISE_VERSION}/SHASUMS256.txt" \
+      -o /tmp/mise-checksums.txt; \
+    grep "mise-v${MISE_VERSION}-linux-arm64$" /tmp/mise-checksums.txt | sed 's|  .*|  /tmp/mise|' | sha256sum -c -; \
+    rm /tmp/mise-checksums.txt; \
+    chmod +x /tmp/mise; \
+    mkdir -p "$HOME/.local/bin"; \
+    mv /tmp/mise "$HOME/.local/bin/mise"
+ENV PATH="/home/dev/.local/bin:${PATH}"
+
+# uv — verified via release checksum file
+ARG UV_VERSION=0.11.4
+RUN set -eux; \
+    curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-aarch64-unknown-linux-gnu.tar.gz" \
+      -o /tmp/uv.tar.gz; \
+    curl -fsSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-aarch64-unknown-linux-gnu.tar.gz.sha256" \
+      -o /tmp/uv.sha256; \
+    sed -i 's|  .*|  /tmp/uv.tar.gz|' /tmp/uv.sha256; \
+    sha256sum -c /tmp/uv.sha256; \
+    tar -xzf /tmp/uv.tar.gz -C /tmp; \
+    mkdir -p "$HOME/.local/bin"; \
+    mv /tmp/uv-aarch64-unknown-linux-gnu/uv "$HOME/.local/bin/uv"; \
+    mv /tmp/uv-aarch64-unknown-linux-gnu/uvx "$HOME/.local/bin/uvx"; \
+    rm -rf /tmp/uv*
+ENV PATH="/home/dev/.local/bin:${PATH}"
+
+# uv tools: ty, prek, ruff
+RUN uv tool install ty && \
+    uv tool install prek && \
+    uv tool install ruff
+ENV PATH="/home/dev/.local/share/uv/tools/bin:/home/dev/.local/bin:${PATH}"
+
+# bun global packages: opencode-ai, critique
+RUN bun install -g opencode-ai critique
+ENV PATH="/home/dev/.bun/bin:${PATH}"
+
+# mise: install python and go from global config (copy config first)
+COPY --chown=dev:dev mise/config.toml /home/dev/.config/mise/config.toml
+RUN mise install --yes || true
+
+# gcloud CLI via apk (NOT gcloud components install)
+USER root
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk update && apk add google-cloud-sdk \
+    || true
+USER dev
+
+# Copy configs
+COPY --chown=dev:dev git/.gitconfig       /home/dev/.gitconfig
+COPY --chown=dev:dev git/.gitignore_global /home/dev/.gitignore_global
+COPY --chown=dev:dev opencode/            /home/dev/.config/opencode/
+COPY --chown=dev:dev mise/config.toml     /home/dev/.config/mise/config.toml
+
+# ── Stage: full ─────────────────────────────────────────────────────────────
+FROM base AS full
+
+USER root
+# Full stage = interactive human dev environment on top of the agent base.
+# Everything here is TUI or interactive; agent-useful CLIs live in base.
+#
+# Host-only (not in Wolfi apk, use Homebrew on macOS):
+#   lnav    — log file navigator
+#   kubectx — kubectl context/namespace switcher
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk update && apk add \
+      tmux \
+      starship \
+      lazygit \
+      btop \
+      fzf \
+      zoxide \
+      bat \
+      delta \
+      glow \
+      neovim \
+      k9s \
+      lazydocker
+USER dev
+
+# Copy full-stage configs
+COPY --chown=dev:dev bash/          /home/dev/.config/bash/
+COPY --chown=dev:dev bash/.bash_profile /home/dev/.bash_profile
+COPY --chown=dev:dev bash/.bashrc       /home/dev/.bashrc
+COPY --chown=dev:dev bash/.bash_aliases /home/dev/.bash_aliases
+COPY --chown=dev:dev bash/.inputrc      /home/dev/.inputrc
+COPY --chown=dev:dev tmux/.tmux.conf    /home/dev/.tmux.conf
+COPY --chown=dev:dev starship/starship.toml /home/dev/.config/starship.toml
+COPY --chown=dev:dev lazygit/config.yml /home/dev/.config/lazygit/config.yml
+COPY --chown=dev:dev nvim/              /home/dev/.config/nvim/
+
+CMD ["bash", "-l"]

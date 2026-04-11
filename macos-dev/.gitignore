@@ -1,0 +1,23 @@
+# ── Generated files ──────────────────────────────────────────────────────────
+docs/cheatsheet.pdf
+nvim/lazy-lock.json.bak
+
+# ── Local overrides (never committed) ────────────────────────────────────────
+container/dev.env
+container/custom-ca.pem
+.bashrc.local
+.gitconfig.local
+opencode-local/
+
+# ── Backup directories created by install scripts ─────────────────────────────
+.dotfiles-backup/
+
+# ── OS artefacts ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editor artefacts ─────────────────────────────────────────────────────────
+*.swp
+*.swo
+*~
+.aider*

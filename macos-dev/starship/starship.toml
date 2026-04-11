@@ -1,0 +1,60 @@
+# starship.toml — prompt configuration
+# See docs/design/terminal.md for the specification.
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$kubernetes\
+$nodejs$python$golang$terraform\
+$cmd_duration\
+$line_break\
+$character"""
+
+scan_timeout = 30
+command_timeout = 1000
+
+[directory]
+truncation_length = 4
+truncate_to_repo  = true
+style             = "bold blue"
+
+[git_branch]
+symbol = " "
+style  = "bold purple"
+
+[git_status]
+conflicted = "⚡"
+ahead      = "↑${count}"
+behind     = "↓${count}"
+diverged   = "⇕"
+modified = "*"
+staged = "+"
+untracked = "?"
+stashed = "\\$"
+
+[character]
+vicmd_symbol   = "[N](bold green) "
+success_symbol = "[I](bold yellow) "
+error_symbol   = "[I](bold red) "
+
+[cmd_duration]
+min_time = 2000
+format   = " [$duration](yellow)"
+
+[nodejs]
+format = "[ $version](green) "
+detect_files = ["package.json", ".nvmrc"]
+
+[python]
+format = "[ $version](yellow) "
+
+[golang]
+format = "[ $version](cyan) "
+
+[kubernetes]
+disabled = false
+format = "[⎈ $context](blue) "
+
+[terraform]
+format = "[ $version](purple) "

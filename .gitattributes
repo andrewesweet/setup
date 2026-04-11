@@ -1,0 +1,35 @@
+# .gitattributes — enforce LF line endings for text files on all platforms
+#
+# Background:
+#   On Windows-hosted GitHub Actions runners, Git's default core.autocrlf=true
+#   converts LF → CRLF on checkout. When WSL2 then runs bash on a shell script
+#   with CRLF endings, bash fails with "$'\r': command not found" and syntax
+#   errors on every line.
+#
+#   This file tells Git to always use LF for text files, regardless of platform.
+#   Binary files auto-detect and are left alone.
+
+# Default: detect text vs binary, force LF for text
+* text=auto eol=lf
+
+# Explicit LF for shell scripts and bash dotfiles
+# (belt-and-braces in case 'text=auto' misdetects any of these)
+*.sh          text eol=lf
+*.bash        text eol=lf
+.bashrc       text eol=lf
+.bash_profile text eol=lf
+.bash_aliases text eol=lf
+.inputrc      text eol=lf
+
+# Config formats that the install scripts / CI parse
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.json  text eol=lf
+*.jsonc text eol=lf
+*.md    text eol=lf
+
+# Binary formats (explicit — should auto-detect but safer)
+*.png binary
+*.jpg binary
+*.pdf binary

@@ -1,0 +1,25 @@
+{
+  "recommendations": [
+    "charliermarsh.ruff",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "golang.go",
+    "hashicorp.terraform",
+    "redhat.vscode-yaml",
+    "github.vscode-github-actions",
+    "DavidAnson.vscode-markdownlint",
+    "yzhang.markdown-all-in-one",
+    "timonwong.shellcheck",
+    "mkhl.shfmt",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "github.vscode-codeql",
+    "gitleaks.gitleaks",
+    "ms-vscode-remote.remote-wsl",
+    "ms-vscode-remote.remote-containers",
+    "esbenp.prettier-vscode",
+    "catppuccin.catppuccin-vsc",
+    "EditorConfig.EditorConfig",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}

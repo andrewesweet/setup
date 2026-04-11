@@ -1,0 +1,49 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor artefacts
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.aider*
+
+# OS / tools
+Thumbs.db
+.direnv/
+
+# Secrets and credentials
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.p8
+*.jks
+*.keystore
+*_rsa
+*_ecdsa
+*_ed25519
+auth.json
+credentials.json
+application_default_credentials.json
+
+# npm / PyPI auth
+.npmrc
+
+# Terraform state and secrets
+terraform.tfstate*
+.terraform/
+*.tfvars
+
+# Dotfiles local overrides
+.bashrc.local
+.gitconfig.local
+opencode-local/
+dev.env
