@@ -48,6 +48,7 @@ echo ""
 # ── File existence ─────────────────────────────────────────────────────────
 echo "File existence:"
 check "init.lua exists"            test -f "$REPO_ROOT/nvim/init.lua"
+check "lazy.lua exists"            test -f "$REPO_ROOT/nvim/lua/config/lazy.lua"
 check "options.lua exists"         test -f "$REPO_ROOT/nvim/lua/config/options.lua"
 check "keymaps.lua exists"         test -f "$REPO_ROOT/nvim/lua/config/keymaps.lua"
 check "autocmds.lua exists"        test -f "$REPO_ROOT/nvim/lua/config/autocmds.lua"
@@ -60,6 +61,16 @@ check "integrations.lua exists"    test -f "$REPO_ROOT/nvim/lua/plugins/integrat
 echo ""
 echo "init.lua:"
 check "bootstraps LazyVim"         grep -q 'config.lazy' "$REPO_ROOT/nvim/init.lua"
+
+# ── lazy.lua ──────────────────────────────────────────────────────────────
+# Bootstrap file from LazyVim/starter — without it, init.lua's
+# require('config.lazy') fails on startup with E5113 module not found.
+echo ""
+echo "lazy.lua:"
+check "clones lazy.nvim"           grep -q 'lazy.nvim.git' "$REPO_ROOT/nvim/lua/config/lazy.lua"
+check "prepends lazypath to rtp"   grep -q "vim.opt.rtp:prepend(lazypath)" "$REPO_ROOT/nvim/lua/config/lazy.lua"
+check "imports lazyvim.plugins"    grep -q 'lazyvim.plugins' "$REPO_ROOT/nvim/lua/config/lazy.lua"
+check "imports plugins dir"        grep -q '"plugins"' "$REPO_ROOT/nvim/lua/config/lazy.lua"
 
 # ── options.lua ───────────────────────────────────────────────────────────
 echo ""
