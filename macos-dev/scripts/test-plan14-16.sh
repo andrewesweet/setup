@@ -88,6 +88,13 @@ check "has GCP sub-header"                grep -q '^### GCP' "$REPO_ROOT/docs/ch
 check "has Container sub-header"          grep -q '^### Container' "$REPO_ROOT/docs/cheatsheet.md"
 check "Searching table has fd"            grep -q '| fd |' "$REPO_ROOT/docs/cheatsheet.md"
 check "Git table has lazygit"             grep -q '| lazygit |' "$REPO_ROOT/docs/cheatsheet.md"
+# Discovery footer (option D from cheatsheet design discussion):
+# points users at each tool's own discovery key for the full
+# binding list, since the cheatsheet itself is intentionally minimal.
+check "Discovery footer present"          grep -q '^### Discover full bindings' "$REPO_ROOT/docs/cheatsheet.md"
+check "Discovery: nvim WhichKey"          grep -q 'WhichKey' "$REPO_ROOT/docs/cheatsheet.md"
+check "Discovery: tmux list-keys"         grep -q 'tmux list-keys' "$REPO_ROOT/docs/cheatsheet.md"
+check "Discovery: starship explain"       grep -q 'starship explain' "$REPO_ROOT/docs/cheatsheet.md"
 
 # ── README.md existence and sections (8 checks) ───────────────────────────
 echo ""

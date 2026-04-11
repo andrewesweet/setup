@@ -117,3 +117,23 @@ Tool for the job — quick commands and aliases.
 | Show motion hints on the current line | precognition.nvim | `:Precognition toggle` / `:Precognition peek` |
 | Practice game (delete-me, ci{, whackamole, …) | vim-be-good | `:VimBeGood` |
 | Built-in interactive tutor | vimtutor | `:Tutor` (or `vimtutor` from shell) |
+
+### Discover full bindings inside each tool
+
+This cheatsheet is intentionally limited (two pages of A4) — it is a muscle-memory refresher, not a complete reference. Every tool ships its own discovery key. The shell function `cheat <tool>` summarises each one without leaving your terminal.
+
+| Tool | Discovery key / command |
+|------|--------------------------|
+| nvim / LazyVim | `<space>` (which-key), `:WhichKey`, `:help index`, `:Lazy`, `:Mason`, `:Tutor` |
+| OpenCode | `cheat opencode` (dumps `tui.jsonc`) |
+| tmux | `Ctrl+A` then `?`, or `tmux list-keys` from shell |
+| lazygit | `?` |
+| lazydocker | `?` |
+| k9s | `?` |
+| btop | `h` |
+| lnav | `?` |
+| fzf | `?` in any prompt; `man fzf` for full reference |
+| starship | `starship explain` |
+| delta | `delta --show-config` |
+| bash readline | `bind -P` |
+| git | `git help -a` |

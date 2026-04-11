@@ -202,13 +202,89 @@ cheat() {
     return 1
   fi
   case "${1:-}" in
+    "")
+      glow "$file" -s dark -p ;;
     keys)
       sed -n '/^## Key bindings/,/^## Tool reference/{/^## Tool reference/d;p}' "$file" \
         | glow -s dark -p ;;
     tools)
       sed -n '/^## Tool reference/,$p' "$file" \
         | glow -s dark -p ;;
+
+    # ── Per-tool discovery ───────────────────────────────────────────
+    # The cheatsheet is intentionally minimal (2 pages of A4). For
+    # the complete, up-to-date binding list, every tool ships its own
+    # discovery key — these subcommands tell you which key, and where
+    # possible dump the live config so you don't have to leave the
+    # shell.
+
+    nvim|vim)
+      cat <<'EOF'
+nvim / LazyVim — discover bindings inside the editor:
+  <space>          which-key popup (LazyVim leader menu)
+  :WhichKey        full which-key tree
+  :help index      all built-in normal-mode commands
+  :Lazy            installed plugins (each has its own keys)
+  :Mason           installed LSP servers / formatters / linters
+  :Tutor           30-min interactive vimtutor
+EOF
+      ;;
+    lazygit|lg)      echo "Inside lazygit: press '?' for the full keybinding overlay." ;;
+    lazydocker|lzd)  echo "Inside lazydocker: press '?' for the full keybinding overlay." ;;
+    k9s)             echo "Inside k9s: press '?' for help, ':' for command mode." ;;
+    btop)            echo "Inside btop: press 'h' for the help screen." ;;
+    lnav)            echo "Inside lnav: press '?' for help." ;;
+    fzf)
+      echo "In any fzf prompt: '?' toggles preview header."
+      echo "Full reference: man fzf"
+      ;;
+    tmux)
+      echo "In tmux: prefix (Ctrl+A) then '?' to list all bindings."
+      echo "From shell: tmux list-keys"
+      ;;
+    bash|shell|readline)
+      echo "Readline bindings (top 20):"
+      bind -P 2>/dev/null | grep -v 'not bound' | head -20
+      echo "Full list: bind -P"
+      ;;
+    git)
+      echo "All git subcommands: git help -a"
+      echo "Aliases in this repo: grep -A100 '^\[alias\]' \"\$DOTFILES/git/.gitconfig\""
+      ;;
+    starship)
+      command -v starship >/dev/null && starship explain || echo "starship not on PATH"
+      ;;
+    delta)
+      command -v delta >/dev/null && delta --show-config | head -30 || echo "delta not on PATH"
+      ;;
+    opencode|oc)
+      echo "OpenCode TUI bindings: \$DOTFILES/opencode/tui.jsonc"
+      [[ -f "$dotfiles/opencode/tui.jsonc" ]] && cat "$dotfiles/opencode/tui.jsonc"
+      ;;
+
+    -h|--help|help)
+      cat <<'EOF'
+cheat — quick reference for keys, tools, and per-tool discovery
+
+  cheat            Render full cheatsheet
+  cheat keys       Page 1: key bindings by action
+  cheat tools      Page 2: tool for the job
+  cheat <tool>     Per-tool "how to discover bindings" hint
+  cheat help       This message
+
+Per-tool subcommands:
+  bash, btop, delta, fzf, git, k9s, lazydocker, lazygit, lnav,
+  nvim, opencode, starship, tmux
+
+The cheatsheet is intentionally limited to 2 pages of A4 — it is a
+muscle-memory refresher, not a complete reference. For the full
+current binding list of any tool, use its own discovery key.
+EOF
+      ;;
     *)
-      glow "$file" -s dark -p ;;
+      echo "cheat: unknown subcommand '$1'" >&2
+      echo "Run 'cheat help' for usage." >&2
+      return 1
+      ;;
   esac
 }

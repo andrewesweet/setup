@@ -206,6 +206,15 @@ check "crs() function exists"     grep -qE '^crs[[:space:]]*\(\)' "$REPO_ROOT/ba
 check "aliases() function exists" grep -qE '^aliases[[:space:]]*\(\)' "$REPO_ROOT/bash/.bash_aliases"
 check "cheat() function exists"   grep -qE '^cheat[[:space:]]*\(\)' "$REPO_ROOT/bash/.bash_aliases"
 check "cheat() validates DOTFILES" grep -q 'Cheatsheet not found' "$REPO_ROOT/bash/.bash_aliases"
+# Per-tool discovery subcommands (option B from cheatsheet design discussion).
+# Each delegates to the tool's own help — keeps cheatsheet.md scannable
+# while still providing one-command discovery for installed tools.
+check "cheat nvim subcommand"     grep -qE 'nvim\|vim\)' "$REPO_ROOT/bash/.bash_aliases"
+check "cheat lazygit subcommand"  grep -qE 'lazygit\|lg\)' "$REPO_ROOT/bash/.bash_aliases"
+check "cheat tmux subcommand"     grep -qE '^[[:space:]]*tmux\)' "$REPO_ROOT/bash/.bash_aliases"
+check "cheat opencode subcommand" grep -qE 'opencode\|oc\)' "$REPO_ROOT/bash/.bash_aliases"
+check "cheat help subcommand"     grep -qE '\-h\|--help\|help\)' "$REPO_ROOT/bash/.bash_aliases"
+check "cheat unknown rejects"     grep -q "unknown subcommand" "$REPO_ROOT/bash/.bash_aliases"
 
 # Platform-conditional
 check "platform ports alias"      grep -q 'ports=.*lsof\|ports=.*ss' "$REPO_ROOT/bash/.bash_aliases"
