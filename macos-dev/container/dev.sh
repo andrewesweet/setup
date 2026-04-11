@@ -186,17 +186,22 @@ _network_flags() {
 _volume_flags() {
   local flags=()
 
-  # Named volumes
+  # tmpfs mounts — applied first so named volumes layer on top of them.
+  #
+  # /home/dev/.cache is writable via tmpfs so tools like starship, bat,
+  # nvim (treesitter), k9s, fzf, etc. can write their own cache dirs
+  # without tripping the --read-only rootfs. The dev-cache-uv volume
+  # below layers on top at /home/dev/.cache/uv for persistent uv cache.
+  flags+=(--tmpfs /tmp)
+  flags+=(--tmpfs /home/dev/.cache)
+
+  # Named volumes (persistent across container restarts)
   flags+=(-v dev-cache-uv:/home/dev/.cache/uv)
   flags+=(-v dev-cache-go:/home/dev/go)
   flags+=(-v dev-cache-mise:/home/dev/.local/share/mise)
   flags+=(-v dev-cache-mason:/home/dev/.local/share/mason)
   flags+=(-v dev-cache-bun:/home/dev/.bun)
   flags+=(-v dev-data-opencode:/home/dev/.local/share/opencode)
-
-  # tmpfs mounts
-  flags+=(--tmpfs /tmp)
-  flags+=(--tmpfs /home/dev/.cache/tmp)
 
   echo "${flags[@]}"
 }
