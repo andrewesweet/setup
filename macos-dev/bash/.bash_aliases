@@ -11,10 +11,20 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 
 # ── File viewing ────────────────────────────────────────────────────────────
-alias ll='ls -lAh'
-alias la='ls -A'
-alias lt='tree -L 2'
-alias llt='tree -L 3'
+# eza replaces ls with git-aware, colour, icon support.
+# Falls back to plain ls if eza is not installed.
+if command -v eza &>/dev/null; then
+  alias ls='eza --color=auto --icons=auto --group-directories-first'
+  alias ll='eza --long --all --git --icons=auto --group-directories-first --header'
+  alias la='eza --all --icons=auto --group-directories-first'
+  alias lt='eza --tree --level=2 --icons=auto --group-directories-first'
+  alias llt='eza --tree --level=3 --long --icons=auto --group-directories-first'
+else
+  alias ll='ls -lAh'
+  alias la='ls -A'
+  alias lt='tree -L 2'
+  alias llt='tree -L 3'
+fi
 alias mdv='glow -s dark'
 
 # ── Git — prefix: g ─────────────────────────────────────────────────────────

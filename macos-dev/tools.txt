@@ -28,6 +28,7 @@ ripgrep              brew:ripgrep                   apt:ripgrep             apk:
 
 # ── File viewing ─────────────────────────────────────────────────────────────
 bat                  brew:bat                       apt:bat                 apk:bat
+eza                  brew:eza                       apt:-                   apk:eza
 glow                 brew:glow                      apt:-                   apk:glow
 lnav                 brew:lnav                      apt:lnav                apk:-
 

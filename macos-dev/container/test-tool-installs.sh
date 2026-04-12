@@ -21,7 +21,7 @@ done
 if [[ "${1:-}" == "--full" ]]; then
   echo ""
   echo "Full tools:"
-  for tool in tmux starship lazygit btop fzf zoxide bat delta glow nvim k9s lazydocker; do
+  for tool in tmux starship lazygit btop fzf zoxide bat eza delta glow nvim k9s lazydocker; do
     check "$tool"
   done
 fi
