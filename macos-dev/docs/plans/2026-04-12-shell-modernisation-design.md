@@ -1626,3 +1626,68 @@ All tools verified against current official documentation. Corrections applied:
 | tmux-fzf-url | current | Default trigger: `prefix+u`. Config keys confirmed. |
 | tmux-sessionx | current | `@sessionx-bind` and `@sessionx-zoxide-mode` not confirmed in official docs — verify from repo README at implementation time. |
 | tmux-floax | current | `prefix+p` confirmed. DOES shadow native previous-window — acceptable since we use h/j/k/l navigation. Requires tmux 3.3+. |
+
+## Appendix C: TODO — Future Plan Cycles
+
+Scope deliberately excluded from this design. Each is a separate plan cycle
+(brainstorming → design → implementation plan → implementation).
+
+### macOS Desktop Environment
+
+**Initial targets:**
+- **AeroSpace** (https://github.com/nikitabobko/AeroSpace) — tiling window manager for macOS. Config at `~/.config/aerospace/aerospace.toml`.
+- **SketchyBar** (https://github.com/FelixKratz/SketchyBar) — status bar replacement. Config at `~/.config/sketchybar/`.
+
+**Integration scope** (for the future design):
+- Workspace-switch events pipe from AeroSpace → SketchyBar via `exec-on-workspace-change`
+- Dracula Pro theming for SketchyBar items (AeroSpace has no visual output of its own)
+- Keybinding conventions that don't conflict with tmux (C-a), nvim (Space), or shell vi-mode
+- Optional adjacent tools: **skhd** (hotkey daemon), **Karabiner-Elements** (keyboard remapping), **JankyBorders** (window border indicator)
+- SketchyBar items to consider: git branch, k8s context, AWS/GCP profile, battery, time, calendar — mostly shell-script-driven using the same tools we're already configuring
+- macOS-only — no WSL2/Linux equivalent. Out of scope for `install-wsl.sh`.
+
+**Why separate from shell modernisation:**
+- Desktop environment is an orthogonal concern from shell tooling
+- macOS-only scope would complicate cross-platform install scripts
+- Independent validation timeline — no coupling with zsh/nushell migration
+- Dracula theming re-use is the only crossover, and it's a data-only dependency (hex values from the design's Dracula Pro palette section)
+
+### gh Extensions — Layer 1b scope
+
+User-selected extensions to add to Layer 1b:
+
+- `github/gh-copilot` — inline command explanation/suggestion (`gh copilot explain`, `gh copilot suggest`)
+- `seachicken/gh-poi` — safe pruning of merged branches (checks PR state via API)
+- `yusukebe/gh-markdown-preview` — local GitHub-flavored markdown rendering
+- `k1LoW/gh-grep` — cross-repo grep via GitHub API
+- `github/gh-aw` — agentic workflows for GitHub Actions (user opted in; monitor supply-chain risk surface in corporate CI)
+- `Link-/gh-token` — GitHub App installation token helper (user opted in; coexists with existing `gha-pin` PAT flow)
+
+**Installation**: `gh extension install <owner>/<repo>` in `install-macos.sh` and
+`install-wsl.sh` post-brew step. No Brewfile or `tools.txt` changes (gh extensions
+aren't managed via package managers). Gated on `command -v gh &>/dev/null`.
+
+**Aliases** (to be added in Layer 1b alias files):
+```bash
+# gh-copilot
+alias ghce='gh copilot explain'
+alias ghcs='gh copilot suggest'
+
+# gh-poi (prune merged branches)
+alias ghp='gh poi'
+
+# gh-markdown-preview
+alias ghmd='gh markdown-preview'
+
+# gh-grep
+alias ghg='gh grep'
+
+# gh-aw (agentic workflows)
+alias ghaw='gh aw'
+
+# gh-token (installation token retrieval)
+# No alias — used in automation scripts, not interactive shells
+```
+
+**cheat integration** (Layer 1b): extend the `cheat` function with a `cheat gh-ext`
+subcommand that lists all installed extensions and their primary commands.
