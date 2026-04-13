@@ -184,6 +184,18 @@ if ! brew bundle --file="$DOTFILES/Brewfile"; then
   exit 1
 fi
 
+# ── Step 1b: TPM (tmux plugin manager) ───────────────────────────────────
+# TPM is not a brew formula. Clone directly; plugins install on first
+# tmux launch with `prefix + I` (or continuum auto-restore). Idempotent.
+if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+  log "installing TPM"
+  if ! git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"; then
+    warn "TPM clone failed — install manually before first tmux launch"
+  fi
+else
+  log "TPM already installed at ~/.tmux/plugins/tpm"
+fi
+
 # ── Step 2: Post-brew tool installs ──────────────────────────────────────────
 
 # uv tools (ty and prek are NOT in Homebrew)
@@ -268,8 +280,9 @@ link bash/.inputrc      .inputrc
 link git/.gitconfig         .gitconfig
 link git/.gitignore_global  .gitignore_global
 
-# kitty terminal (Plan 4)
-link kitty/kitty.conf  .config/kitty/kitty.conf
+# kitty terminal (Plan 4, Dracula Pro palette added in Layer 1b-ii)
+link kitty/kitty.conf        .config/kitty/kitty.conf
+link kitty/dracula-pro.conf  .config/kitty/dracula-pro.conf
 
 # tmux (Plan 5)
 link tmux/.tmux.conf  .tmux.conf
@@ -354,16 +367,21 @@ Next steps:
   1. Switch shell to Homebrew bash 5:
        echo "$HOMEBREW_PREFIX/bin/bash" | sudo tee -a /etc/shells
        chsh -s $HOMEBREW_PREFIX/bin/bash
-  2. Create ~/.gitconfig.local with your identity:
+  2. Install tmux plugins (first tmux launch):
+       prefix + I  (Ctrl-A then Shift-I)
+     Note: tmux-thumbs requires a Rust toolchain to compile on macOS too.
+     If compilation fails, install from:
+       https://github.com/fcsonline/tmux-thumbs/releases
+  3. Create ~/.gitconfig.local with your identity:
        git config --file ~/.gitconfig.local user.name "Your Name"
        git config --file ~/.gitconfig.local user.email "you@example.com"
-  3. Install fzf shell bindings (one-time, interactive):
+  4. Install fzf shell bindings (one-time, interactive):
        $HOMEBREW_PREFIX/opt/fzf/install --all --no-update-rc
-  4. Authenticate tools:
+  5. Authenticate tools:
        opencode auth login   # select GitHub Copilot
        gh auth login
        gcloud auth login     # only if gcloud is installed (see prerequisites)
-  5. Restart terminal.
+  6. Restart terminal.
 
 Prerequisites NOT installed by this script:
   - Google Cloud SDK (gcloud) — see warnings above if missing. The

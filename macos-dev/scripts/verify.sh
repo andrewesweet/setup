@@ -189,6 +189,19 @@ check "diffnav config symlink resolves" \
 check "sesh.toml is a generated regular file" \
   bash -c 'test -f "$HOME/.config/sesh/sesh.toml" && test ! -L "$HOME/.config/sesh/sesh.toml"'
 
+# ── Layer 1b-ii (TPM + theming) ──────────────────────────────────────────
+echo ""
+echo "Layer 1b-ii:"
+# shellcheck disable=SC2016  # $HOME expanded inside inner bash -c intentionally
+check "TPM clone at ~/.tmux/plugins/tpm" \
+  bash -c 'test -d "$HOME/.tmux/plugins/tpm"'
+# shellcheck disable=SC2016
+check "kitty dracula-pro.conf symlink resolves" \
+  bash -c 'test -L "$HOME/.config/kitty/dracula-pro.conf" && test -e "$HOME/.config/kitty/dracula-pro.conf"'
+# BAT_THEME env var check (indirect): .bashrc content
+check "BAT_THEME is Dracula in tracked .bashrc" \
+  grep -qE 'export BAT_THEME="Dracula"' "$REPO_ROOT/bash/.bashrc"
+
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
 echo ""
 echo "${YELLOW}── Remaining manual steps ──${RESET}"

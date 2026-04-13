@@ -4,10 +4,26 @@
 gui:
   theme:
     activeBorderColor:
-      - '#89b4fa'
+      - '#BD93F9'
       - bold
+    inactiveBorderColor:
+      - '#6272A4'
+    optionsTextColor:
+      - '#F8F8F2'
     selectedLineBgColor:
-      - '#313244'
+      - '#44475A'
+    selectedRangeBgColor:
+      - '#44475A'
+    cherryPickedCommitBgColor:
+      - '#44475A'
+    cherryPickedCommitFgColor:
+      - '#BD93F9'
+    unstagedChangesColor:
+      - '#FF5555'
+    defaultFgColor:
+      - '#F8F8F2'
+    searchingActiveBorderColor:
+      - '#F1FA8C'
   sidePanelWidth: 0.25
   expandFocusedSidePanel: true
   showFileTree: true
@@ -16,7 +32,7 @@ gui:
 git:
   paging:
     colorArg: always
-    pager: delta --paging=never --syntax-theme='Monokai Extended'
+    pager: delta --paging=never --syntax-theme='Dracula'
   commit:
     signOff: false
   fetching:

@@ -49,7 +49,7 @@ check "kitty.conf exists"  test -f "$REPO_ROOT/kitty/kitty.conf"
 # ── Font and display ──────────────────────────────────────────────────────
 echo ""
 echo "Font and display:"
-check "font_family = JetBrains Mono"    grep -qF 'font_family      JetBrains Mono' "$REPO_ROOT/kitty/kitty.conf"
+check "font_family = JetBrainsMono Nerd Font (1b-ii)"  grep -qF 'font_family      JetBrainsMono Nerd Font' "$REPO_ROOT/kitty/kitty.conf"
 check "font_size = 13.0"               grep -q 'font_size.*13\.0' "$REPO_ROOT/kitty/kitty.conf"
 check "shell_integration enabled"       grep -q 'shell_integration.*enabled' "$REPO_ROOT/kitty/kitty.conf"
 check "scrollback_lines = 10000"        grep -q 'scrollback_lines.*10000' "$REPO_ROOT/kitty/kitty.conf"

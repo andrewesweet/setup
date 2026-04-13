@@ -252,6 +252,21 @@ EOF
       echo "In tmux: prefix (Ctrl+A) then '?' to list all bindings."
       echo "From shell: tmux list-keys"
       ;;
+    tmux-plugins)
+      cat <<'EOF'
+tmux plugins (TPM + 10 plugins — see docs/plans § 3.6)
+  prefix + I          install declared plugins
+  prefix + U          update plugins
+  prefix + alt+u      uninstall plugins not in config
+  prefix + Space      tmux-thumbs — highlight URLs/paths/hashes on screen
+  prefix + p          tmux-floax — toggle floating pane
+  prefix + o          tmux-sessionx — session picker (zoxide-aware)
+  prefix + u          tmux-fzf-url — URL picker over scrollback
+  prefix + F          tmux-fzf — fuzzy tmux command runner
+  prefix + Ctrl-S     tmux-resurrect — save session
+  prefix + Ctrl-R     tmux-resurrect — restore session (continuum auto-restores too)
+EOF
+      ;;
     bash|shell|readline)
       echo "Readline bindings (top 20):"
       bind -P 2>/dev/null | grep -v 'not bound' | head -20
@@ -361,7 +376,7 @@ cheat — quick reference for keys, tools, and per-tool discovery
 Per-tool subcommands:
   atuin, bash, btop, delta, diffnav, fzf, git, jqp, k9s, lazydocker,
   lazygit, lnav, nvim, opencode, rip2, sesh, starship, tmux,
-  tv/television, xh, yazi
+  tmux-plugins, tv/television, xh, yazi
 
 New in Layer 1b-i: sesh, yazi, xh, rip2, jqp, diffnav, atuin, tv.
 
