@@ -144,10 +144,10 @@ brew "sesh"
 brew "yazi"
 # xh: modern httpie replacement (httpie stays for team compat — see `http` alias)
 brew "xh"
-# rip (cesarferreira): fuzzy process killer — NOT a safe-rm
-tap "cesarferreira/tap"
-brew "cesarferreira/tap/rip"
 # rip2 (MilesCranmer): safe rm with undo (graveyard ~/.local/share/graveyard)
+# Note: cesarferreira/rip (process killer) was dropped — its bin/rip
+# conflicts with rip2's bin/rip in /opt/homebrew. For interactive process
+# killing, use `kill $(pgrep <name>)` or `pkill <name>`.
 brew "rip2"
 # jqp: interactive jq playground (vi-navigation, Dracula theme)
 brew "jqp"

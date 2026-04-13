@@ -158,7 +158,6 @@ echo "Layer 1b-i tools:"
 check "sesh on PATH"      command -v sesh
 check "yazi on PATH"      command -v yazi
 check "xh on PATH"        command -v xh
-check "rip on PATH"       command -v rip
 check "rip2 on PATH"      command -v rip2
 check "jqp on PATH"       command -v jqp
 check "diffnav on PATH"   command -v diffnav
