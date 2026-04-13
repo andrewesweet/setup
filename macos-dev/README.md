@@ -150,6 +150,10 @@ Plan-specific acceptance tests live in `scripts/test-plan*.sh`. Each one validat
 bash scripts/test-plan-layer1a.sh           # safe checks only (CI default)
 bash scripts/test-plan-layer1a.sh --full    # + invasive checks (requires installed tools)
 
+# Layer 1c — ghq + ghorg + shell helpers
+bash scripts/test-plan-layer1c.sh          # Layer 1c: ghq + ghorg + shell helpers
+bash scripts/test-plan-layer1c.sh --full   # + invasive checks (requires tools installed + WSL simulation)
+
 # Plan 14–16 — historical
 bash scripts/test-plan14-16.sh
 ```
