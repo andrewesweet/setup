@@ -192,7 +192,18 @@ check "cheat gh-ext runs gh extension list" \
 check "cheat ghd mentions C → opencode" \
   bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -qiE 'C.*opencode|opencode.*C'"
 
-# Later tasks append AC-12 through AC-15.
+# ── AC-12: cheatsheet.md sections ────────────────────────────────────────
+echo ""
+echo "AC-12: cheatsheet additions"
+check "cheatsheet has TV channel triggers section" \
+  grep -qE '^### Television channel triggers|^### TV channel triggers' docs/cheatsheet.md
+check "cheatsheet has gh-dash workflow section" \
+  grep -qE '^### gh-dash workflow|^### PR review via gh-dash' docs/cheatsheet.md
+for a in ghd ghce ghcs ghp ghmd ghg ghaw; do
+  check "cheatsheet lists $a" grep -qE "\\b$a\\b" docs/cheatsheet.md
+done
+
+# Later tasks append AC-13 through AC-15.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
