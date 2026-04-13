@@ -1,0 +1,60 @@
+# atuin/config.toml — shell history management
+# See docs/plans/2026-04-12-shell-modernisation-design.md § 3.1
+#
+# Sync is DISABLED by default. To enable:
+#   - Self-hosted: set sync_address to your server URL, auto_sync = true
+#   - atuin.sh cloud: sync_address = "https://api.atuin.sh", auto_sync = true
+# Encryption key at ~/.local/share/atuin/key is NEVER synced.
+
+# ── UI ──────────────────────────────────────────────────────────────────────
+style = "compact"
+enter_accept = true
+
+# ── Search ──────────────────────────────────────────────────────────────────
+search_mode = "fuzzy"
+filter_mode = "global"
+workspaces = true
+filter_mode_shell_up_key_binding = "directory"
+
+# ── Keymap ──────────────────────────────────────────────────────────────────
+keymap_mode = "auto"
+
+# ── Secret filtering ────────────────────────────────────────────────────────
+# Default regexes cover AWS keys, GitHub PATs, Slack tokens, Stripe keys.
+secrets_filter = true
+
+# Custom filter for variable-assignment-style patterns AND raw token prefixes.
+# Unanchored regexes — match anywhere in command.
+history_filter = [
+  "^.*GITHUB_TOKEN.*$",
+  "^.*GH_TOKEN.*$",
+  "^.*SECRET.*$",
+  "^.*PASSWORD.*$",
+  "^.*BEARER.*$",
+  "^.*AUTHORIZATION.*$",
+  "^.*AWS_ACCESS.*$",
+  "^.*AWS_SECRET.*$",
+  "^.*AWS_SESSION.*$",
+  "^.*ANTHROPIC.*$",
+  "^.*OPENAI.*$",
+  "^.*ghp_[A-Za-z0-9_]+.*$",
+  "^.*gho_[A-Za-z0-9_]+.*$",
+  "^.*github_pat_[A-Za-z0-9_]+.*$",
+  "^.*glpat-[A-Za-z0-9_-]+.*$",
+  "^.*sk-[A-Za-z0-9]+.*$",
+  "^.*xoxb-[A-Za-z0-9-]+.*$",
+  "^.*xoxp-[A-Za-z0-9-]+.*$",
+  "^.*PRIVATE.KEY.*$",
+]
+
+# ── Sync DISABLED ───────────────────────────────────────────────────────────
+auto_sync = false
+
+[sync]
+records = true
+
+[stats]
+common_subcommands = [
+  "cargo", "docker", "git", "go", "gcloud",
+  "kubectl", "npm", "podman", "terraform", "tmux",
+]

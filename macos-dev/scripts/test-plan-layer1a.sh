@@ -74,6 +74,22 @@ echo ""
 echo "AC-2: tools.txt manifest consistency"
 check "check-tool-manifest.sh passes"        bash scripts/check-tool-manifest.sh
 
+# ── AC-4: atuin auto_sync = false ─────────────────────────────────────────
+echo ""
+echo "AC-4: atuin config disables sync"
+check "atuin/config.toml exists"             test -f atuin/config.toml
+check "auto_sync = false"                    grep -qE '^\s*auto_sync\s*=\s*false' atuin/config.toml
+
+# ── AC-5: history_filter covers token/secret prefixes ───────────────────
+echo ""
+echo "AC-5: atuin history_filter coverage"
+for pat in GITHUB_TOKEN GH_TOKEN SECRET PASSWORD BEARER AUTHORIZATION \
+           AWS_ACCESS AWS_SECRET AWS_SESSION ANTHROPIC OPENAI \
+           'ghp_' 'gho_' 'github_pat_' 'glpat-' 'sk-' 'xoxb-' 'xoxp-'; do
+  check "history_filter contains pattern '$pat'" \
+    bash -c "grep -Fq '$pat' atuin/config.toml"
+done
+
 # ── AC-3, AC-6, AC-10, AC-11 etc. — stubs to be filled by later tasks ───
 # (Placeholders for each AC; each will become a real check as features land.)
 
