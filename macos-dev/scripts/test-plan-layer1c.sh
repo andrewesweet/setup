@@ -76,6 +76,27 @@ check "check-tool-manifest.sh passes"    bash scripts/check-tool-manifest.sh
 
 # AC-3 through AC-14 — stubs to be filled by later tasks.
 
+# ── AC-3: git/.gitconfig sets ghq.root ────────────────────────────────
+echo ""
+echo "AC-3: git/.gitconfig declares ghq.root"
+check "git config ghq.root = ~/code" \
+  bash -c 'root=$(git config --file git/.gitconfig ghq.root 2>/dev/null); [[ "$root" == "~/code" ]]'
+
+# ── AC-4: ghq root resolves to $HOME/code (full only) ────────────────
+echo ""
+echo "AC-4: ghq root command resolves"
+if [[ "$FULL" == true ]] && command -v ghq &>/dev/null; then
+  actual="$(ghq root 2>/dev/null)"
+  expected="$HOME/code"
+  if [[ "$actual" == "$expected" ]]; then
+    ok "ghq root = \$HOME/code"
+  else
+    nok "ghq root = \$HOME/code (got: $actual)"
+  fi
+else
+  skp "ghq root = \$HOME/code" "requires --full + ghq installed + symlinks"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
