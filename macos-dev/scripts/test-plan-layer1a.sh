@@ -115,18 +115,26 @@ done
 echo ""
 echo "AC-8: atuin bash init gated behind ENABLE_ATUIN"
 check "bash/.bashrc mentions ENABLE_ATUIN"    grep -q 'ENABLE_ATUIN' bash/.bashrc
-check "atuin init is guarded"                 \
-  bash -c 'grep -zE "ENABLE_ATUIN:[^}]+\}\" == 1[^f]+fi" bash/.bashrc || grep -E "ENABLE_ATUIN.*==.*1.*atuin init" bash/.bashrc'
+# Structural multiline match: must find an `if` that gates on ENABLE_ATUIN and
+# wraps `atuin init bash` before the closing `fi`. Comments alone cannot match.
+check "atuin init is guarded by if/fi block" \
+  bash -c "grep -Pzo '(?s)if[^\n]*ENABLE_ATUIN[^\n]*==[^\n]*1[^\n]*\n[^\n]*atuin init bash[^\n]*\nfi' bash/.bashrc | grep -q ."
 
 if [[ "$FULL" == true ]] && command -v atuin &>/dev/null; then
   # Spawn an interactive-ish bash with ENABLE_ATUIN unset
   unset_out="$(ENABLE_ATUIN= bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "^reverse-search-history" || true' 2>/dev/null)"
-  check "with ENABLE_ATUIN unset: Ctrl-R is default readline" \
-    bash -c "echo '$unset_out' | grep -q 'reverse-search-history'"
+  if printf '%s' "$unset_out" | grep -q 'reverse-search-history'; then
+    ok "with ENABLE_ATUIN unset: Ctrl-R is default readline"
+  else
+    nok "with ENABLE_ATUIN unset: Ctrl-R is default readline"
+  fi
 
   set_out="$(ENABLE_ATUIN=1 bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "C-r" || true' 2>/dev/null)"
-  check "with ENABLE_ATUIN=1: Ctrl-R is rebound" \
-    bash -c "echo '$set_out' | grep -qi 'atuin\|_atuin'"
+  if printf '%s' "$set_out" | grep -qi 'atuin\|_atuin'; then
+    ok "with ENABLE_ATUIN=1: Ctrl-R is rebound"
+  else
+    nok "with ENABLE_ATUIN=1: Ctrl-R is rebound"
+  fi
 else
   skp "with ENABLE_ATUIN unset: Ctrl-R default" "requires --full + atuin installed"
   skp "with ENABLE_ATUIN=1: Ctrl-R rebound"    "requires --full + atuin installed"
