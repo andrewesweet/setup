@@ -125,6 +125,24 @@ check "ghorg-gh passes '--path ~/code/github.com'" \
 check "ghorg-gh does NOT pass --output-dir" \
   bash -c "! awk '/^ghorg-gh\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'output-dir'"
 
+# ── AC-8: Alt-R bound to repo in bash readline ────────────────────────
+echo ""
+echo "AC-8: Alt-R binding for repo"
+# Structural check: a bind line for \er that calls repo exists
+check "bash/.bashrc binds \\er to repo" \
+  grep -qE '^[[:space:]]*bind[[:space:]]+.*\\er.*repo' bash/.bashrc
+
+if [[ "$FULL" == true ]]; then
+  bind_out="$(bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "\\\\er" || true' 2>/dev/null)"
+  if printf '%s' "$bind_out" | grep -q 'repo'; then
+    ok "interactive bash binds Alt-R to repo"
+  else
+    nok "interactive bash binds Alt-R to repo"
+  fi
+else
+  skp "interactive bash binds Alt-R to repo" "requires --full"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

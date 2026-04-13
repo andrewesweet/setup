@@ -249,7 +249,14 @@ export FZF_DEFAULT_OPTS='
 # ── 12. Source aliases ─────────────────────────────────────────────────────
 [[ -f "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
 
-# ── 13. Local overrides ───────────────────────────────────────────────────
+# ── 13. Layer 1c keybindings ───────────────────────────────────────────────
+# Alt-R: invoke the `repo` function (ghq+fzf interactive picker).
+# Only bind in interactive shells to avoid noisy errors in non-interactive contexts.
+if [[ $- == *i* ]]; then
+  bind '"\er":"repo\n"'
+fi
+
+# ── 14. Local overrides ───────────────────────────────────────────────────
 # .bashrc.local is gitignored. Use it for per-machine overrides, e.g.:
 #   export EDITOR='code --wait'      # VS Code-primary users
 #   export NOTIFY_OSC9=1             # enable OSC 9 on unsupported terminals
