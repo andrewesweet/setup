@@ -1055,11 +1055,13 @@ Modify `scripts/test-plan-layer1a.sh`: add this block:
 # ── AC-12: --restore reverts Layer 1a symlinks ────────────────────────────
 echo ""
 echo "AC-12: install --restore handles atuin + television"
-# Static check: restore() iterates the backup dir, which will include any
-# file that had an original non-symlink replaced. We verify by checking the
-# restore() function does not hardcode a path list that excludes our new ones.
-check "restore() walks backup dir dynamically" \
-  grep -qE 'find.*-type' install-macos.sh
+# Scoped check: restore() function body must contain a `find ... -type l` call.
+# Including symlinks in the walk is what makes Layer 1a additions
+# (atuin, television) auto-handled by the existing restore() — without
+# adding entries to a hardcoded path list. If a future edit removes the
+# symlink walk, this assertion fails.
+check "restore() walks backup dir dynamically (find -type l)" \
+  bash -c "awk '/^restore\\(\\) \\{/,/^\\}/' install-macos.sh | sed 's/#.*//' | grep -qE '\\-type l'"
 # Full mode: actually run install + restore and verify symlinks are gone
 if [[ "$FULL" == true ]]; then
   skp "install + restore round-trip" "destructive — requires manual verification"
