@@ -125,6 +125,14 @@ for tool in "${tools[@]}"; do
   check "$tool available" command -v "$tool"
 done
 
+# ── Layer 1a tools ────────────────────────────────────────────────────────
+echo ""
+echo "Layer 1a tools:"
+check "atuin on PATH"            command -v atuin
+check "tv (television) on PATH"  command -v tv
+check "atuin config symlink"     test -L "$HOME/.config/atuin/config.toml"
+check "television config symlink" test -L "$HOME/.config/television/config.toml"
+
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
 echo ""
 echo "${YELLOW}── Remaining manual steps ──${RESET}"

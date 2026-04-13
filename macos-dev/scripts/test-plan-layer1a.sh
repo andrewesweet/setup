@@ -202,6 +202,12 @@ if [[ "$FULL" == true ]]; then
   skp "install + restore round-trip" "destructive — requires manual verification"
 fi
 
+# ── AC-13: verify.sh passes ──────────────────────────────────────────────
+echo ""
+echo "AC-13: verify.sh smoke checks"
+check "verify.sh mentions atuin"        grep -q 'atuin' scripts/verify.sh
+check "verify.sh mentions tv"           grep -qE '\btv\b' scripts/verify.sh
+
 # ── AC-11 etc. — stubs to be filled by later tasks ──────────────────────
 # (Placeholders for each AC; each will become a real check as features land.)
 
