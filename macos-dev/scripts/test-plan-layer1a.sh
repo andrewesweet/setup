@@ -210,8 +210,32 @@ check "verify.sh checks tv on PATH"         grep -q 'command -v tv' scripts/veri
 check "verify.sh checks atuin config link"  grep -q '.config/atuin/config.toml' scripts/verify.sh
 check "verify.sh checks tv config link"     grep -q '.config/television/config.toml' scripts/verify.sh
 
-# ── AC-11 etc. — stubs to be filled by later tasks ──────────────────────
-# (Placeholders for each AC; each will become a real check as features land.)
+# ── AC-11: install is idempotent ──────────────────────────────────────────
+echo ""
+echo "AC-11: install idempotency"
+if [[ "$FULL" == true ]] && command -v brew &>/dev/null && [[ "$PLATFORM" == "macos" ]]; then
+  # Run install once (may already be up to date)
+  bash install-macos.sh >/tmp/install-1.log 2>&1 || true
+  # Run again; second run should not backup any file that's already a symlink to $DOTFILES
+  bash install-macos.sh >/tmp/install-2.log 2>&1 || true
+  if grep -E "backed up .*atuin/config\.toml" /tmp/install-2.log >/dev/null; then
+    nok "second install reports no 'backed up' lines for atuin"
+  else
+    ok "second install reports no 'backed up' lines for atuin"
+  fi
+  if grep -E "backed up .*television/config\.toml" /tmp/install-2.log >/dev/null; then
+    nok "second install reports no 'backed up' lines for television"
+  else
+    ok "second install reports no 'backed up' lines for television"
+  fi
+  if grep -q "install complete" /tmp/install-2.log; then
+    ok "second install completes successfully"
+  else
+    nok "second install completes successfully"
+  fi
+else
+  skp "install idempotency (macOS)" "requires --full on macOS with brew"
+fi
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"

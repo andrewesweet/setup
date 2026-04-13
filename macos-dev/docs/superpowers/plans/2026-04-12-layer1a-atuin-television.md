@@ -1214,16 +1214,27 @@ if [[ "$FULL" == true ]] && command -v brew &>/dev/null && [[ "$PLATFORM" == "ma
   bash install-macos.sh >/tmp/install-1.log 2>&1 || true
   # Run again; second run should not backup any file that's already a symlink to $DOTFILES
   bash install-macos.sh >/tmp/install-2.log 2>&1 || true
-  check "second install reports no 'backed up' lines for atuin" \
-    bash -c '! grep -E "backed up .*atuin/config\.toml" /tmp/install-2.log'
-  check "second install reports no 'backed up' lines for television" \
-    bash -c '! grep -E "backed up .*television/config\.toml" /tmp/install-2.log'
-  check "second install exits 0" \
-    bash -c 'tail -n5 /tmp/install-2.log; grep -q "install complete" /tmp/install-2.log'
+  if grep -E "backed up .*atuin/config\.toml" /tmp/install-2.log >/dev/null; then
+    nok "second install reports no 'backed up' lines for atuin"
+  else
+    ok "second install reports no 'backed up' lines for atuin"
+  fi
+  if grep -E "backed up .*television/config\.toml" /tmp/install-2.log >/dev/null; then
+    nok "second install reports no 'backed up' lines for television"
+  else
+    ok "second install reports no 'backed up' lines for television"
+  fi
+  if grep -q "install complete" /tmp/install-2.log; then
+    ok "second install completes successfully"
+  else
+    nok "second install completes successfully"
+  fi
 else
-  skp "install idempotency (macOS)" "requires --full on macOS"
+  skp "install idempotency (macOS)" "requires --full on macOS with brew"
 fi
 ```
+
+Uses explicit `if/then/ok/nok` per the AC-8 hardening convention to avoid `bash -c` quote interpolation in dynamic checks.
 
 - [ ] **Step 2: Run tests on macOS in --full mode (if available)**
 
