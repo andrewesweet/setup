@@ -136,6 +136,17 @@ check "y() body uses --cwd-file" \
 check "y() body cds into the yazi-selected directory" \
   bash -c "awk '/^y\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -qE 'builtin cd|^[[:space:]]*cd '"
 
+# ── AC-7: jqp config (Dracula) ───────────────────────────────────────────
+echo ""
+echo "AC-7: jqp/.jqp.yaml"
+check "jqp/.jqp.yaml exists" test -f jqp/.jqp.yaml
+check "jqp config has theme: dracula" \
+  grep -qE '^theme:\s*dracula\s*$' jqp/.jqp.yaml
+check "install-macos.sh links jqp/.jqp.yaml" \
+  grep -qE 'link\s+jqp/\.jqp\.yaml' install-macos.sh
+check "install-wsl.sh links jqp/.jqp.yaml" \
+  grep -qE 'link\s+jqp/\.jqp\.yaml' install-wsl.sh
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

@@ -290,6 +290,9 @@ link yazi/yazi.toml    .config/yazi/yazi.toml
 link yazi/keymap.toml  .config/yazi/keymap.toml
 link yazi/theme.toml   .config/yazi/theme.toml
 
+# jqp (Plan Layer 1b-i)
+link jqp/.jqp.yaml  .jqp.yaml
+
 # opencode (Plan 9)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc
 link opencode/tui.jsonc                         .config/opencode/tui.jsonc
