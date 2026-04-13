@@ -267,6 +267,90 @@ EOF
     delta)
       command -v delta >/dev/null && delta --show-config | head -30 || echo "delta not on PATH"
       ;;
+    atuin)
+      cat <<'EOF'
+atuin — shell history with search + filtering
+  Ctrl-R           interactive search (shell-global)
+  atuin search -i  same picker from the CLI
+  atuin stats      usage stats
+  atuin import auto   pull existing history on first login (if desired)
+Config: ~/.config/atuin/config.toml
+EOF
+      ;;
+    tv|television)
+      cat <<'EOF'
+television — channel-based fuzzy picker
+  Ctrl-T           smart autocomplete (shell integration, context-aware)
+  tv <channel>     open channel by name (e.g. tv files, tv git-branch)
+  tv --list        list available channels
+Cable channels live at ~/.config/television/cable/ (Layer 1b-iii).
+EOF
+      ;;
+    sesh)
+      cat <<'EOF'
+sesh — tmux session manager (CLI picker + tmux plugin)
+  sx               connect (alias for `sesh connect`)
+  sxl              list sessions (alias for `sesh list`)
+  sesh last        re-attach to the most recent session
+Config: ~/.config/sesh/sesh.toml (generated from sesh/sesh.toml.tmpl).
+EOF
+      ;;
+    yazi)
+      cat <<'EOF'
+yazi — terminal file manager (vi-mode native)
+  y                open yazi and cd to the selected dir on quit
+  <CR> / o         open file / enter dir
+  h/j/k/l          navigate (default)
+  /                fuzzy search (fd + rg under the hood)
+  q                quit without cd
+Config: ~/.config/yazi/{yazi,keymap,theme}.toml
+EOF
+      ;;
+    xh)
+      cat <<'EOF'
+xh — modern httpie replacement (Rust, single binary)
+  http GET httpbin.org/get   shorthand alias for xh
+  xh POST httpbin.org/post name=alice
+  xh --json GET ...          force JSON
+Syntax: method-as-first-arg, key=value JSON body, key==value query, key:value header.
+Differences from httpie: no Python; smaller binary; --offline flag available.
+EOF
+      ;;
+    rip)
+      cat <<'EOF'
+rip (cesarferreira/rip) — fuzzy process killer
+  rip              list processes, select with fzf, send SIGTERM
+  rip -9           send SIGKILL instead
+NOT a safe-rm. For that, use rip2 (see `cheat rip2`).
+EOF
+      ;;
+    rip2)
+      cat <<'EOF'
+rip2 (MilesCranmer/rip2) — safe rm with undo
+  rip2 file ...    move files to the graveyard (not deleted)
+  rrip             undo last rip2 deletion (alias for `rip2 -u`)
+  rm-safe file     explicit safe-rm alias (avoid confusion with rip, the killer)
+Graveyard: ~/.local/share/graveyard
+EOF
+      ;;
+    jqp)
+      cat <<'EOF'
+jqp — interactive jq playground
+  jqi <file>       open jqp on a JSON file (alias for jqp)
+  cat foo.json | jqp
+Tab switches panels; Ctrl-C exits.
+Config: ~/.jqp.yaml (theme: dracula).
+EOF
+      ;;
+    diffnav)
+      cat <<'EOF'
+diffnav — file-tree nav UI over delta output
+  dn <unified.diff>    navigate a diff
+  git diff | dn        pipe diff directly
+h/l moves between files; j/k moves between hunks.
+Used as gh-dash's pager (see 1b-iii).
+EOF
+      ;;
     opencode|oc)
       echo "OpenCode TUI bindings: \$DOTFILES/opencode/tui.jsonc"
       [[ -f "$dotfiles/opencode/tui.jsonc" ]] && cat "$dotfiles/opencode/tui.jsonc"
@@ -283,8 +367,11 @@ cheat — quick reference for keys, tools, and per-tool discovery
   cheat help       This message
 
 Per-tool subcommands:
-  bash, btop, delta, fzf, git, k9s, lazydocker, lazygit, lnav,
-  nvim, opencode, starship, tmux
+  atuin, bash, btop, delta, diffnav, fzf, git, jqp, k9s, lazydocker,
+  lazygit, lnav, nvim, opencode, rip, rip2, sesh, starship, tmux,
+  tv/television, xh, yazi
+
+New in Layer 1b-i: sesh, yazi, xh, rip, rip2, jqp, diffnav, atuin, tv.
 
 The cheatsheet is intentionally limited to 2 pages of A4 — it is a
 muscle-memory refresher, not a complete reference. For the full
@@ -298,6 +385,30 @@ EOF
       ;;
   esac
 }
+
+# ── Layer 1b-i aliases ──────────────────────────────────────────────────────
+# xh — modern httpie replacement. httpie stays installed for team compat.
+alias http='xh'
+
+# rip (cesarferreira/rip) is a fuzzy process killer — no alias needed;
+# invoke as `rip` directly. Do not confuse with rip2 (safe rm).
+
+# rip2 (MilesCranmer/rip2) — safe rm with undo. Graveyard at
+# ~/.local/share/graveyard (per §7.3 of design). Two aliases:
+#   rrip     — undo last deletion
+#   rm-safe  — explicit safe-rm (makes the intent unambiguous in scripts)
+alias rrip='rip2 -u'
+alias rm-safe='rip2'
+
+# jqp — interactive jq playground
+alias jqi='jqp'
+
+# diffnav — file-tree navigation pager for delta output
+alias dn='diffnav'
+
+# sesh — tmux session manager. `sx` prefix to avoid collision with Linux `ss`.
+alias sx='sesh connect'
+alias sxl='sesh list'
 
 # ── Repo organisation (Layer 1c: ghq + ghorg) ────────────────────────────────
 # Interactive repo picker — bound to Alt-R (see bash/.bashrc).
@@ -332,4 +443,20 @@ gclone() {
 ghorg-gh() {
   local org="$1"; shift
   ghorg clone "$org" --path ~/code/github.com "$@"
+}
+
+# ── Yazi — cd-on-quit wrapper (Layer 1b-i) ──────────────────────────────────
+# Launches yazi and, on exit, cd's the parent shell to whatever directory
+# yazi was last in. `yazi` alone can't do this because a child process
+# can't change the parent's cwd — it writes the final cwd to a temp file
+# and the wrapper reads it back.
+y() {
+  local tmp cwd
+  tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  cwd="$(cat -- "$tmp" 2>/dev/null)"
+  if [[ -n "$cwd" && "$cwd" != "$PWD" ]]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
 }

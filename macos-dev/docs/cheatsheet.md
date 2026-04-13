@@ -71,6 +71,21 @@ Tool for the job — quick commands and aliases.
 | Clone and cd into it | ghq | `gclone <url>` | — |
 | Bulk-clone a GitHub org | ghorg | `ghorg-gh <org>` | — |
 
+### Layer 1b-i tools
+
+| Task | Tool | Command | Alias |
+|------|------|---------|-------|
+| tmux session manager (CLI) | sesh | `sesh connect <name>` | `sx` |
+| List sesh sessions | sesh | `sesh list` | `sxl` |
+| File manager (cd-on-quit) | yazi | `yazi` | `y` (function) |
+| HTTP client | xh | `xh GET httpbin.org/get` | `http` |
+| rip — fuzzy process killer | rip | `rip` | — |
+| Safe rm (undo-able) | rip2 | `rip2 file` | `rm-safe` |
+| Undo last rip2 delete | rip2 | `rip2 -u` | `rrip` |
+| Interactive jq playground | jqp | `cat file.json \| jqp` | `jqi` |
+| Navigate diffs (delta UI) | diffnav | `git diff \| diffnav` | `dn` |
+| Cross-shell completions | carapace | auto (via bash init) | — |
+
 ### Git
 
 | Task | Tool | Command | Alias |
@@ -140,3 +155,9 @@ This cheatsheet is intentionally limited (two pages of A4) — it is a muscle-me
 | delta | `delta --show-config` |
 | bash readline | `bind -P` |
 | git | `git help -a` |
+| sesh | `cheat sesh` |
+| yazi | Inside yazi: `?` for help overlay |
+| jqp | Inside jqp: `Ctrl+H` for help |
+| diffnav | Inside diffnav: `?` for help |
+| xh | `xh --help`; `cheat xh` for quickstart |
+| rip / rip2 | `cheat rip` / `cheat rip2` |

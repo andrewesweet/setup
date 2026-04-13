@@ -152,6 +152,44 @@ if command -v ghq &>/dev/null; then
   fi
 fi
 
+# ── Layer 1b-i tools ──────────────────────────────────────────────────────
+echo ""
+echo "Layer 1b-i tools:"
+check "sesh on PATH"      command -v sesh
+check "yazi on PATH"      command -v yazi
+check "xh on PATH"        command -v xh
+check "rip on PATH"       command -v rip
+check "rip2 on PATH"      command -v rip2
+check "jqp on PATH"       command -v jqp
+check "diffnav on PATH"   command -v diffnav
+check "carapace on PATH"  command -v carapace
+
+# yazi configs
+# shellcheck disable=SC2016  # $HOME expanded inside inner bash -c intentionally
+check "yazi config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/yazi/yazi.toml" && test -e "$HOME/.config/yazi/yazi.toml"'
+# shellcheck disable=SC2016
+check "yazi keymap symlink resolves" \
+  bash -c 'test -L "$HOME/.config/yazi/keymap.toml" && test -e "$HOME/.config/yazi/keymap.toml"'
+# shellcheck disable=SC2016
+check "yazi theme symlink resolves" \
+  bash -c 'test -L "$HOME/.config/yazi/theme.toml" && test -e "$HOME/.config/yazi/theme.toml"'
+
+# jqp config (~/.jqp.yaml)
+# shellcheck disable=SC2016
+check "jqp config symlink resolves" \
+  bash -c 'test -L "$HOME/.jqp.yaml" && test -e "$HOME/.jqp.yaml"'
+
+# diffnav config
+# shellcheck disable=SC2016
+check "diffnav config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/diffnav/config.yml" && test -e "$HOME/.config/diffnav/config.yml"'
+
+# sesh.toml is a regular file (generated from template), NOT a symlink
+# shellcheck disable=SC2016
+check "sesh.toml is a generated regular file" \
+  bash -c 'test -f "$HOME/.config/sesh/sesh.toml" && test ! -L "$HOME/.config/sesh/sesh.toml"'
+
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
 echo ""
 echo "${YELLOW}── Remaining manual steps ──${RESET}"

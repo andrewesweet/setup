@@ -1,0 +1,5 @@
+# jqp/.jqp.yaml — jqp (interactive jq playground) config
+# Symlinked to ~/.jqp.yaml by install scripts.
+# See docs/plans/2026-04-12-shell-modernisation-design.md § 3.9
+
+theme: dracula

@@ -1,0 +1,25 @@
+# diffnav/config.yml — file-tree navigation pager for delta output.
+# Used as gh-dash's pager (set up in Layer 1b-iii).
+# See docs/plans/2026-04-12-shell-modernisation-design.md § 3.9
+
+# diffnav reads this file at $XDG_CONFIG_HOME/diffnav/config.yml.
+# Palette values are Dracula (see design § 3.9):
+#   background=#282A36  foreground=#F8F8F2  comment=#6272A4
+#   purple=#BD93F9  pink=#FF79C6  cyan=#8BE9FD  green=#50FA7B
+#   orange=#FFB86C  red=#FF5555  yellow=#F1FA8C
+
+# Pane layout: tree on the left, diff view on the right.
+file_tree_width: 30
+
+# Dracula styling for the panes.
+theme:
+  file_tree:
+    selected_fg: "#282A36"
+    selected_bg: "#BD93F9"
+    unselected_fg: "#F8F8F2"
+    border_fg: "#6272A4"
+  diff:
+    border_fg: "#6272A4"
+  status_bar:
+    fg: "#F8F8F2"
+    bg: "#44475A"

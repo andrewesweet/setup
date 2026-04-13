@@ -71,6 +71,10 @@ export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 export OPENCODE_CONFIG="$HOME/.config/opencode-local/opencode.jsonc"
 export OPENCODE_CONFIG_DIR="$HOME/.config/opencode-local"
 
+# carapace — cross-shell completion bridges. MUST be exported before
+# section 9 (Completions) so `carapace _carapace bash` sees it at init.
+export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
+
 # ── 4. Bash completion ─────────────────────────────────────────────────────
 if [[ $_OS == macos ]] && [[ -n "${HOMEBREW_PREFIX:-}" ]]; then
   [[ -f "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh" ]] && \
@@ -170,6 +174,12 @@ if command -v cog &>/dev/null; then
 fi
 
 # git-cliff: no shell completions command as of v2.12.0
+
+# carapace (completion backstop for tools without native bash support).
+# Requires CARAPACE_BRIDGES to be set earlier in this file (section 3).
+if command -v carapace &>/dev/null; then
+  source <(carapace _carapace bash)
+fi
 
 # gcloud (platform-specific path)
 if [[ $_OS == macos ]] && [[ -n "${HOMEBREW_PREFIX:-}" ]]; then

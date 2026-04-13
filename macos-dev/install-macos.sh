@@ -250,6 +250,14 @@ fi
 # (Intentionally empty in Plan 1. Later plans add link() calls as configs
 # get created.)
 log "symlinking configs"
+
+# ── sesh (generated from template — absolute paths required by schema) ──
+mkdir -p "$HOME/.config/sesh"
+# shellcheck disable=SC2016  # $DOTFILES/$HOME expand at install time, intentional
+sed -e "s|@DOTFILES@|$DOTFILES|g" -e "s|@HOME@|$HOME|g" \
+  "$DOTFILES/sesh/sesh.toml.tmpl" > "$HOME/.config/sesh/sesh.toml"
+printf "  generated %s\n" "$HOME/.config/sesh/sesh.toml"
+
 # bash config (Plan 2)
 link bash/.bash_profile .bash_profile
 link bash/.bashrc       .bashrc
@@ -276,6 +284,17 @@ link atuin/config.toml        .config/atuin/config.toml
 
 # television (Plan Layer 1a)
 link television/config.toml   .config/television/config.toml
+
+# yazi (Plan Layer 1b-i)
+link yazi/yazi.toml    .config/yazi/yazi.toml
+link yazi/keymap.toml  .config/yazi/keymap.toml
+link yazi/theme.toml   .config/yazi/theme.toml
+
+# jqp (Plan Layer 1b-i)
+link jqp/.jqp.yaml  .jqp.yaml
+
+# diffnav (Plan Layer 1b-i)
+link diffnav/config.yml  .config/diffnav/config.yml
 
 # opencode (Plan 9)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc

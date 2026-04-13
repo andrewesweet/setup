@@ -1,0 +1,8 @@
+# yazi/keymap.toml — yazi keybindings
+# Defaults are already vi-centric (h/j/k/l, gg/G, /, :). Extensions below.
+# See docs/plans/2026-04-12-shell-modernisation-design.md § 3.10.3
+
+[[manager.prepend_keymap]]
+on = "!"
+run = 'shell "$SHELL" --block --confirm'
+desc = "Open shell in CWD"

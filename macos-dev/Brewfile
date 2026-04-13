@@ -137,5 +137,25 @@ brew "direnv"
 tap "charmbracelet/tap"
 brew "charmbracelet/tap/freeze"
 
+# ── Shell-agnostic tools (Layer 1b-i) ───────────────────────────────────────
+# sesh: tmux session manager (CLI picker — complements tmux-sessionx plugin)
+brew "sesh"
+# yazi: terminal file manager (vi-mode native)
+brew "yazi"
+# xh: modern httpie replacement (httpie stays for team compat — see `http` alias)
+brew "xh"
+# rip (cesarferreira): fuzzy process killer — NOT a safe-rm
+tap "cesarferreira/tap"
+brew "cesarferreira/tap/rip"
+# rip2 (MilesCranmer): safe rm with undo (graveyard ~/.local/share/graveyard)
+brew "rip2"
+# jqp: interactive jq playground (vi-navigation, Dracula theme)
+brew "jqp"
+# diffnav: file-tree nav UI on top of delta (used as gh-dash pager in 1b-iii)
+tap "dlvhdr/formulae"
+brew "dlvhdr/formulae/diffnav"
+# carapace: cross-shell completion bridge
+brew "carapace"
+
 # ── VS Code (macOS cask) ─────────────────────────────────────────────────────
 cask "visual-studio-code"
