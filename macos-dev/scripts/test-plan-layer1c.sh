@@ -229,6 +229,14 @@ check "verify.sh checks ghq on PATH"    grep -q 'command -v ghq' scripts/verify.
 check "verify.sh checks ghorg on PATH"  grep -q 'command -v ghorg' scripts/verify.sh
 check "verify.sh checks 'ghq root'"     grep -q 'ghq root' scripts/verify.sh
 
+# ── AC-13: cheatsheet.md documents Layer 1c helpers ──────────────────
+echo ""
+echo "AC-13: cheatsheet.md repo helpers"
+check "cheatsheet mentions repo function"     grep -qE '\brepo\b' docs/cheatsheet.md
+check "cheatsheet mentions gclone"            grep -q 'gclone' docs/cheatsheet.md
+check "cheatsheet mentions ghorg-gh"          grep -q 'ghorg-gh' docs/cheatsheet.md
+check "cheatsheet mentions Alt-R"             grep -qE 'Alt.R' docs/cheatsheet.md
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

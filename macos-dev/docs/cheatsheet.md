@@ -67,6 +67,9 @@ Tool for the job — quick commands and aliases.
 | Fuzzy search history | atuin (if `ENABLE_ATUIN=1`) / fzf default | Ctrl+R | — |
 | Jump to directory | zoxide | `z <partial>` | — |
 | Interactive dir picker | zoxide+fzf | `zi` | — |
+| Pick a repo (ghq tree) | ghq+fzf | `repo` | Alt-R |
+| Clone and cd into it | ghq | `gclone <url>` | — |
+| Bulk-clone a GitHub org | ghorg | `ghorg-gh <org>` | — |
 
 ### Git
 
