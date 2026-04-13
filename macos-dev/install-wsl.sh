@@ -366,6 +366,10 @@ link atuin/config.toml        .config/atuin/config.toml
 # television (Plan Layer 1a)
 link television/config.toml   .config/television/config.toml
 
+# television cable channels (Layer 1b-iii) — directory-level symlink so
+# additional .toml files added later require no re-wire.
+link television/cable         .config/television/cable
+
 # yazi (Plan Layer 1b-i)
 link yazi/yazi.toml    .config/yazi/yazi.toml
 link yazi/keymap.toml  .config/yazi/keymap.toml

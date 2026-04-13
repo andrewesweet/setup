@@ -111,7 +111,15 @@ for g in gcloud-configs gcloud-instances gcloud-run-services gcloud-sql; do
   check "$g.toml uses --format=value()"  grep -qE "format=.value\\(" television/cable/$g.toml
 done
 
-# Later tasks append AC-2, AC-8 through AC-15.
+# ── AC-2: television/cable directory symlink ─────────────────────────────
+echo ""
+echo "AC-2: install scripts symlink television/cable as directory"
+check "install-macos.sh links television/cable" \
+  grep -qE '^link television/cable[[:space:]]+\.config/television/cable' install-macos.sh
+check "install-wsl.sh links television/cable" \
+  grep -qE '^link television/cable[[:space:]]+\.config/television/cable' install-wsl.sh
+
+# Later tasks append AC-8 through AC-15.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
