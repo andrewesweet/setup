@@ -1,0 +1,14 @@
+[metadata]
+name = "dirs"
+description = "Directories under current dir"
+requirements = ["fd"]
+
+[source]
+command = "fd --type d --hidden --follow --exclude .git"
+
+[preview]
+command = "ls -la '{}'"
+
+[actions.cd]
+command = "cd '{}'"
+default = true

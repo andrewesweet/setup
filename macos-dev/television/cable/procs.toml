@@ -1,0 +1,19 @@
+[metadata]
+name = "procs"
+description = "Running processes (POSIX-compatible ps flags)"
+
+# `ps -e -o pid=,ucomm=` is POSIX-portable across macOS BSD ps and GNU procps.
+# The trailing `=` on each column suppresses headers portably; GNU-specific
+# header-stripping flags are intentionally avoided for macOS BSD-ps compat.
+[source]
+command = "ps -e -o pid=,ucomm= | awk '{printf \"%-8s %s\\n\", $1, $2}'"
+
+[actions.kill]
+command = "kill $(echo '{}' | awk '{print $1}')"
+default = true
+
+[actions.term]
+command = "kill -TERM $(echo '{}' | awk '{print $1}')"
+
+[actions.hup]
+command = "kill -HUP $(echo '{}' | awk '{print $1}')"

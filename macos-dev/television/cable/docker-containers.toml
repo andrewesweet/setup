@@ -1,0 +1,23 @@
+[metadata]
+name = "docker-containers"
+description = "Podman containers (matches existing container setup)"
+requirements = ["podman"]
+
+[source]
+command = "podman ps -a --format '{{.ID}}\\t{{.Names}}\\t{{.Image}}\\t{{.Status}}'"
+
+[preview]
+command = "podman inspect $(echo '{}' | awk '{print $1}') 2>/dev/null | head -40"
+
+[actions.exec]
+command = "podman exec -it $(echo '{}' | awk '{print $1}') sh"
+default = true
+
+[actions.logs]
+command = "podman logs $(echo '{}' | awk '{print $1}')"
+
+[actions.stop]
+command = "podman stop $(echo '{}' | awk '{print $1}')"
+
+[actions.rm]
+command = "podman rm $(echo '{}' | awk '{print $1}')"

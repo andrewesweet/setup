@@ -1,0 +1,17 @@
+[metadata]
+name = "docker-images"
+description = "Podman images"
+requirements = ["podman"]
+
+[source]
+command = "podman images --format '{{.Repository}}:{{.Tag}}\\t{{.ID}}\\t{{.Size}}'"
+
+[preview]
+command = "podman inspect $(echo '{}' | awk '{print $2}') 2>/dev/null | head -40"
+
+[actions.run]
+command = "podman run -it --rm $(echo '{}' | awk '{print $1}')"
+default = true
+
+[actions.rm]
+command = "podman rmi $(echo '{}' | awk '{print $2}')"

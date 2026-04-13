@@ -1,0 +1,10 @@
+[metadata]
+name = "alias"
+description = "Shell aliases"
+
+[source]
+command = "alias 2>/dev/null | sed 's/^alias //; s/=/\\t/'"
+
+[actions.print]
+command = "echo '{}'"
+default = true

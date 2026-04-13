@@ -69,7 +69,49 @@ for c in alias env dirs files procs \
   check "television/cable/$c.toml exists" test -f "television/cable/$c.toml"
 done
 
-# Later tasks append AC-2 through AC-15.
+# ── AC-3: git-repos.toml sources from ghq ────────────────────────────────
+echo ""
+echo "AC-3: git-repos channel sources from ghq list --full-path"
+check "git-repos.toml uses 'ghq list --full-path'" \
+  grep -qE 'ghq list --full-path' television/cable/git-repos.toml
+check "git-repos.toml has no pre-1c fd fallback" \
+  bash -c "! grep -qE 'fd.*\\.git\\\$' television/cable/git-repos.toml"
+
+# ── AC-4: env.toml filters secrets ───────────────────────────────────────
+echo ""
+echo "AC-4: env.toml filters sensitive patterns"
+for p in GITHUB_TOKEN GH_TOKEN 'AWS_' SECRET PASSWORD KEY BEARER AUTHORIZATION ANTHROPIC OPENAI; do
+  check "env.toml filter covers $p" grep -qE "$p" television/cable/env.toml
+done
+
+# ── AC-5: procs.toml uses POSIX ps flags ─────────────────────────────────
+echo ""
+echo "AC-5: procs.toml POSIX ps flags"
+check "procs.toml uses 'ps -e -o pid=,ucomm='" \
+  grep -qE 'ps -e -o pid=,ucomm=' television/cable/procs.toml
+check "procs.toml avoids GNU-only --no-headers" \
+  bash -c "! grep -q -- '--no-headers' television/cable/procs.toml"
+
+# ── AC-6: docker-*.toml use podman ───────────────────────────────────────
+echo ""
+echo "AC-6: docker channels use podman"
+check "docker-containers.toml uses podman" \
+  grep -qE '^command = "podman ' television/cable/docker-containers.toml
+check "docker-images.toml uses podman" \
+  grep -qE '^command = "podman ' television/cable/docker-images.toml
+check "docker-containers.toml does not invoke bare docker" \
+  bash -c "! grep -qE '^command = \"docker ' television/cable/docker-containers.toml"
+
+# ── AC-7: gcloud channels present with value-format commands ────────────
+echo ""
+echo "AC-7: gcloud channels"
+for g in gcloud-configs gcloud-instances gcloud-run-services gcloud-sql; do
+  check "$g.toml exists"                 test -f television/cable/$g.toml
+  check "$g.toml uses gcloud"            grep -qE 'command = "gcloud ' television/cable/$g.toml
+  check "$g.toml uses --format=value()"  grep -qE "format=.value\\(" television/cable/$g.toml
+done
+
+# Later tasks append AC-2, AC-8 through AC-15.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"

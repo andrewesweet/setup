@@ -1,0 +1,17 @@
+[metadata]
+name = "git-branch"
+description = "Git branches (local + remote)"
+requirements = ["git"]
+
+[source]
+command = "git branch --all --sort=-committerdate --format='%(refname:short)' | sed 's|^origin/||' | awk '!seen[$0]++'"
+
+[preview]
+command = "git log --oneline --decorate --color=always -20 '{}'"
+
+[actions.checkout]
+command = "git checkout '{}'"
+default = true
+
+[actions.delete]
+command = "git branch -d '{}'"

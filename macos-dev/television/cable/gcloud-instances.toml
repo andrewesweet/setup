@@ -1,0 +1,17 @@
+[metadata]
+name = "gcloud-instances"
+description = "GCE VM instances"
+requirements = ["gcloud"]
+
+[source]
+command = "gcloud compute instances list --format='value(name,zone,status)' 2>/dev/null || true"
+
+[actions.ssh]
+command = "gcloud compute ssh $(echo '{}' | awk '{print $1}') --zone $(echo '{}' | awk '{print $2}')"
+default = true
+
+[actions.start]
+command = "gcloud compute instances start $(echo '{}' | awk '{print $1}') --zone $(echo '{}' | awk '{print $2}')"
+
+[actions.stop]
+command = "gcloud compute instances stop $(echo '{}' | awk '{print $1}') --zone $(echo '{}' | awk '{print $2}')"

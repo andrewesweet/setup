@@ -1,0 +1,14 @@
+[metadata]
+name = "git-log"
+description = "Recent git commits"
+requirements = ["git"]
+
+[source]
+command = "git log --oneline --decorate --color=always -n 500"
+
+[preview]
+command = "git show --color=always --stat $(echo '{}' | awk '{print $1}')"
+
+[actions.show]
+command = "git show $(echo '{}' | awk '{print $1}')"
+default = true

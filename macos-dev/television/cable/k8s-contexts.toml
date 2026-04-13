@@ -1,0 +1,11 @@
+[metadata]
+name = "k8s-contexts"
+description = "Kubernetes contexts"
+requirements = ["kubectl"]
+
+[source]
+command = "kubectl config get-contexts -o name 2>/dev/null || true"
+
+[actions.use]
+command = "kubectl config use-context '{}'"
+default = true

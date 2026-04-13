@@ -1,0 +1,14 @@
+[metadata]
+name = "files"
+description = "Files under current dir (respects .gitignore)"
+requirements = ["fd"]
+
+[source]
+command = "fd --type f --hidden --follow --exclude .git --exclude .env --exclude .ssh --exclude .aws --exclude .gnupg"
+
+[preview]
+command = "bat --color=always --style=numbers --line-range=:500 '{}'"
+
+[actions.edit]
+command = "${EDITOR:-nvim} '{}'"
+default = true
