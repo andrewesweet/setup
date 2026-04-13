@@ -40,6 +40,7 @@
 Ctrl-R  →  atuin      (history search — sole owner, no other tool claims this)
 Ctrl-T  →  television (smart autocomplete — context-aware channel picker)
 Alt-C   →  zoxide     (directory jump — unchanged from current fzf binding)
+Alt-R   →  ghq+fzf    (repo picker — `repo` shell function; Layer 1c)
 z / zi  →  zoxide     (cd replacement — unchanged)
 ```
 
@@ -51,6 +52,12 @@ atuin is the sole owner of Ctrl-R. This eliminates the triple-claim chain
 Television's internal UI keybinding `ctrl-r` is rebound from `toggle_remote_control`
 to avoid confusion with the shell-level Ctrl-R (atuin). Internal `ctrl-t` is rebound
 from `toggle_layout` to `ctrl-shift-t` to avoid confusion with the shell-level Ctrl-T.
+
+**Rejected: Ctrl-G for `repo`.** Ctrl-G is bash readline's `abort` (cancels
+incremental search, multi-key sequences). Rebinding it would break standard
+muscle memory across every bash environment. Alt-R parallels Alt-C (zoxide)
+in the meta-modifier "navigation jumpers" group and is unclaimed by readline,
+fzf, atuin, or television.
 
 ### 2.3 Tool Init Ordering
 
@@ -443,8 +450,13 @@ smart_autocomplete = "ctrl-t"
   (works on both macOS BSD ps and Linux GNU ps)
 - The `docker-*.toml` channels use `podman` instead of `docker` to match the user's
   container setup
-- The `git-repos.toml` channel uses `fd --exclude Library --exclude 'Application Support'`
-  flags which are harmless no-ops on Linux where those directories don't exist
+- The `git-repos.toml` channel sources from `ghq list --full-path` once Layer 1c
+  lands (depends on ghq being installed). Until then, it falls back to
+  `fd --exclude Library --exclude 'Application Support' -t d -d 8 .git$ ~ -X dirname`
+  flags which are harmless no-ops on Linux where those directories don't exist.
+  Layer 1b's `git-repos.toml` channel SHOULD pre-emptively use the `ghq list`
+  source so Layer 1c is purely additive (ghq install makes the channel work
+  without re-editing the cable file).
 
 ### 3.3 Sesh (sesh/sesh.toml.tmpl → sesh.toml)
 
@@ -1153,6 +1165,144 @@ Decisions incorporated into the design based on the research:
 7. **Zsh completion order**: fpath-based completions (bat, eza, fd) registered via
    compinit; generated completions (mise, rg, xh, rip2, uv, cog) sourced after.
 
+## 3.11 Repo Organisation (ghq + ghorg)
+
+GOPATH-style local checkout layout, enforced by tooling. Solves the
+"where-did-I-clone-that" pain point and makes bulk org cloning predictable.
+
+### 3.11.1 Layout
+
+All git checkouts live under `~/code/<host>/<org>/<repo>`. Examples:
+- `~/code/github.com/anthropics/claude-code`
+- `~/code/gitlab.com/some-org/service`
+- `~/code/gitlab.mycompany.com/team/repo`
+
+Single root, single git identity (no work/personal split).
+
+### 3.11.2 Tools
+
+| Tool | Source | Purpose |
+|------|--------|---------|
+| `ghq` | brew (`ghq`) | Replaces `git clone`. Enforces the `<host>/<org>/<repo>` layout. |
+| `ghorg` | brew (`ghorg`) | Bulk-clones whole GitHub/GitLab orgs. Used occasionally. |
+
+Both available via Homebrew on macOS and Linuxbrew on WSL2.
+
+### 3.11.3 git/.gitconfig
+
+Add to the tracked `git/.gitconfig`:
+
+```ini
+[ghq]
+  root = ~/code
+```
+
+NOT in `~/.gitconfig.local` — `ghq.root` is structural, not personal.
+
+### 3.11.4 Shell functions (bash and zsh — always-on)
+
+```bash
+# Interactive repo picker — Alt-R binding
+repo() {
+  local dir
+  dir=$(ghq list --full-path | fzf --preview 'ls -la {}') && cd "$dir" || return
+}
+
+# Clone-and-go: ghq get + cd to the resolved canonical path
+gclone() {
+  if ghq get -u "$1"; then
+    local target
+    target="$(ghq list -e -p "$1" 2>/dev/null | head -1)"
+    if [[ -n "$target" && -d "$target" ]]; then
+      cd "$target"
+    else
+      echo "ghq: cannot resolve path for '$1'" >&2
+      return 1
+    fi
+  fi
+}
+
+# Bulk-clone a GitHub org into the ghq tree
+ghorg-gh() {
+  local org="$1"; shift
+  ghorg clone "$org" --path ~/code/github.com "$@"
+}
+
+# Alt-R binding for repo
+bind '"\er":"repo\n"'    # bash
+# zsh equivalent: bindkey -s '^[r' 'repo\n'
+```
+
+`ghq list -e -p <ref>` returns the canonical path for an exact match (URL,
+`host/org/repo`, or `org/repo`), avoiding the false-match risk of substring
+search. The guard ensures a failed lookup does not `cd` somewhere wrong.
+
+### 3.11.5 ghorg ↔ ghq interop
+
+ghorg's default output is `~/ghorg/<org>/<repo>` — flat, no host level — which
+breaks the ghq layout. Always invoke ghorg with `--path` pointing at the
+correct host directory:
+
+```bash
+# GitHub org
+ghorg clone myorg --path ~/code/github.com
+
+# Self-hosted GitLab (with subgroup preservation)
+ghorg clone myorg --scm gitlab --base-url https://gitlab.myco.com \
+  --path ~/code/gitlab.myco.com --preserve-dir
+```
+
+Notes:
+- Do NOT pass `--output-dir` (renames the org folder, breaks ghq's expected
+  `<org>` level).
+- After ghorg finishes, `ghq list` discovers new clones automatically (ghq
+  walks the filesystem under `ghq.root`).
+- Use `--clone-protocol=ssh` for SSH cloning.
+
+### 3.11.6 WSL2 critical rule
+
+`~/code` MUST live on the Linux ext4 filesystem (under `~`), NEVER under
+`/mnt/c/`. 9P-mounted Windows paths are ~10× slower for git operations.
+
+`install-wsl.sh` MUST hard-abort if `$HOME` resolves under `/mnt/c/` (or if
+`~/code` is somehow already symlinked there). Manual install step (one-time):
+add `\\wsl$\Ubuntu\home\<user>\code` to Windows Defender exclusions.
+
+### 3.11.7 AI coding-tool convention
+
+Both supported coding agents (OpenCode and GitHub Copilot Coding Agent inside
+VS Code) honour `~/AGENTS.md` per the emerging cross-vendor spec. Add a
+"Local repo layout" section to a tracked file at `agents/AGENTS.md.snippet`
+plus a one-shot installer `scripts/install-ai-conventions.sh` that appends
+the snippet to `~/AGENTS.md` if not already present.
+
+Snippet content (verbatim):
+
+```markdown
+## Local repo layout
+
+Clone git repos via `ghq get <url>` — never plain `git clone`. The repo root
+is `~/code` and the enforced layout is `<host>/<org>/<repo>`. For bulk-cloning
+an org, use `ghorg clone <org> --path ~/code/<host>` so repos land inside the
+ghq tree. On WSL2 never clone into `/mnt/c/...`.
+
+To navigate to an existing checkout, prefer `cd "$(ghq list -e -p <ref>)"` or
+the interactive `repo` function (Alt-R) over `cd ~/code/...` paths.
+```
+
+The installer is a separate script (not auto-run in install-macos.sh /
+install-wsl.sh) because `~/AGENTS.md` may be user-curated and merging into
+it requires user consent.
+
+### 3.11.8 Verification
+
+- `ghq root` prints `$HOME/code`.
+- `ghq get github.com/anthropics/claude-code` lands at `~/code/github.com/anthropics/claude-code`.
+- `repo` opens an fzf picker listing all ghq-managed repos.
+- `ghorg clone <small-test-org> --path ~/code/github.com` drops repos in
+  `~/code/github.com/<test-org>/` and `ghq list` shows them.
+- `bind -P | grep '"\er"'` shows the Alt-R binding.
+
 ## 4. Implementation Layers
 
 ### Layer 1a: Keybinding Changes (atuin + television only)
@@ -1172,7 +1322,9 @@ The smallest possible change that replaces Ctrl-R and Ctrl-T behaviour:
 
 Everything else that doesn't require a shell change:
 1. Brewfile + tools.txt: sesh, yazi, xh, rip, rip2, jqp, diffnav, carapace (gh-dash via gh extension, not brew)
-2. Television cable channels (all 30+ TOML files)
+2. Television cable channels (all 30+ TOML files) — `git-repos.toml` MUST source from
+   `ghq list --full-path` (forward-references Layer 1c; channel is broken until 1c lands
+   but the file lives in 1b for cohesion with the other channels)
 3. TPM + all tmux plugin configuration
 4. sesh, yazi, gh-dash configs
 5. New aliases (http, rrip, jqi, ghd, dn, sx, y)
@@ -1180,6 +1332,30 @@ Everything else that doesn't require a shell change:
 7. `cheatsheet.md` updated
 8. install-macos.sh + install-wsl.sh: TPM clone, gh-dash extension, symlinks
 9. Verification: all tools functional, tmux plugins installed
+
+### Layer 1c: Repo Organisation (ghq + ghorg)
+
+Self-contained capability. Sits between Layer 1b (tools) and Layer 2 (zsh).
+Doesn't block 1b or 2 — can run in parallel with planning.
+
+1. Brewfile + tools.txt: ghq, ghorg
+2. git/.gitconfig: add `[ghq] root = ~/code`
+3. bash/.bashrc (or .bash_aliases): always-on `repo()`, `gclone()`, `ghorg-gh()` functions
+4. Alt-R binding for `repo` in bash readline (`bind '"\er":"repo\n"'`)
+5. install-macos.sh + install-wsl.sh: link git/.gitconfig already in place; add ghq/ghorg
+   to install verification step
+6. install-wsl.sh: hard-abort precondition if `$HOME` is under `/mnt/c/`
+7. agents/AGENTS.md.snippet (tracked): "Local repo layout" convention text
+8. scripts/install-ai-conventions.sh: appends snippet to `~/AGENTS.md` if not present (idempotent)
+9. docs/cheatsheet.md: rows for `repo`, `gclone`, `ghorg-gh`, Alt-R chord
+10. README.md: short "Repo layout" section
+11. scripts/verify.sh: smoke-check ghq root + ghorg PATH + git config
+12. scripts/test-plan-layer1c.sh: ATDD with ACs for: ghq.root config, install symlink,
+    function defined, Alt-R bound, WSL precondition trips correctly under simulated
+    `/mnt/c/` HOME, AGENTS.md snippet idempotency.
+
+Forward dependencies: Layer 1b's `git-repos.toml` channel becomes functional once
+Layer 1c lands.
 
 ### Layer 2: Zsh as Interactive Shell
 
