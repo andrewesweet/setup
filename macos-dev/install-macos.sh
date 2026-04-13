@@ -271,6 +271,12 @@ link starship/starship.toml  .config/starship.toml
 link lazygit/config.yml      .config/lazygit/config.yml
 link mise/config.toml        .config/mise/config.toml
 
+# atuin (Plan Layer 1a)
+link atuin/config.toml        .config/atuin/config.toml
+
+# television (Plan Layer 1a)
+link television/config.toml   .config/television/config.toml
+
 # opencode (Plan 9)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc
 link opencode/tui.jsonc                         .config/opencode/tui.jsonc

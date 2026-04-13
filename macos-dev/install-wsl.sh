@@ -162,7 +162,12 @@ fi
 #   - starship, mise, uv, zoxide, bat, delta, fd, ripgrep
 #   - lazygit, btop, lnav, glow, neovim
 #   - bun, podman, gcloud SDK, codeql, typst, pandoc
+#   - atuin (no apt — installer at https://setup.atuin.sh)              [Layer 1a]
+#   - television (no apt — github.com/alexpasmantier/television releases) [Layer 1a]
 warn "step 2 (GitHub releases) is stubbed — later plans add tool installs"
+warn "atuin/television not installed: install manually until WSL tool installer is built"
+warn "  atuin:      bash <(curl -fsSL https://setup.atuin.sh)"
+warn "  television: see github.com/alexpasmantier/television/releases (binary is 'tv')"
 
 # ── Step 3: Post-bootstrap tool installs ─────────────────────────────────────
 if command -v uv &>/dev/null; then
@@ -202,6 +207,12 @@ link tmux/.tmux.conf  .tmux.conf
 link starship/starship.toml  .config/starship.toml
 link lazygit/config.yml      .config/lazygit/config.yml
 link mise/config.toml        .config/mise/config.toml
+
+# atuin (Plan Layer 1a)
+link atuin/config.toml        .config/atuin/config.toml
+
+# television (Plan Layer 1a)
+link television/config.toml   .config/television/config.toml
 
 # opencode (Plan 9)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc
@@ -244,6 +255,11 @@ Next steps:
        opencode auth login
        gh auth login
        gcloud auth login
+
+Layer 1a tools (manual install on WSL2 — automated in a later plan):
+  atuin:      bash <(curl -fsSL https://setup.atuin.sh)
+  television: download from https://github.com/alexpasmantier/television/releases
+              (binary name is 'tv')
 
 If install-wsl.sh --restore is needed, backups are in:
   $HOME/.dotfiles-backup/

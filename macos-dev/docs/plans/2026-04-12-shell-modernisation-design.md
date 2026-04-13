@@ -320,7 +320,9 @@ history_filter = [
   "^.*gho_[A-Za-z0-9_]+.*$",
   "^.*github_pat_[A-Za-z0-9_]+.*$",
   "^.*glpat-[A-Za-z0-9_-]+.*$",
-  "^.*sk-[A-Za-z0-9]+.*$",
+  # OpenAI sk-/sk-proj-/sk-ant- style keys; lower bound of 20 chars
+  # after the sk- prefix rejects false positives like "disk-utils".
+  "^.*sk-[A-Za-z0-9_-]{20,}.*$",
   "^.*xoxb-[A-Za-z0-9-]+.*$",
   "^.*xoxp-[A-Za-z0-9-]+.*$",
   "^.*PRIVATE.KEY.*$",
@@ -429,7 +431,7 @@ fallback_channel = "files"
 [shell_integration.keybindings]
 # Television ONLY claims Ctrl-T. Ctrl-R is NOT claimed here —
 # atuin is the sole owner of Ctrl-R.
-"smart_autocomplete" = "ctrl-t"
+smart_autocomplete = "ctrl-t"
 ```
 
 **Cable channel security notes:**

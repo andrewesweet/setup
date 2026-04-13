@@ -346,11 +346,14 @@ check "auto_sync = false"                    grep -qE '^\s*auto_sync\s*=\s*false
 # ── AC-5: history_filter covers token/secret prefixes ───────────────────
 echo ""
 echo "AC-5: atuin history_filter coverage"
+# Scope: extract the history_filter array body then strip comments before
+# matching, so a comment mentioning a token cannot satisfy the assertion.
+# Mirrors the AC-12 idiom (commit 0ca1e06).
 for pat in GITHUB_TOKEN GH_TOKEN SECRET PASSWORD BEARER AUTHORIZATION \
            AWS_ACCESS AWS_SECRET AWS_SESSION ANTHROPIC OPENAI \
            'ghp_' 'gho_' 'github_pat_' 'glpat-' 'sk-' 'xoxb-' 'xoxp-'; do
   check "history_filter contains pattern '$pat'" \
-    bash -c "grep -Fq '$pat' atuin/config.toml"
+    bash -c "awk '/^history_filter = \[/,/^\]/' atuin/config.toml | sed 's/#.*//' | grep -Fq '$pat'"
 done
 ```
 
@@ -407,7 +410,9 @@ history_filter = [
   "^.*gho_[A-Za-z0-9_]+.*$",
   "^.*github_pat_[A-Za-z0-9_]+.*$",
   "^.*glpat-[A-Za-z0-9_-]+.*$",
-  "^.*sk-[A-Za-z0-9]+.*$",
+  # OpenAI sk-/sk-proj-/sk-ant- style keys; lower bound of 20 chars
+  # after the sk- prefix rejects false positives like "disk-utils".
+  "^.*sk-[A-Za-z0-9_-]{20,}.*$",
   "^.*xoxb-[A-Za-z0-9-]+.*$",
   "^.*xoxp-[A-Za-z0-9-]+.*$",
   "^.*PRIVATE.KEY.*$",
@@ -538,7 +543,7 @@ fallback_channel = "files"
 
 [shell_integration.keybindings]
 # Only Ctrl-T is claimed. atuin owns Ctrl-R.
-"smart_autocomplete" = "ctrl-t"
+smart_autocomplete = "ctrl-t"
 ```
 
 - [ ] **Step 4: Run tests to confirm AC-7 passes**
@@ -699,18 +704,26 @@ Modify `scripts/test-plan-layer1a.sh`: add this block:
 echo ""
 echo "AC-8: atuin bash init gated behind ENABLE_ATUIN"
 check "bash/.bashrc mentions ENABLE_ATUIN"    grep -q 'ENABLE_ATUIN' bash/.bashrc
-check "atuin init is guarded"                 \
-  bash -c 'grep -zE "ENABLE_ATUIN:[^}]+\}\" == 1[^f]+fi" bash/.bashrc || grep -E "ENABLE_ATUIN.*==.*1.*atuin init" bash/.bashrc'
+# Structural multiline match: must find an `if` that gates on ENABLE_ATUIN and
+# wraps `atuin init bash` before the closing `fi`. Comments alone cannot match.
+check "atuin init is guarded by if/fi block" \
+  bash -c "grep -Pzo '(?s)if[^\n]*ENABLE_ATUIN[^\n]*==[^\n]*1[^\n]*\n[^\n]*atuin init bash[^\n]*\nfi' bash/.bashrc | grep -q ."
 
 if [[ "$FULL" == true ]] && command -v atuin &>/dev/null; then
   # Spawn an interactive-ish bash with ENABLE_ATUIN unset
   unset_out="$(ENABLE_ATUIN= bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "^reverse-search-history" || true' 2>/dev/null)"
-  check "with ENABLE_ATUIN unset: Ctrl-R is default readline" \
-    bash -c "echo '$unset_out' | grep -q 'reverse-search-history'"
+  if printf '%s' "$unset_out" | grep -q 'reverse-search-history'; then
+    ok "with ENABLE_ATUIN unset: Ctrl-R is default readline"
+  else
+    nok "with ENABLE_ATUIN unset: Ctrl-R is default readline"
+  fi
 
   set_out="$(ENABLE_ATUIN=1 bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "C-r" || true' 2>/dev/null)"
-  check "with ENABLE_ATUIN=1: Ctrl-R is rebound" \
-    bash -c "echo '$set_out' | grep -qi 'atuin\|_atuin'"
+  if printf '%s' "$set_out" | grep -qi 'atuin\|_atuin'; then
+    ok "with ENABLE_ATUIN=1: Ctrl-R is rebound"
+  else
+    nok "with ENABLE_ATUIN=1: Ctrl-R is rebound"
+  fi
 else
   skp "with ENABLE_ATUIN unset: Ctrl-R default" "requires --full + atuin installed"
   skp "with ENABLE_ATUIN=1: Ctrl-R rebound"    "requires --full + atuin installed"
@@ -790,9 +803,13 @@ Modify `scripts/test-plan-layer1a.sh`: add this block:
 echo ""
 echo "AC-9: television bash init gated behind ENABLE_TV"
 check "bash/.bashrc mentions ENABLE_TV"       grep -q 'ENABLE_TV' bash/.bashrc
-check "tv init is guarded"                    \
-  grep -E 'ENABLE_TV.*==.*1.*tv init' bash/.bashrc
+# Structural multiline match: must find an `if` that gates on ENABLE_TV and
+# wraps `tv init bash` before the closing `fi`. Comments alone cannot match.
+check "tv init is guarded by if/fi block" \
+  bash -c "grep -Pzo '(?s)if[^\n]*ENABLE_TV[^\n]*==[^\n]*1[^\n]*\n[^\n]*tv init bash[^\n]*\nfi' bash/.bashrc | grep -q ."
 ```
+
+Note: Mirrors the AC-8 hardening (commit e1f3ed6) — a flat regex with `.*tv init` would falsely match the comment line `# tv shell integration binds ...` even if the `if` block were missing. The structural multiline form requires the `if … ENABLE_TV … 1` line, the `tv init bash` eval, and the closing `fi` to all be present.
 
 - [ ] **Step 2: Run tests to confirm AC-9 fails**
 
@@ -865,15 +882,23 @@ if [[ "$FULL" == true ]]; then
   # Check actual symlinks — only meaningful after install-macos.sh has run
   if [[ -L "$HOME/.config/atuin/config.toml" ]]; then
     actual="$(readlink "$HOME/.config/atuin/config.toml")"
-    check "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml" \
-      bash -c "[[ '$actual' == '$MACOS_DEV/atuin/config.toml' ]]"
+    expected="$MACOS_DEV/atuin/config.toml"
+    if [[ "$actual" == "$expected" ]]; then
+      ok "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml"
+    else
+      nok "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml (got: $actual)"
+    fi
   else
     skp "~/.config/atuin/config.toml symlink" "install not yet run"
   fi
   if [[ -L "$HOME/.config/television/config.toml" ]]; then
     actual="$(readlink "$HOME/.config/television/config.toml")"
-    check "~/.config/television/config.toml → \$DOTFILES/television/config.toml" \
-      bash -c "[[ '$actual' == '$MACOS_DEV/television/config.toml' ]]"
+    expected="$MACOS_DEV/television/config.toml"
+    if [[ "$actual" == "$expected" ]]; then
+      ok "~/.config/television/config.toml → \$DOTFILES/television/config.toml"
+    else
+      nok "~/.config/television/config.toml → \$DOTFILES/television/config.toml (got: $actual)"
+    fi
   else
     skp "~/.config/television/config.toml symlink" "install not yet run"
   fi
@@ -963,31 +988,31 @@ link atuin/config.toml        .config/atuin/config.toml
 link television/config.toml   .config/television/config.toml
 ```
 
-- [ ] **Step 4: Document the tool install gap for WSL2 in install-wsl.sh**
+- [ ] **Step 4: Document the WSL2 install gap (warn-only, no helper added)**
 
-Find the tool install section of `install-wsl.sh`. Add a comment noting that atuin and television are not in Debian/Ubuntu apt repositories. If a `gh_release_install` helper exists, call it:
+  Task 8 deliberately does NOT add a `gh_release_install` helper to install-wsl.sh —
+  that helper belongs to a future plan that introduces the broader WSL tool installer
+  scaffold (likely Layer 1b). For Layer 1a, document the gap clearly in two places:
 
-```bash
-# atuin (no apt package — install script)
-if ! command -v atuin &>/dev/null; then
-  log "installing atuin via the official installer"
-  bash <(curl -fsSL https://setup.atuin.sh) || warn "atuin install failed"
-fi
+  **(a)** Extend the Step 2 stub comment to mention atuin and television by name, with
+  install-source pointers, e.g.:
 
-# television (no apt package — GitHub release)
-if ! command -v tv &>/dev/null; then
-  log "installing television from GitHub releases"
-  # Use gh_release_install if available, else warn
-  if declare -f gh_release_install >/dev/null; then
-    gh_release_install alexpasmantier/television tv "linux.*$(uname -m)" || warn "tv install failed"
-  else
-    warn "gh_release_install helper not defined — install television manually"
-    warn "  https://github.com/alexpasmantier/television/releases"
-  fi
-fi
-```
+  ```
+  #   - atuin (no apt — installer at https://setup.atuin.sh)              [Layer 1a]
+  #   - television (no apt — github.com/alexpasmantier/television releases) [Layer 1a]
+  ```
 
-If this conflicts with existing structure, adapt to the existing pattern — the goal is: WSL users can install atuin + television in some documented way.
+  **(b)** After the existing `warn "step 2 (GitHub releases) is stubbed …"`, add three
+  warn lines giving the user a manual install path:
+
+  ```bash
+  warn "atuin/television not installed: install manually until WSL tool installer is built"
+  warn "  atuin:      bash <(curl -fsSL https://setup.atuin.sh)"
+  warn "  television: see github.com/alexpasmantier/television/releases (binary is 'tv')"
+  ```
+
+  **(c)** Mirror the gap into the Step 5 "Next steps" heredoc so users who run with
+  `2>/dev/null` still see the manual-install guidance.
 
 - [ ] **Step 5: Verify install-wsl.sh parses**
 
@@ -1033,11 +1058,13 @@ Modify `scripts/test-plan-layer1a.sh`: add this block:
 # ── AC-12: --restore reverts Layer 1a symlinks ────────────────────────────
 echo ""
 echo "AC-12: install --restore handles atuin + television"
-# Static check: restore() iterates the backup dir, which will include any
-# file that had an original non-symlink replaced. We verify by checking the
-# restore() function does not hardcode a path list that excludes our new ones.
-check "restore() walks backup dir dynamically" \
-  grep -qE 'find.*-type' install-macos.sh
+# Scoped check: restore() function body must contain a `find ... -type l` call.
+# Including symlinks in the walk is what makes Layer 1a additions
+# (atuin, television) auto-handled by the existing restore() — without
+# adding entries to a hardcoded path list. If a future edit removes the
+# symlink walk, this assertion fails.
+check "restore() walks backup dir dynamically (find -type l)" \
+  bash -c "awk '/^restore\\(\\) \\{/,/^\\}/' install-macos.sh | sed 's/#.*//' | grep -qE '\\-type l'"
 # Full mode: actually run install + restore and verify symlinks are gone
 if [[ "$FULL" == true ]]; then
   skp "install + restore round-trip" "destructive — requires manual verification"
@@ -1078,11 +1105,13 @@ Expected: shows existing tool availability checks.
 Modify `scripts/test-plan-layer1a.sh`: add this block:
 
 ```bash
-# ── AC-13: verify.sh passes ──────────────────────────────────────────────
+# ── AC-13: verify.sh checks Layer 1a tools ──────────────────────────────
 echo ""
 echo "AC-13: verify.sh smoke checks"
-check "verify.sh mentions atuin"        grep -q 'atuin' scripts/verify.sh
-check "verify.sh mentions tv"           grep -qE '\btv\b' scripts/verify.sh
+check "verify.sh checks atuin on PATH"      grep -q 'command -v atuin' scripts/verify.sh
+check "verify.sh checks tv on PATH"         grep -q 'command -v tv' scripts/verify.sh
+check "verify.sh checks atuin config link"  grep -q '.config/atuin/config.toml' scripts/verify.sh
+check "verify.sh checks tv config link"     grep -q '.config/television/config.toml' scripts/verify.sh
 ```
 
 - [ ] **Step 3: Run tests to confirm AC-13 fails**
@@ -1100,8 +1129,11 @@ echo ""
 echo "Layer 1a tools:"
 check "atuin on PATH"            command -v atuin
 check "tv (television) on PATH"  command -v tv
-check "atuin config symlink"     test -L "$HOME/.config/atuin/config.toml"
-check "television config symlink" test -L "$HOME/.config/television/config.toml"
+# Symlink must exist AND its target must resolve (catches dangling symlinks).
+check "atuin config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/atuin/config.toml" && test -e "$HOME/.config/atuin/config.toml"'
+check "television config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/television/config.toml" && test -e "$HOME/.config/television/config.toml"'
 ```
 
 - [ ] **Step 5: Verify verify.sh parses**
@@ -1185,16 +1217,27 @@ if [[ "$FULL" == true ]] && command -v brew &>/dev/null && [[ "$PLATFORM" == "ma
   bash install-macos.sh >/tmp/install-1.log 2>&1 || true
   # Run again; second run should not backup any file that's already a symlink to $DOTFILES
   bash install-macos.sh >/tmp/install-2.log 2>&1 || true
-  check "second install reports no 'backed up' lines for atuin" \
-    bash -c '! grep -E "backed up .*atuin/config\.toml" /tmp/install-2.log'
-  check "second install reports no 'backed up' lines for television" \
-    bash -c '! grep -E "backed up .*television/config\.toml" /tmp/install-2.log'
-  check "second install exits 0" \
-    bash -c 'tail -n5 /tmp/install-2.log; grep -q "install complete" /tmp/install-2.log'
+  if grep -E "backed up .*atuin/config\.toml" /tmp/install-2.log >/dev/null; then
+    nok "second install reports no 'backed up' lines for atuin"
+  else
+    ok "second install reports no 'backed up' lines for atuin"
+  fi
+  if grep -E "backed up .*television/config\.toml" /tmp/install-2.log >/dev/null; then
+    nok "second install reports no 'backed up' lines for television"
+  else
+    ok "second install reports no 'backed up' lines for television"
+  fi
+  if grep -q "install complete" /tmp/install-2.log; then
+    ok "second install completes successfully"
+  else
+    nok "second install completes successfully"
+  fi
 else
-  skp "install idempotency (macOS)" "requires --full on macOS"
+  skp "install idempotency (macOS)" "requires --full on macOS with brew"
 fi
 ```
+
+Uses explicit `if/then/ok/nok` per the AC-8 hardening convention to avoid `bash -c` quote interpolation in dynamic checks.
 
 - [ ] **Step 2: Run tests on macOS in --full mode (if available)**
 

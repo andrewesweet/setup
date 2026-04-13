@@ -114,6 +114,21 @@ Each layer overrides the previous. To change where personal overrides are stored
 | `OPENCODE_CONFIG` | Personal OpenCode config path (default: `~/.config/opencode-local/opencode.jsonc`) |
 | `OPENCODE_CONFIG_DIR` | Personal OpenCode directory for agents/commands/modes/plugins (default: `~/.config/opencode-local/`) |
 
+## Testing
+
+Plan-specific acceptance tests live in `scripts/test-plan*.sh`. Each one validates a single plan's contract end-to-end (typically a few dozen ACs).
+
+```bash
+# Layer 1a — atuin + television + Dracula starship
+bash scripts/test-plan-layer1a.sh           # safe checks only (CI default)
+bash scripts/test-plan-layer1a.sh --full    # + invasive checks (requires installed tools)
+
+# Plan 14–16 — historical
+bash scripts/test-plan14-16.sh
+```
+
+Both safe-mode and full-mode return non-zero if any check fails. Run safe mode anywhere; full mode requires the corresponding tools installed and (for some checks) macOS.
+
 ## Container development
 
 The `dev` script manages a Podman-based development container:
