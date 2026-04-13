@@ -172,7 +172,13 @@ n=$(grep -c '^# ── [0-9]' bash/.bashrc)
 if [[ "$n" -eq 14 ]]; then ok ".bashrc has 14 numbered sections"; else nok ".bashrc has $n sections"; fi
 check "test-plan2.sh still passes" bash scripts/test-plan2.sh
 
-# Later tasks append AC-14 through AC-20.
+# ── AC-14: delta uses Dracula syntax theme ───────────────────────────────
+echo ""
+echo "AC-14: delta syntax-theme = Dracula"
+check "git .gitconfig delta syntax-theme = Dracula" \
+  bash -c "awk '/^\\[delta\\]\$/{in_s=1; next} /^\\[/{in_s=0} in_s' git/.gitconfig | grep -qE 'syntax-theme[[:space:]]*=[[:space:]]*Dracula'"
+
+# Later tasks append AC-15 through AC-20.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
