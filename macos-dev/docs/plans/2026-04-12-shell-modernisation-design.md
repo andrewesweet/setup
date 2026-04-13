@@ -1691,3 +1691,54 @@ alias ghaw='gh aw'
 
 **cheat integration** (Layer 1b): extend the `cheat` function with a `cheat gh-ext`
 subcommand that lists all installed extensions and their primary commands.
+
+### OpenCode Ecosystem Integration
+
+Separate plan cycle — not part of Layers 1a/1b/2/3.
+
+**Context**: OpenCode (opencode-ai) has a thriving community ecosystem with a
+marketplace at [opencode.cafe](https://www.opencode.cafe/) and a curated
+[awesome-opencode](https://github.com/awesome-opencode/awesome-opencode) list.
+Pattern categories: config profiles, scheduled runs, notifications, git worktree
+automation, editor integrations (nvim), async PTY execution.
+
+**Starting-point evaluations** (from 2026-04-13 research pass):
+
+*Strong recommend — warrant inclusion in the eventual plan:*
+- `kdcokenny/ocx` — portable `.opencode/` profile manager with SHA-256 verification.
+  Aligns with corporate/CyberArk security posture.
+- `different-ai/opencode-scheduler` — cron/launchd/systemd scheduling for recurring
+  OpenCode tasks (GCP drift checks, Terraform lint, etc.).
+- `nickjvandyke/opencode.nvim` — Neovim plugin with LSP-style interaction. Highest
+  maturity among nvim integrations.
+
+*Maybe — trial during the plan cycle before committing:*
+- `shekohex/opencode-pty` — async PTY execution for long-running tasks.
+- `kdcokenny/opencode-worktree` — automated git-worktree setup for parallel branches.
+- `mohak34/opencode-notifier` — desktop notifications on completion (if adopted,
+  pick ONLY this one; the panta82/notificator and kdcokenny/notify alternatives
+  are less mature).
+
+*Skip:*
+- `JRedeker/opencode-shell-strategy` — docs, not a plugin. Read once.
+- `panta82/opencode-notificator`, `kdcokenny/opencode-notify` — superseded.
+- `sudo-tee/opencode.nvim` — admits early-dev status. Use nickjvandyke's instead.
+- `different-ai/openwork` — separate product (a Claude alternative), NOT an OpenCode
+  extension. Different tool entirely.
+- `anomalyco/opencode` — appears to be a fork, not an extension.
+
+**Broader ecosystem to evaluate at plan time**: the OpenCode Marketplace CLI
+([NikiforovAll/opencode-marketplace](https://github.com/NikiforovAll/opencode-marketplace))
+and the full awesome-opencode list. Research pass should re-survey at plan-writing
+time since the ecosystem is moving quickly.
+
+**Scope for the future plan**: installation patterns (marketplace CLI vs direct git
+clone vs `opencode plugin install`), profile strategy (how ocx composes with our
+existing `opencode/` and `opencode-local/` dual-config approach), scheduler use cases
+(integration with our GCP/Terraform/GHA workflow), nvim integration sequencing (fits
+alongside existing LazyVim config), cross-platform portability (macOS + WSL2), and
+carrying the Dracula Pro theme through to OpenCode-owned UI surfaces.
+
+**When to start**: after the shell modernisation layers stabilise, since OpenCode
+integrations depend on the shell integrations (e.g., notifications via shell hooks,
+scheduler calling into zsh/nushell).
