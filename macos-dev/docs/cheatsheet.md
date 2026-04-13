@@ -53,6 +53,22 @@ Key bindings by action across all tools. Vi-mode everywhere except OpenCode inpu
 | Delta n/N jumps hunks not search results | Use `less` search separately, or disable `navigate=true` in delta |
 | Stale Neovim float obscures buffer | `:fclose!` (closes orphaned floating windows from cmdline popup / hover / etc.) |
 
+### tmux plugin keybindings
+
+All bindings are relative to `prefix` (Ctrl-A).
+
+| Action | Binding | Plugin |
+|--------|---------|--------|
+| Install plugins | `prefix + I` | TPM |
+| Update plugins | `prefix + U` | TPM |
+| Floating pane | `prefix + p` | tmux-floax |
+| Session picker | `prefix + o` | tmux-sessionx |
+| Highlight on-screen patterns | `prefix + Space` | tmux-thumbs |
+| URL picker (scrollback) | `prefix + u` | tmux-fzf-url |
+| Fuzzy tmux command | `prefix + F` | tmux-fzf |
+| Save session | `prefix + Ctrl-S` | tmux-resurrect |
+| Restore session | `prefix + Ctrl-R` | tmux-resurrect |
+
 ## Tool reference
 
 Tool for the job — quick commands and aliases.

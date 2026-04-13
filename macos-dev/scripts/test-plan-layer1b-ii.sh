@@ -205,7 +205,22 @@ check "install-macos.sh links dracula-pro.conf" \
 check "install-wsl.sh links dracula-pro.conf" \
   grep -qE 'link\s+kitty/dracula-pro\.conf' install-wsl.sh
 
-# Later tasks append AC-17 through AC-20.
+# ── AC-17: cheat tmux-plugins subcommand ─────────────────────────────────
+echo ""
+echo "AC-17: cheat tmux-plugins case arm"
+cheat_body() { awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//'; }
+if cheat_body | grep -qE '^[[:space:]]*tmux-plugins\)'; then
+  ok "cheat: 'tmux-plugins' case arm present"
+else
+  nok "cheat: 'tmux-plugins' case arm present"
+fi
+check "tmux-plugins arm lists prefix+I"     bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + I'"
+check "tmux-plugins arm lists prefix+p (floax)"     bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + p.*floax\\|floax.*prefix + p'"
+check "tmux-plugins arm lists prefix+o (sessionx)"  bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + o.*sessionx\\|sessionx.*prefix + o'"
+check "tmux-plugins arm lists prefix+Space (thumbs)" bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + Space'"
+check "cheatsheet.md has tmux plugins section"  grep -qE '^### tmux plugin keybindings|^### tmux plugins' docs/cheatsheet.md
+
+# Later tasks append AC-18 through AC-20.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
