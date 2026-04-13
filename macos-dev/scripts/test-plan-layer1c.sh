@@ -146,9 +146,9 @@ fi
 # ── AC-9: install-wsl.sh aborts if $HOME under /mnt/c ─────────────────
 echo ""
 echo "AC-9: WSL /mnt/c precondition"
-# Static: the precondition function exists and references /mnt/c
+# Static: the precondition function exists and guards DrvFs drive-letter mounts
 check "install-wsl.sh contains check_home_on_ext4() function" \
-  bash -c "awk '/^check_home_on_ext4\\(\\) \\{/,/^\\}/' install-wsl.sh | grep -q '/mnt/c'"
+  bash -c "awk '/^check_home_on_ext4\\(\\) \\{/,/^\\}/' install-wsl.sh | grep -qE '/mnt/\\[a-zA-Z\\]/'"
 check "install-wsl.sh supports --check-preconditions" \
   grep -qE '\-\-check-preconditions' install-wsl.sh
 
@@ -159,10 +159,10 @@ if [[ "$FULL" == true ]]; then
   HOME=/mnt/c/Users/test bash install-wsl.sh --check-preconditions >/tmp/wsl-a.out 2>/tmp/wsl-a.err
   rc_a=$?
   set -e 2>/dev/null || true
-  if [[ $rc_a -ne 0 ]] && grep -q '/mnt/c' /tmp/wsl-a.err; then
-    ok "HOME=/mnt/c/... causes abort with /mnt/c message"
+  if [[ $rc_a -ne 0 ]] && grep -q '9P-mounted' /tmp/wsl-a.err; then
+    ok "HOME=/mnt/c/... aborts with 9P-specific message"
   else
-    nok "HOME=/mnt/c/... should abort with /mnt/c message (rc=$rc_a)"
+    nok "HOME=/mnt/c/... should abort citing 9P (rc=$rc_a)"
   fi
   # Case B: HOME on ext4 should succeed
   set +e

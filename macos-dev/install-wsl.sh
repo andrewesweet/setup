@@ -84,7 +84,7 @@ check_home_on_ext4() {
   local home_real
   home_real="$(readlink -f "$HOME" 2>/dev/null || echo "$HOME")"
   case "$home_real" in
-    /mnt/c/*|/mnt/*)
+    /mnt/[a-zA-Z]/*)
       err "HOME ($home_real) is on a 9P-mounted Windows path."
       err "ghq tree (~/code) would be crippling slow here."
       err "Move your Linux home to ext4 before running this installer."
