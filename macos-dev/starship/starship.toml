@@ -1,5 +1,5 @@
-# starship.toml — prompt configuration
-# See docs/design/terminal.md for the specification.
+# starship.toml — prompt configuration with Dracula palette
+# See docs/plans/2026-04-12-shell-modernisation-design.md § 3.9
 
 format = """
 $directory\
@@ -13,34 +13,48 @@ $character"""
 
 scan_timeout = 30
 command_timeout = 1000
+palette = "dracula"
+
+[palettes.dracula]
+background = "#282A36"
+current_line = "#44475A"
+foreground = "#F8F8F2"
+comment = "#6272A4"
+cyan = "#8BE9FD"
+green = "#50FA7B"
+orange = "#FFB86C"
+pink = "#FF79C6"
+purple = "#BD93F9"
+red = "#FF5555"
+yellow = "#F1FA8C"
 
 [directory]
 truncation_length = 4
-truncate_to_repo  = true
-style             = "bold blue"
+truncate_to_repo = true
+style = "bold purple"
 
 [git_branch]
 symbol = " "
-style  = "bold purple"
+style = "bold pink"
 
 [git_status]
 conflicted = "⚡"
-ahead      = "↑${count}"
-behind     = "↓${count}"
-diverged   = "⇕"
+ahead = "↑${count}"
+behind = "↓${count}"
+diverged = "⇕"
 modified = "*"
 staged = "+"
 untracked = "?"
 stashed = "\\$"
 
 [character]
-vicmd_symbol   = "[N](bold green) "
+vicmd_symbol = "[N](bold green) "
 success_symbol = "[I](bold yellow) "
-error_symbol   = "[I](bold red) "
+error_symbol = "[I](bold red) "
 
 [cmd_duration]
 min_time = 2000
-format   = " [$duration](yellow)"
+format = " [$duration](yellow)"
 
 [nodejs]
 format = "[ $version](green) "
@@ -54,7 +68,7 @@ format = "[ $version](cyan) "
 
 [kubernetes]
 disabled = false
-format = "[⎈ $context](blue) "
+format = "[⎈ $context](cyan) "
 
 [terraform]
 format = "[ $version](purple) "

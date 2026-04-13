@@ -99,7 +99,19 @@ check "smart_autocomplete = ctrl-t present"   \
 check "command_history key is ABSENT"         \
   bash -c "! grep -qE 'command_history\s*=' television/config.toml"
 
-# ── AC-3, AC-6, AC-10, AC-11 etc. — stubs to be filled by later tasks ───
+# ── AC-10: Starship uses Dracula palette ──────────────────────────────────
+echo ""
+echo "AC-10: Starship Dracula palette"
+check "starship palette = dracula"            \
+  grep -qE '^palette\s*=\s*"dracula"' starship/starship.toml
+check "[palettes.dracula] table exists"       \
+  grep -qE '^\[palettes\.dracula\]' starship/starship.toml
+for color in background current_line foreground comment cyan green orange pink purple red yellow; do
+  check "palette has '$color'"                \
+    grep -qE "^$color\s*=" starship/starship.toml
+done
+
+# ── AC-3, AC-6, AC-11 etc. — stubs to be filled by later tasks ──────────
 # (Placeholders for each AC; each will become a real check as features land.)
 
 echo ""
