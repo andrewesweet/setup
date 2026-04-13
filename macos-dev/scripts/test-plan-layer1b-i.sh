@@ -180,16 +180,24 @@ check "alias sxl='sesh list'"      grep -qE "^alias sxl='sesh list'"      bash/.
 echo ""
 echo "AC-11: cheat() subcommand coverage"
 # Scope to the cheat() function body so comments elsewhere don't false-positive.
-cheat_body() { awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//'; }
+# Pre-materialise into a variable to avoid a SIGPIPE race: under `set -o
+# pipefail`, `awk | sed | grep -q` flakes when grep -q exits on first match
+# while awk/sed are still producing — SIGPIPE exit (141) propagates and
+# the whole pipeline returns non-zero. Here-string + cached var eliminates
+# the pipe entirely.
+CHEAT_BODY="$(awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//')"
 for tool in atuin "tv|television" sesh yazi xh rip2 jqp diffnav; do
-  if cheat_body | grep -qE "^[[:space:]]*${tool}\)"; then
+  if grep -qE "^[[:space:]]*${tool}\)" <<< "$CHEAT_BODY"; then
     ok "cheat: case arm for '$tool' present"
   else
     nok "cheat: case arm for '$tool' present"
   fi
 done
-check "cheat help lists new subcommands" \
-  bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'sesh, yazi, xh, rip2'"
+if grep -q 'sesh, yazi, xh, rip2' <<< "$CHEAT_BODY"; then
+  ok "cheat help lists new subcommands"
+else
+  nok "cheat help lists new subcommands"
+fi
 
 # ── AC-12: cheatsheet.md tool reference rows ─────────────────────────────
 echo ""
