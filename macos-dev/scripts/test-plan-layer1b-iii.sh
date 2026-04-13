@@ -203,7 +203,17 @@ for a in ghd ghce ghcs ghp ghmd ghg ghaw; do
   check "cheatsheet lists $a" grep -qE "\\b$a\\b" docs/cheatsheet.md
 done
 
-# Later tasks append AC-13 through AC-15.
+# ── AC-13: verify.sh Layer 1b-iii block ──────────────────────────────────
+echo ""
+echo "AC-13: verify.sh Layer 1b-iii coverage"
+check "verify.sh checks television/cable symlink" \
+  grep -qE 'television/cable' scripts/verify.sh
+check "verify.sh checks gh-dash config symlink" \
+  grep -qE 'gh-dash/config\.yml' scripts/verify.sh
+check "verify.sh iterates gh extensions" \
+  grep -qE 'gh extension list' scripts/verify.sh
+
+# Later tasks append AC-14 and AC-15.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
