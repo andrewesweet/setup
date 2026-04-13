@@ -800,9 +800,13 @@ Modify `scripts/test-plan-layer1a.sh`: add this block:
 echo ""
 echo "AC-9: television bash init gated behind ENABLE_TV"
 check "bash/.bashrc mentions ENABLE_TV"       grep -q 'ENABLE_TV' bash/.bashrc
-check "tv init is guarded"                    \
-  grep -E 'ENABLE_TV.*==.*1.*tv init' bash/.bashrc
+# Structural multiline match: must find an `if` that gates on ENABLE_TV and
+# wraps `tv init bash` before the closing `fi`. Comments alone cannot match.
+check "tv init is guarded by if/fi block" \
+  bash -c "grep -Pzo '(?s)if[^\n]*ENABLE_TV[^\n]*==[^\n]*1[^\n]*\n[^\n]*tv init bash[^\n]*\nfi' bash/.bashrc | grep -q ."
 ```
+
+Note: Mirrors the AC-8 hardening (commit e1f3ed6) — a flat regex with `.*tv init` would falsely match the comment line `# tv shell integration binds ...` even if the `if` block were missing. The structural multiline form requires the `if … ENABLE_TV … 1` line, the `tv init bash` eval, and the closing `fi` to all be present.
 
 - [ ] **Step 2: Run tests to confirm AC-9 fails**
 

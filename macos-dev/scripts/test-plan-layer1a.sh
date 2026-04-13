@@ -140,6 +140,15 @@ else
   skp "with ENABLE_ATUIN=1: Ctrl-R rebound"    "requires --full + atuin installed"
 fi
 
+# ── AC-9: television init is opt-in via ENABLE_TV ─────────────────────────
+echo ""
+echo "AC-9: television bash init gated behind ENABLE_TV"
+check "bash/.bashrc mentions ENABLE_TV"       grep -q 'ENABLE_TV' bash/.bashrc
+# Structural multiline match: must find an `if` that gates on ENABLE_TV and
+# wraps `tv init bash` before the closing `fi`. Comments alone cannot match.
+check "tv init is guarded by if/fi block" \
+  bash -c "grep -Pzo '(?s)if[^\n]*ENABLE_TV[^\n]*==[^\n]*1[^\n]*\n[^\n]*tv init bash[^\n]*\nfi' bash/.bashrc | grep -q ."
+
 # ── AC-3, AC-6, AC-11 etc. — stubs to be filled by later tasks ──────────
 # (Placeholders for each AC; each will become a real check as features land.)
 

@@ -122,6 +122,13 @@ if [[ "${ENABLE_ATUIN:-0}" == 1 ]] && command -v atuin &>/dev/null; then
   eval "$(atuin init bash)"
 fi
 
+# television — OPT-IN via ENABLE_TV=1 in .bashrc.local.
+# tv shell integration binds Ctrl-T to the smart_autocomplete channel picker.
+# Ctrl-R is NOT bound by tv — it remains with readline or atuin if enabled.
+if [[ "${ENABLE_TV:-0}" == 1 ]] && command -v tv &>/dev/null; then
+  eval "$(tv init bash)"
+fi
+
 # zoxide
 if command -v zoxide &>/dev/null; then
   eval "$(zoxide init bash)"
