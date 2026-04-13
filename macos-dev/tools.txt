@@ -118,5 +118,15 @@ nvim                 brew:neovim                    apt:neovim              apk:
 # ── direnv ───────────────────────────────────────────────────────────────────
 direnv               brew:direnv                    apt:direnv              apk:direnv
 
+# ── Shell-agnostic tools (Layer 1b-i) ───────────────────────────────────────
+sesh                 brew:sesh                      apt:-                   apk:-
+yazi                 brew:yazi                      apt:-                   apk:-
+xh                   brew:xh                        apt:xh                  apk:xh
+rip                  brew:cesarferreira/tap/rip     apt:-                   apk:-
+rip2                 brew:rip2                      apt:-                   apk:-
+jqp                  brew:jqp                       apt:-                   apk:-
+diffnav              brew:dlvhdr/formulae/diffnav   apt:-                   apk:-
+carapace             brew:carapace                  apt:-                   apk:-
+
 # ── VS Code (macOS only — Windows installs on Windows side for WSL2) ─────────
 code                 brew:visual-studio-code        apt:-                   apk:-
