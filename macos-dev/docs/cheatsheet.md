@@ -63,8 +63,8 @@ Tool for the job — quick commands and aliases.
 |------|------|---------|-------|
 | Find file by name | fd | `fd <pattern>` | `ff`, `ft`, `fdd` |
 | Search file contents | ripgrep | `rg <pattern>` | `fs` |
-| Fuzzy find file | fzf | Ctrl+T | — |
-| Fuzzy search history | fzf | Ctrl+R | — |
+| Fuzzy find file (smart autocomplete) | television (if `ENABLE_TV=1`) / fzf default | Ctrl+T | — |
+| Fuzzy search history | atuin (if `ENABLE_ATUIN=1`) / fzf default | Ctrl+R | — |
 | Jump to directory | zoxide | `z <partial>` | — |
 | Interactive dir picker | zoxide+fzf | `zi` | — |
 
