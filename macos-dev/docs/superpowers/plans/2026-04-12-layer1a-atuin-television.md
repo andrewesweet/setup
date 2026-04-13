@@ -879,15 +879,23 @@ if [[ "$FULL" == true ]]; then
   # Check actual symlinks — only meaningful after install-macos.sh has run
   if [[ -L "$HOME/.config/atuin/config.toml" ]]; then
     actual="$(readlink "$HOME/.config/atuin/config.toml")"
-    check "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml" \
-      bash -c "[[ '$actual' == '$MACOS_DEV/atuin/config.toml' ]]"
+    expected="$MACOS_DEV/atuin/config.toml"
+    if [[ "$actual" == "$expected" ]]; then
+      ok "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml"
+    else
+      nok "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml (got: $actual)"
+    fi
   else
     skp "~/.config/atuin/config.toml symlink" "install not yet run"
   fi
   if [[ -L "$HOME/.config/television/config.toml" ]]; then
     actual="$(readlink "$HOME/.config/television/config.toml")"
-    check "~/.config/television/config.toml → \$DOTFILES/television/config.toml" \
-      bash -c "[[ '$actual' == '$MACOS_DEV/television/config.toml' ]]"
+    expected="$MACOS_DEV/television/config.toml"
+    if [[ "$actual" == "$expected" ]]; then
+      ok "~/.config/television/config.toml → \$DOTFILES/television/config.toml"
+    else
+      nok "~/.config/television/config.toml → \$DOTFILES/television/config.toml (got: $actual)"
+    fi
   else
     skp "~/.config/television/config.toml symlink" "install not yet run"
   fi
