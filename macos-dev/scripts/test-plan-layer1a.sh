@@ -87,7 +87,7 @@ for pat in GITHUB_TOKEN GH_TOKEN SECRET PASSWORD BEARER AUTHORIZATION \
            AWS_ACCESS AWS_SECRET AWS_SESSION ANTHROPIC OPENAI \
            'ghp_' 'gho_' 'github_pat_' 'glpat-' 'sk-' 'xoxb-' 'xoxp-'; do
   check "history_filter contains pattern '$pat'" \
-    bash -c "grep -Fq '$pat' atuin/config.toml"
+    bash -c "awk '/^history_filter = \[/,/^\]/' atuin/config.toml | grep -Fq '$pat'"
 done
 
 # ── AC-3, AC-6, AC-10, AC-11 etc. — stubs to be filled by later tasks ───

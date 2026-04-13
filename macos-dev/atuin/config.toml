@@ -41,7 +41,8 @@ history_filter = [
   "^.*gho_[A-Za-z0-9_]+.*$",
   "^.*github_pat_[A-Za-z0-9_]+.*$",
   "^.*glpat-[A-Za-z0-9_-]+.*$",
-  "^.*sk-[A-Za-z0-9]+.*$",
+  # OpenAI keys are ≥48 alphanumeric; lower bound of 20 rejects false positives like "disk-utils".
+  "^.*sk-[A-Za-z0-9]{20,}.*$",
   "^.*xoxb-[A-Za-z0-9-]+.*$",
   "^.*xoxp-[A-Za-z0-9-]+.*$",
   "^.*PRIVATE.KEY.*$",

@@ -350,7 +350,7 @@ for pat in GITHUB_TOKEN GH_TOKEN SECRET PASSWORD BEARER AUTHORIZATION \
            AWS_ACCESS AWS_SECRET AWS_SESSION ANTHROPIC OPENAI \
            'ghp_' 'gho_' 'github_pat_' 'glpat-' 'sk-' 'xoxb-' 'xoxp-'; do
   check "history_filter contains pattern '$pat'" \
-    bash -c "grep -Fq '$pat' atuin/config.toml"
+    bash -c "awk '/^history_filter = \[/,/^\]/' atuin/config.toml | grep -Fq '$pat'"
 done
 ```
 
@@ -407,7 +407,8 @@ history_filter = [
   "^.*gho_[A-Za-z0-9_]+.*$",
   "^.*github_pat_[A-Za-z0-9_]+.*$",
   "^.*glpat-[A-Za-z0-9_-]+.*$",
-  "^.*sk-[A-Za-z0-9]+.*$",
+  # OpenAI keys are ≥48 alphanumeric; lower bound of 20 rejects false positives like "disk-utils".
+  "^.*sk-[A-Za-z0-9]{20,}.*$",
   "^.*xoxb-[A-Za-z0-9-]+.*$",
   "^.*xoxp-[A-Za-z0-9-]+.*$",
   "^.*PRIVATE.KEY.*$",
