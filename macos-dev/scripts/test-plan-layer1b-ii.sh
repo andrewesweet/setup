@@ -190,7 +190,22 @@ check "lazygit theme inactiveBorderColor uses comment" \
 check "lazygit theme selectedLineBgColor uses current_line" \
   bash -c "grep -Pzo '(?s)selectedLineBgColor:.{0,40}#44475A' lazygit/config.yml >/dev/null 2>&1"
 
-# Later tasks append AC-16 through AC-20.
+# ── AC-16: kitty font + dracula-pro ──────────────────────────────────────
+echo ""
+echo "AC-16: kitty font and Dracula Pro"
+check "kitty font_family = JetBrainsMono Nerd Font" \
+  grep -qE '^font_family[[:space:]]+JetBrainsMono Nerd Font' kitty/kitty.conf
+check "kitty disable_ligatures never"  grep -qE '^disable_ligatures[[:space:]]+never' kitty/kitty.conf
+check "kitty includes dracula-pro.conf" grep -qE '^include[[:space:]]+dracula-pro\.conf' kitty/kitty.conf
+check "kitty/dracula-pro.conf exists"   test -f kitty/dracula-pro.conf
+check "dracula-pro.conf has foreground" grep -qE '^foreground[[:space:]]+#' kitty/dracula-pro.conf
+check "dracula-pro.conf has background" grep -qE '^background[[:space:]]+#' kitty/dracula-pro.conf
+check "install-macos.sh links dracula-pro.conf" \
+  grep -qE 'link\s+kitty/dracula-pro\.conf' install-macos.sh
+check "install-wsl.sh links dracula-pro.conf" \
+  grep -qE 'link\s+kitty/dracula-pro\.conf' install-wsl.sh
+
+# Later tasks append AC-17 through AC-20.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"

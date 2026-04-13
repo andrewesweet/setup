@@ -348,8 +348,9 @@ link bash/.inputrc      .inputrc
 link git/.gitconfig         .gitconfig
 link git/.gitignore_global  .gitignore_global
 
-# kitty terminal (Plan 4)
-link kitty/kitty.conf  .config/kitty/kitty.conf
+# kitty terminal (Plan 4, Dracula Pro palette added in Layer 1b-ii)
+link kitty/kitty.conf        .config/kitty/kitty.conf
+link kitty/dracula-pro.conf  .config/kitty/dracula-pro.conf
 
 # tmux (Plan 5)
 link tmux/.tmux.conf  .tmux.conf
