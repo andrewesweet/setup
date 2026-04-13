@@ -178,7 +178,19 @@ echo "AC-14: delta syntax-theme = Dracula"
 check "git .gitconfig delta syntax-theme = Dracula" \
   bash -c "awk '/^\\[delta\\]\$/{in_s=1; next} /^\\[/{in_s=0} in_s' git/.gitconfig | grep -qE 'syntax-theme[[:space:]]*=[[:space:]]*Dracula'"
 
-# Later tasks append AC-15 through AC-20.
+# ── AC-15: lazygit Dracula theme ─────────────────────────────────────────
+# Uses -Pzo multiline matching to walk the YAML array: key: followed by
+# "- '#COLOR'" on the next line.
+echo ""
+echo "AC-15: lazygit Dracula theme colors"
+check "lazygit theme activeBorderColor uses purple" \
+  bash -c "grep -Pzo '(?s)activeBorderColor:.{0,40}#BD93F9' lazygit/config.yml >/dev/null 2>&1"
+check "lazygit theme inactiveBorderColor uses comment" \
+  bash -c "grep -Pzo '(?s)inactiveBorderColor:.{0,40}#6272A4' lazygit/config.yml >/dev/null 2>&1"
+check "lazygit theme selectedLineBgColor uses current_line" \
+  bash -c "grep -Pzo '(?s)selectedLineBgColor:.{0,40}#44475A' lazygit/config.yml >/dev/null 2>&1"
+
+# Later tasks append AC-16 through AC-20.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
