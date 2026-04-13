@@ -1,0 +1,14 @@
+[metadata]
+name = "git-worktrees"
+description = "Git worktrees"
+requirements = ["git"]
+
+[source]
+command = "git worktree list"
+
+[preview]
+command = "cd $(echo '{}' | awk '{print $1}') && git log --oneline -20 --color=always"
+
+[actions.cd]
+command = "cd $(echo '{}' | awk '{print $1}')"
+default = true

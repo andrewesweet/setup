@@ -1,0 +1,14 @@
+[metadata]
+name = "gcloud-sql"
+description = "Cloud SQL instances"
+requirements = ["gcloud"]
+
+[source]
+command = "gcloud sql instances list --format='value(name,region,state)' 2>/dev/null || true"
+
+[actions.describe]
+command = "gcloud sql instances describe $(echo '{}' | awk '{print $1}')"
+default = true
+
+[actions.proxy]
+command = "cloud-sql-proxy $(echo '{}' | awk '{print $1}')"

@@ -1,0 +1,11 @@
+[metadata]
+name = "gcloud-configs"
+description = "gcloud CLI configurations"
+requirements = ["gcloud"]
+
+[source]
+command = "gcloud config configurations list --format='value(name,properties.core.project)' 2>/dev/null || true"
+
+[actions.activate]
+command = "gcloud config configurations activate $(echo '{}' | awk '{print $1}')"
+default = true

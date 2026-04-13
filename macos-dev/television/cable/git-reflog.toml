@@ -1,0 +1,14 @@
+[metadata]
+name = "git-reflog"
+description = "Git reflog"
+requirements = ["git"]
+
+[source]
+command = "git reflog --color=always -n 200"
+
+[preview]
+command = "git show --color=always --stat $(echo '{}' | awk '{print $1}')"
+
+[actions.checkout]
+command = "git checkout $(echo '{}' | awk '{print $1}')"
+default = true

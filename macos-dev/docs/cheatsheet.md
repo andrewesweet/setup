@@ -69,6 +69,29 @@ All bindings are relative to `prefix` (Ctrl-A).
 | Save session | `prefix + Ctrl-S` | tmux-resurrect |
 | Restore session | `prefix + Ctrl-R` | tmux-resurrect |
 
+### Television channel triggers
+
+Ctrl-T invokes television; the channel is chosen by context (the command being typed). Add the trigger to `[shell_integration.channel_triggers]` in `~/.config/television/config.toml`.
+
+| Command typed | Channel |
+|---------------|---------|
+| `cat`, `less`, `vim`, `nvim`, `bat`, `cp`, `mv`, `rm` | files |
+| `cd`, `ls`, `z`, `rmdir` | dirs |
+| `alias`, `unalias` | alias |
+| `export`, `unset` | env |
+| `git checkout`, `git branch`, `git merge`, `git rebase`, `git pull`, `git push` | git-branch |
+| `git add`, `git restore` | git-diff |
+| `git log`, `git show` | git-log |
+| `podman exec`, `podman stop`, `podman rm` | docker-containers |
+| `podman run` | docker-images |
+| `kubectl exec`, `kubectl logs` | k8s-pods |
+| `kubectx` | k8s-contexts |
+| `make` | make-targets |
+| `ssh`, `scp` | ssh-hosts |
+| `nvim`, `code`, `git clone` | git-repos (from ghq tree) |
+
+Invoke manually: `tv <channel>` (e.g. `tv git-log`, `tv gcloud-configs`, `tv procs`).
+
 ## Tool reference
 
 Tool for the job — quick commands and aliases.
@@ -100,6 +123,32 @@ Tool for the job — quick commands and aliases.
 | Interactive jq playground | jqp | `cat file.json \| jqp` | `jqi` |
 | Navigate diffs (delta UI) | diffnav | `git diff \| diffnav` | `dn` |
 | Cross-shell completions | carapace | auto (via bash init) | — |
+
+### gh-dash workflow
+
+gh-dash is the PR/issue dashboard. `ghd` launches it.
+
+| Task | Binding | Result |
+|------|---------|--------|
+| Preview PR | Enter | Inline preview pane |
+| Open repo in lazygit | g | `cd <repo>; lazygit` |
+| Open PR in opencode | C | `tmux new-window -c <repo> "opencode"` (custom binding) |
+| View diff | d | Delta-rendered diff via diffnav |
+| Open PR in browser | o | `gh browse` on the selection |
+| Refresh section | r | Re-fetch from GitHub |
+
+Pager for diffs is `diffnav` (file-tree nav UI over delta output). Delta's syntax theme is Dracula via `git/.gitconfig`.
+
+| Task | Tool | Command | Alias |
+|------|------|---------|-------|
+| PR/issue dashboard | gh-dash | `gh dash` | `ghd` |
+| Explain a command | gh-copilot | `gh copilot explain <cmd>` | `ghce` |
+| Suggest a command | gh-copilot | `gh copilot suggest <q>` | `ghcs` |
+| Prune merged branches | gh-poi | `gh poi` | `ghp` |
+| Render GFM locally | gh-markdown-preview | `gh markdown-preview <file>` | `ghmd` |
+| Cross-repo grep | gh-grep | `gh grep <q>` | `ghg` |
+| Agentic workflows | gh-aw | `gh aw ...` | `ghaw` |
+| Installation token helper | gh-token | `gh token -i <id>` (automation) | — |
 
 ### Git
 

@@ -1,0 +1,10 @@
+[metadata]
+name = "ssh-hosts"
+description = "SSH hosts from ~/.ssh/config"
+
+[source]
+command = "awk '/^Host[[:space:]]+/ {for (i=2; i<=NF; i++) if ($i !~ /[*?]/) print $i}' ~/.ssh/config 2>/dev/null | sort -u"
+
+[actions.ssh]
+command = "ssh '{}'"
+default = true

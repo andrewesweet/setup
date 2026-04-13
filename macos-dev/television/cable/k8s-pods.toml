@@ -1,0 +1,17 @@
+[metadata]
+name = "k8s-pods"
+description = "Kubernetes pods (current context)"
+requirements = ["kubectl"]
+
+[source]
+command = "kubectl get pods --all-namespaces --no-headers 2>/dev/null || true"
+
+[preview]
+command = "kubectl describe pod -n $(echo '{}' | awk '{print $1}') $(echo '{}' | awk '{print $2}') 2>/dev/null | head -60"
+
+[actions.exec]
+command = "kubectl exec -it -n $(echo '{}' | awk '{print $1}') $(echo '{}' | awk '{print $2}') -- sh"
+default = true
+
+[actions.logs]
+command = "kubectl logs -n $(echo '{}' | awk '{print $1}') $(echo '{}' | awk '{print $2}')"

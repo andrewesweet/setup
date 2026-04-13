@@ -1,0 +1,22 @@
+[metadata]
+name = "git-repos"
+description = "Git repos under the ghq tree (~/code)"
+requirements = ["ghq"]
+
+# Source: ghq list --full-path (absolute paths under ~/code/<host>/<org>/<repo>).
+# Layer 1c (shipped) installs ghq and seeds the tree.
+[source]
+command = "ghq list --full-path"
+
+[preview]
+command = "ls -la '{}' | head -40"
+
+[actions.cd]
+command = "cd '{}'"
+default = true
+
+[actions.nvim]
+command = "cd '{}' && ${EDITOR:-nvim}"
+
+[actions.code]
+command = "code '{}'"

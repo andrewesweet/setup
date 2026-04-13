@@ -1,0 +1,17 @@
+[metadata]
+name = "gcloud-run-services"
+description = "Cloud Run services"
+requirements = ["gcloud"]
+
+[source]
+command = "gcloud run services list --format='value(metadata.name,metadata.namespace,status.url)' 2>/dev/null || true"
+
+[actions.describe]
+command = "gcloud run services describe $(echo '{}' | awk '{print $1}') --region $(echo '{}' | awk '{print $2}')"
+default = true
+
+[actions.logs]
+command = "gcloud run services logs read $(echo '{}' | awk '{print $1}') --region $(echo '{}' | awk '{print $2}') --limit 50"
+
+[actions.open]
+command = "${BROWSER:-open} $(echo '{}' | awk '{print $3}')"

@@ -1,0 +1,20 @@
+[metadata]
+name = "git-stash"
+description = "Git stashes"
+requirements = ["git"]
+
+[source]
+command = "git stash list"
+
+[preview]
+command = "git stash show -p --color=always $(echo '{}' | awk -F: '{print $1}')"
+
+[actions.apply]
+command = "git stash apply $(echo '{}' | awk -F: '{print $1}')"
+default = true
+
+[actions.pop]
+command = "git stash pop $(echo '{}' | awk -F: '{print $1}')"
+
+[actions.drop]
+command = "git stash drop $(echo '{}' | awk -F: '{print $1}')"

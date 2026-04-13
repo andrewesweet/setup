@@ -1,0 +1,68 @@
+# gh-dash/config.yml — PR dashboard (dlvhdr/gh-dash)
+# See docs/plans/2026-04-12-shell-modernisation-design.md § 3.5
+
+prSections:
+  - title: My Pull Requests
+    filters: is:open author:@me
+  - title: Needs My Review
+    filters: is:open review-requested:@me
+  - title: Involved
+    filters: is:open involves:@me -author:@me
+
+issuesSections:
+  - title: My Issues
+    filters: is:open author:@me
+  - title: Assigned
+    filters: is:open assignee:@me
+
+defaults:
+  preview:
+    open: false
+    width: 70
+  prsLimit: 20
+  issuesLimit: 20
+  view: prs
+  refetchIntervalMinutes: 30
+
+keybindings:
+  universal:
+    - key: g
+      name: lazygit
+      command: >
+        cd {{.RepoPath}}; lazygit
+
+  prs:
+    - key: C
+      name: opencode
+      # Opens the selected PR's repo in a new tmux window running opencode.
+      # Requires tmux + opencode to be on PATH. Falls back to a no-op if tmux
+      # isn't available (gh-dash just errors visibly).
+      command: >
+        tmux new-window -c {{.RepoPath}} "opencode"
+
+pager:
+  diff: "diffnav"
+
+confirmQuit: false
+showAuthorIcons: true
+
+# Dracula theme (palette values from docs/plans § 3.9)
+theme:
+  ui:
+    table:
+      showSeparator: true
+  colors:
+    text:
+      primary: "#F8F8F2"
+      secondary: "#6272A4"
+      inverted: "#282A36"
+      faint: "#44475A"
+      warning: "#FFB86C"
+      success: "#50FA7B"
+      error: "#FF5555"
+    background:
+      selected: "#44475A"
+    border:
+      primary: "#BD93F9"
+      secondary: "#6272A4"
+      faint: "#44475A"

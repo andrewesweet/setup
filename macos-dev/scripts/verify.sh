@@ -202,6 +202,30 @@ check "kitty dracula-pro.conf symlink resolves" \
 check "BAT_THEME is Dracula in tracked .bashrc" \
   grep -qE 'export BAT_THEME="Dracula"' "$REPO_ROOT/bash/.bashrc"
 
+# ── Layer 1b-iii (cable channels + gh extensions + gh-dash) ──────────────
+echo ""
+echo "Layer 1b-iii:"
+# shellcheck disable=SC2016  # $HOME expanded inside inner bash -c intentionally
+check "television/cable symlink resolves as a directory" \
+  bash -c 'test -L "$HOME/.config/television/cable" && test -d "$HOME/.config/television/cable"'
+# shellcheck disable=SC2016
+check "gh-dash config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/gh-dash/config.yml" && test -e "$HOME/.config/gh-dash/config.yml"'
+
+# gh extensions (full mode only — requires `gh` authenticated)
+if command -v gh &>/dev/null && gh extension list &>/dev/null; then
+  ext_list="$(gh extension list 2>/dev/null)"
+  for e in gh-dash gh-copilot gh-poi gh-markdown-preview gh-grep gh-aw gh-token; do
+    if printf '%s' "$ext_list" | grep -q "$e"; then
+      ok "gh extension installed: $e"
+    else
+      nok "gh extension installed: $e"
+    fi
+  done
+else
+  echo "  (gh extensions not checked — gh not on PATH or not authenticated)"
+fi
+
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
 echo ""
 echo "${YELLOW}── Remaining manual steps ──${RESET}"

@@ -56,6 +56,15 @@ alias ghprl='gh pr list'
 alias ghprc='gh pr checkout'
 alias ghrv='gh repo view --web'
 
+# gh extensions (Layer 1b-iii). gh-token is automation-only (no alias).
+alias ghd='gh dash'
+alias ghce='gh copilot explain'
+alias ghcs='gh copilot suggest'
+alias ghp='gh poi'
+alias ghmd='gh markdown-preview'
+alias ghg='gh grep'
+alias ghaw='gh aw'
+
 # ── Search & find — prefix: f ──────────────────────────────────────────────
 alias ff='fd'
 alias ft='fd --type f'
@@ -358,6 +367,61 @@ h/l moves between files; j/k moves between hunks.
 Used as gh-dash's pager (see 1b-iii).
 EOF
       ;;
+    gh-ext)
+      echo "Installed gh extensions:"
+      if command -v gh &>/dev/null; then
+        gh extension list
+      else
+        echo "  (gh not on PATH)"
+      fi
+      echo ""
+      echo "Quick references:"
+      echo "  gh-dash          PR/issue dashboard.   ghd / cheat ghd"
+      echo "  gh-copilot       Inline explain/suggest. ghce / ghcs"
+      echo "  gh-poi           Prune merged branches.  ghp"
+      echo "  gh-markdown-preview  Local GFM render.   ghmd"
+      echo "  gh-grep          Cross-repo grep.        ghg"
+      echo "  gh-aw            Agentic workflows.      ghaw"
+      echo "  gh-token         Installation token helper (scripting)."
+      ;;
+    ghd)
+      cat <<'EOF'
+gh-dash (gh dash) — PR/issue dashboard
+  ?           help overlay
+  j/k         down/up
+  l/h         next/prev column
+  r           refresh the current section
+  Enter       preview the selected PR/issue
+  g           open repo in lazygit (RepoPath-substituted)
+  C           open PR in opencode via tmux new-window (1b-iii binding)
+  o           open in browser
+  d           view diff (uses diffnav as pager)
+Config: ~/.config/gh-dash/config.yml
+EOF
+      ;;
+    channels|tv-channels)
+      cat <<'EOF'
+television cable channels — shell-integration triggers
+  Trigger on command              Channel
+  ──────────────────────────────  ────────────
+  cat/less/vim/nvim/bat/cp/mv/rm  files
+  cd/ls/z/rmdir                   dirs
+  alias/unalias                   alias
+  export/unset                    env
+  git checkout/branch/merge/...   git-branch
+  git add/restore                 git-diff
+  git log/show                    git-log
+  podman exec/stop/rm             docker-containers
+  podman run                      docker-images
+  kubectl exec/logs               k8s-pods
+  kubectx                         k8s-contexts
+  make                            make-targets
+  ssh/scp                         ssh-hosts
+  nvim/code/git clone             git-repos (ghq tree)
+Ctrl-T invokes the context-sensitive channel (default: files).
+Invoke manually: `tv <channel>` (e.g. tv git-log, tv procs, tv gcloud-configs).
+EOF
+      ;;
     opencode|oc)
       echo "OpenCode TUI bindings: \$DOTFILES/opencode/tui.jsonc"
       [[ -f "$dotfiles/opencode/tui.jsonc" ]] && cat "$dotfiles/opencode/tui.jsonc"
@@ -374,9 +438,9 @@ cheat — quick reference for keys, tools, and per-tool discovery
   cheat help       This message
 
 Per-tool subcommands:
-  atuin, bash, btop, delta, diffnav, fzf, git, jqp, k9s, lazydocker,
-  lazygit, lnav, nvim, opencode, rip2, sesh, starship, tmux,
-  tmux-plugins, tv/television, xh, yazi
+  atuin, bash, btop, channels, delta, diffnav, fzf, gh-ext, ghd, git,
+  jqp, k9s, lazydocker, lazygit, lnav, nvim, opencode, rip2, sesh,
+  starship, tmux, tmux-plugins, tv/television, xh, yazi
 
 New in Layer 1b-i: sesh, yazi, xh, rip2, jqp, diffnav, atuin, tv.
 

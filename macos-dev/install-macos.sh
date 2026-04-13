@@ -215,6 +215,23 @@ else
   warn "bun not available, skipping opencode/critique install"
 fi
 
+# ── gh extensions (Layer 1b-iii) ─────────────────────────────────────────
+# Each install is idempotent: `gh extension install` is a no-op if already
+# installed. `|| true` avoids failing the whole script if a single extension
+# is unavailable (e.g. corporate network blocks a release asset).
+if command -v gh &>/dev/null; then
+  log "installing gh extensions"
+  gh extension install dlvhdr/gh-dash             || true
+  gh extension install github/gh-copilot          || true
+  gh extension install seachicken/gh-poi          || true
+  gh extension install yusukebe/gh-markdown-preview || true
+  gh extension install k1Low/gh-grep              || true
+  gh extension install github/gh-aw               || true
+  gh extension install Link-/gh-token             || true
+else
+  warn "gh not on PATH — skipping gh extension installs"
+fi
+
 # gcloud SDK — PREREQUISITE, not installed by this script.
 #
 # Homebrew migrated google-cloud-sdk from a formula to the gcloud-cli cask.
@@ -298,6 +315,10 @@ link atuin/config.toml        .config/atuin/config.toml
 # television (Plan Layer 1a)
 link television/config.toml   .config/television/config.toml
 
+# television cable channels (Layer 1b-iii) — directory-level symlink so
+# additional .toml files added later require no re-wire.
+link television/cable         .config/television/cable
+
 # yazi (Plan Layer 1b-i)
 link yazi/yazi.toml    .config/yazi/yazi.toml
 link yazi/keymap.toml  .config/yazi/keymap.toml
@@ -308,6 +329,9 @@ link jqp/.jqp.yaml  .jqp.yaml
 
 # diffnav (Plan Layer 1b-i)
 link diffnav/config.yml  .config/diffnav/config.yml
+
+# gh-dash (Plan Layer 1b-iii)
+link gh-dash/config.yml  .config/gh-dash/config.yml
 
 # opencode (Plan 9)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc

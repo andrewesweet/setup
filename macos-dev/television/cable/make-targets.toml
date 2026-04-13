@@ -1,0 +1,11 @@
+[metadata]
+name = "make-targets"
+description = "Make targets in the current directory"
+requirements = ["make"]
+
+[source]
+command = "make -qp 2>/dev/null | awk -F':' '/^[a-zA-Z0-9_.-]+:/ {print $1}' | sort -u"
+
+[actions.run]
+command = "make '{}'"
+default = true

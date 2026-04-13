@@ -1,0 +1,17 @@
+[metadata]
+name = "git-diff"
+description = "Files with unstaged changes"
+requirements = ["git"]
+
+[source]
+command = "git status --porcelain | awk '{print $2}'"
+
+[preview]
+command = "git diff --color=always -- '{}'"
+
+[actions.add]
+command = "git add '{}'"
+default = true
+
+[actions.restore]
+command = "git restore '{}'"
