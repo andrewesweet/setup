@@ -328,6 +328,23 @@ else
   warn "bun not available, skipping (added in later plan)"
 fi
 
+# ── gh extensions (Layer 1b-iii) ─────────────────────────────────────────
+# Each install is idempotent: `gh extension install` is a no-op if already
+# installed. `|| true` avoids failing the whole script if a single extension
+# is unavailable (e.g. corporate network blocks a release asset).
+if command -v gh &>/dev/null; then
+  log "installing gh extensions"
+  gh extension install dlvhdr/gh-dash             || true
+  gh extension install github/gh-copilot          || true
+  gh extension install seachicken/gh-poi          || true
+  gh extension install yusukebe/gh-markdown-preview || true
+  gh extension install k1Low/gh-grep              || true
+  gh extension install github/gh-aw               || true
+  gh extension install Link-/gh-token             || true
+else
+  warn "gh not on PATH — skipping gh extension installs"
+fi
+
 # ── Step 4: Symlink configs (deferred) ───────────────────────────────────────
 log "symlinking configs"
 

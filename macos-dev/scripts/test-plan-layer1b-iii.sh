@@ -138,7 +138,25 @@ check "install-macos.sh links gh-dash config" \
 check "install-wsl.sh links gh-dash config" \
   grep -qE 'link\s+gh-dash/config\.yml' install-wsl.sh
 
-# Later tasks append AC-9 through AC-15.
+# ── AC-9: install scripts install all gh extensions ──────────────────────
+echo ""
+echo "AC-9: gh extensions installed"
+exts=(dlvhdr/gh-dash github/gh-copilot seachicken/gh-poi yusukebe/gh-markdown-preview k1Low/gh-grep github/gh-aw Link-/gh-token)
+for e in "${exts[@]}"; do
+  # Case-insensitive (-i) so either "k1Low" or "k1low" matches.
+  check "install-macos.sh installs $e" \
+    grep -iqE "gh extension install[[:space:]]+$e\b" install-macos.sh
+  check "install-wsl.sh installs $e" \
+    grep -iqE "gh extension install[[:space:]]+$e\b" install-wsl.sh
+done
+# -Pzo (not -PzoE; E+P are mutually exclusive in GNU grep). Allow up to 400
+# chars of code between the gh guard and the first `gh extension install`.
+check "install-macos.sh guards gh extension install on command -v gh" \
+  bash -c "grep -Pzo '(?s)command -v gh[^\\n]*\\n.{0,400}gh extension install' install-macos.sh >/dev/null 2>&1"
+check "install-wsl.sh guards gh extension install on command -v gh" \
+  bash -c "grep -Pzo '(?s)command -v gh[^\\n]*\\n.{0,400}gh extension install' install-wsl.sh >/dev/null 2>&1"
+
+# Later tasks append AC-10 through AC-15.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
