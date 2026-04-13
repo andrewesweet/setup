@@ -213,7 +213,11 @@ check "verify.sh checks gh-dash config symlink" \
 check "verify.sh iterates gh extensions" \
   grep -qE 'gh extension list' scripts/verify.sh
 
-# Later tasks append AC-14 and AC-15.
+# ── AC-14: structural invariants preserved ───────────────────────────────
+echo ""
+echo "AC-14: structural invariants"
+check ".bashrc section count unchanged (test-plan2.sh)" bash scripts/test-plan2.sh
+check "starship unchanged (test-plan6-8.sh)"            bash scripts/test-plan6-8.sh
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
