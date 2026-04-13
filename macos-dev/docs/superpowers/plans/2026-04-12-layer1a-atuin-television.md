@@ -540,7 +540,7 @@ fallback_channel = "files"
 
 [shell_integration.keybindings]
 # Only Ctrl-T is claimed. atuin owns Ctrl-R.
-"smart_autocomplete" = "ctrl-t"
+smart_autocomplete = "ctrl-t"
 ```
 
 - [ ] **Step 4: Run tests to confirm AC-7 passes**

@@ -431,7 +431,7 @@ fallback_channel = "files"
 [shell_integration.keybindings]
 # Television ONLY claims Ctrl-T. Ctrl-R is NOT claimed here —
 # atuin is the sole owner of Ctrl-R.
-"smart_autocomplete" = "ctrl-t"
+smart_autocomplete = "ctrl-t"
 ```
 
 **Cable channel security notes:**
