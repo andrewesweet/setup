@@ -298,3 +298,38 @@ EOF
       ;;
   esac
 }
+
+# ── Repo organisation (Layer 1c: ghq + ghorg) ────────────────────────────────
+# Interactive repo picker — bound to Alt-R (see bash/.bashrc).
+repo() {
+  local dir
+  dir=$(ghq list --full-path | fzf --preview 'ls -la {}') || return
+  if [[ -n "$dir" && -d "$dir" ]]; then
+    cd "$dir"
+  else
+    echo "repo: cannot cd to '$dir' (deleted between list and select?)" >&2
+    return 1
+  fi
+}
+
+# Clone-and-go: ghq get + cd to the canonical path.
+# Uses `ghq list -e -p` (exact match, full path) to avoid substring+head hazard.
+gclone() {
+  if ghq get -u "$1"; then
+    local target
+    target="$(ghq list -e -p "$1" 2>/dev/null | head -1)"
+    if [[ -n "$target" && -d "$target" ]]; then
+      cd "$target"
+    else
+      echo "ghq: cannot resolve path for '$1'" >&2
+      return 1
+    fi
+  fi
+}
+
+# Bulk-clone a GitHub org into the ghq tree.
+# Pins --path to ~/code/github.com; never pass --output-dir (renames org folder).
+ghorg-gh() {
+  local org="$1"; shift
+  ghorg clone "$org" --path ~/code/github.com "$@"
+}

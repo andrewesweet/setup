@@ -78,6 +78,23 @@ link() {
   printf "  linked    %s\n" "$dst"
 }
 
+# Precondition: $HOME must be on a native Linux filesystem (ext4), not on
+# /mnt/c/ (9P bridge to Windows — ~10× slower, kills git perf on ghq tree).
+check_home_on_ext4() {
+  local home_real
+  home_real="$(readlink -f "$HOME" 2>/dev/null || echo "$HOME")"
+  case "$home_real" in
+    /mnt/[a-zA-Z]/*)
+      err "HOME ($home_real) is on a 9P-mounted Windows path."
+      err "ghq tree (~/code) would be crippling slow here."
+      err "Move your Linux home to ext4 before running this installer."
+      err "See: docs/plans/2026-04-12-shell-modernisation-design.md § 3.11.6"
+      return 1
+      ;;
+  esac
+  return 0
+}
+
 # ── restore() (identical to install-macos.sh) ────────────────────────────────
 restore() {
   if [[ ! -d "$HOME/.dotfiles-backup" ]]; then
@@ -117,6 +134,16 @@ restore() {
 
 # Print DOTFILES resolution result up front for the self-resolution test.
 log "DOTFILES=$DOTFILES"
+
+# Handle --check-preconditions flag: run the check and exit without installing
+if [[ "${1:-}" == "--check-preconditions" ]]; then
+  check_home_on_ext4 || exit 1
+  log "preconditions OK"
+  exit 0
+fi
+
+# Normal install path also runs the precondition early
+check_home_on_ext4 || exit 1
 
 if [[ "$MODE" == "restore" ]]; then
   restore

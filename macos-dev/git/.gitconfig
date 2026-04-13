@@ -73,3 +73,6 @@
     wip     = !git add -A && git commit -m "WIP"
     unwip   = !git log -1 --format='%s' | grep -q 'WIP' && git reset HEAD~1 || echo 'No WIP commit found — nothing undone'
     aliases = config --get-regexp alias
+
+[ghq]
+  root = ~/code

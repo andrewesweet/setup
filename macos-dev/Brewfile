@@ -28,6 +28,10 @@ brew "ripgrep"
 brew "atuin"
 brew "television"
 
+# ── Repo organisation (Layer 1c) ─────────────────────────────────────────────
+brew "ghq"
+brew "ghorg"
+
 # ── File viewing ─────────────────────────────────────────────────────────────
 brew "bat"
 brew "eza"
