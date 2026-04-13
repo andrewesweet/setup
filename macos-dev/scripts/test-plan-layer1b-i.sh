@@ -204,6 +204,41 @@ check "cheatsheet lists rip2/rrip"     grep -qE '\brip2\b.*\brrip\b|rrip.*rip2' 
 check "cheatsheet lists jqp/jqi"       grep -qE '\bjqp\b.*\bjqi\b|jqi.*jqp' docs/cheatsheet.md
 check "cheatsheet lists diffnav/dn"    grep -qE '\bdiffnav\b.*\bdn\b' docs/cheatsheet.md
 
+# ── AC-13: gh_release_install() helper ───────────────────────────────────
+echo ""
+echo "AC-13: install-wsl.sh gh_release_install helper"
+check "gh_release_install is defined" \
+  bash -c "awk '/^gh_release_install\\(\\) \\{/,/^\\}/' install-wsl.sh | grep -q '.'"
+check "helper handles x86_64"    \
+  bash -c "awk '/^gh_release_install\\(\\) \\{/,/^\\}/' install-wsl.sh | grep -q 'x86_64'"
+check "helper handles aarch64"   \
+  bash -c "awk '/^gh_release_install\\(\\) \\{/,/^\\}/' install-wsl.sh | grep -q 'aarch64'"
+check "helper writes to ~/.local/bin" \
+  bash -c "awk '/^gh_release_install\\(\\) \\{/,/^\\}/' install-wsl.sh | grep -q '.local/bin'"
+check "helper is idempotent (checks for existing binary)" \
+  bash -c "awk '/^gh_release_install\\(\\) \\{/,/^\\}/' install-wsl.sh | grep -qE 'command -v|-x '"
+
+# ── AC-14: install-wsl.sh installs each tool ──────────────────────────────
+echo ""
+echo "AC-14: install-wsl.sh installs Layer 1b-i tools"
+check "install-wsl.sh installs sesh" \
+  grep -qE 'gh_release_install\s+"?joshmedeski/sesh"?' install-wsl.sh
+check "install-wsl.sh installs yazi" \
+  grep -qE 'gh_release_install\s+"?sxyazi/yazi"?' install-wsl.sh
+check "install-wsl.sh installs rip (cesarferreira)" \
+  grep -qE 'gh_release_install\s+"?cesarferreira/rip"?' install-wsl.sh
+check "install-wsl.sh installs rip2 (MilesCranmer)" \
+  grep -qE 'gh_release_install\s+"?MilesCranmer/rip2"?' install-wsl.sh
+check "install-wsl.sh installs jqp (noahgorstein)" \
+  grep -qE 'gh_release_install\s+"?noahgorstein/jqp"?' install-wsl.sh
+check "install-wsl.sh installs diffnav (dlvhdr)" \
+  grep -qE 'gh_release_install\s+"?dlvhdr/diffnav"?' install-wsl.sh
+check "install-wsl.sh installs carapace" \
+  grep -qE 'gh_release_install\s+"?rsteube/carapace-bin"?' install-wsl.sh
+# xh is in apt.
+check "install-wsl.sh apt-installs xh" \
+  grep -qE 'apt\s+install.*\bxh\b' install-wsl.sh
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

@@ -78,6 +78,107 @@ link() {
   printf "  linked    %s\n" "$dst"
 }
 
+# ── gh_release_install ───────────────────────────────────────────────────
+# Download a GitHub release binary and install it into ~/.local/bin.
+#
+# Usage: gh_release_install <owner/repo> <binary-name> [<asset-pattern>]
+#   owner/repo:     e.g. "joshmedeski/sesh"
+#   binary-name:    the executable to place in ~/.local/bin (e.g. "sesh")
+#   asset-pattern:  optional extra regex to narrow the asset match
+#                   (defaults to the arch pattern below)
+#
+# Idempotent: skips if ~/.local/bin/<binary-name> is already executable.
+# This is a coarse idempotency check — for version pinning, delete the
+# binary and re-run the installer.
+#
+# Requires: curl, tar, (optional) jq. Falls back to grep/sed parsing if
+# jq is unavailable (which it is during early bootstrap on fresh WSL).
+gh_release_install() {
+  local repo="$1" binary="$2" extra_pattern="${3:-}"
+  local arch os tmp asset url
+  mkdir -p "$HOME/.local/bin"
+
+  # Idempotency: already installed.
+  if [[ -x "$HOME/.local/bin/$binary" ]] || command -v "$binary" &>/dev/null; then
+    printf "  already installed: %s\n" "$binary"
+    return 0
+  fi
+
+  # Arch detection.
+  case "$(uname -m)" in
+    x86_64)  arch='x86_64|amd64|x64' ;;
+    aarch64|arm64) arch='aarch64|arm64' ;;
+    *)       warn "gh_release_install: unsupported arch $(uname -m) for $binary"; return 1 ;;
+  esac
+
+  # OS detection.
+  case "$(uname -s)" in
+    Linux)   os='linux|unknown-linux-(gnu|musl)' ;;
+    Darwin)  os='darwin|apple-darwin' ;;
+    *)       warn "gh_release_install: unsupported OS $(uname -s)"; return 1 ;;
+  esac
+
+  log "fetching latest release metadata: $repo"
+  local api="https://api.github.com/repos/$repo/releases/latest"
+  local releases_json
+  if ! releases_json="$(curl -fsSL "$api" 2>/dev/null)"; then
+    warn "gh_release_install: cannot reach GitHub API for $repo"
+    return 1
+  fi
+
+  # Select a .tar.gz asset matching both arch and os, plus any extra_pattern.
+  # Prefer gnu over musl when both exist (glibc on Ubuntu).
+  local pattern="($arch).*($os)"
+  [[ -n "$extra_pattern" ]] && pattern="$pattern.*$extra_pattern"
+
+  url="$(printf '%s' "$releases_json" \
+    | grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
+    | sed -E 's/.*"([^"]+)"$/\1/' \
+    | grep -E "$pattern" \
+    | grep -E '\.tar\.gz$|\.tgz$' \
+    | grep -vE 'musl' \
+    | head -1)"
+
+  # Fallback: musl-only releases (e.g. some Rust static binaries).
+  if [[ -z "$url" ]]; then
+    url="$(printf '%s' "$releases_json" \
+      | grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
+      | sed -E 's/.*"([^"]+)"$/\1/' \
+      | grep -E "$pattern" \
+      | grep -E '\.tar\.gz$|\.tgz$' \
+      | head -1)"
+  fi
+
+  if [[ -z "$url" ]]; then
+    warn "gh_release_install: no matching asset found for $repo (arch=$arch os=$os)"
+    return 1
+  fi
+
+  log "downloading $url"
+  tmp="$(mktemp -d)"
+  if ! curl -fsSL -o "$tmp/asset.tar.gz" "$url"; then
+    warn "gh_release_install: download failed for $url"
+    rm -rf "$tmp"
+    return 1
+  fi
+
+  # Extract and locate the binary. Handles flat archives and subdir archives.
+  tar -xzf "$tmp/asset.tar.gz" -C "$tmp"
+  asset="$(find "$tmp" -type f -name "$binary" -perm -u+x | head -1)"
+  if [[ -z "$asset" ]]; then
+    asset="$(find "$tmp" -type f -name "$binary" | head -1)"
+  fi
+  if [[ -z "$asset" ]]; then
+    warn "gh_release_install: binary '$binary' not found in archive for $repo"
+    rm -rf "$tmp"
+    return 1
+  fi
+
+  install -m 0755 "$asset" "$HOME/.local/bin/$binary"
+  printf "  installed %s → ~/.local/bin/%s\n" "$binary" "$binary"
+  rm -rf "$tmp"
+}
+
 # Precondition: $HOME must be on a native Linux filesystem (ext4), not on
 # /mnt/c/ (9P bridge to Windows — ~10× slower, kills git perf on ghq tree).
 check_home_on_ext4() {
@@ -173,7 +274,7 @@ if ! sudo apt update; then
   err "check that you have passwordless sudo or run interactively"
   exit 1
 fi
-if ! sudo apt install -y \
+if ! sudo apt install -y xh \
   bash bash-completion \
   git tmux tree wget curl \
   jq \
@@ -183,18 +284,19 @@ if ! sudo apt install -y \
   exit 1
 fi
 
-# ── Step 2: GitHub release / install script installs ─────────────────────────
-# STUBBED: this plan creates the skeleton only. Later plans add:
-#   - fzf (>= 0.48, from github.com/junegunn/fzf releases)
-#   - starship, mise, uv, zoxide, bat, delta, fd, ripgrep
-#   - lazygit, btop, lnav, glow, neovim
-#   - bun, podman, gcloud SDK, codeql, typst, pandoc
-#   - atuin (no apt — installer at https://setup.atuin.sh)              [Layer 1a]
-#   - television (no apt — github.com/alexpasmantier/television releases) [Layer 1a]
-warn "step 2 (GitHub releases) is stubbed — later plans add tool installs"
-warn "atuin/television not installed: install manually until WSL tool installer is built"
-warn "  atuin:      bash <(curl -fsSL https://setup.atuin.sh)"
-warn "  television: see github.com/alexpasmantier/television/releases (binary is 'tv')"
+# ── Step 2: GitHub release installs (Layer 1a + 1b-i) ────────────────────
+log "installing release binaries (Layer 1a)"
+gh_release_install "atuinsh/atuin"                atuin
+gh_release_install "alexpasmantier/television"    tv
+
+log "installing release binaries (Layer 1b-i)"
+gh_release_install "joshmedeski/sesh"             sesh
+gh_release_install "sxyazi/yazi"                  yazi
+gh_release_install "cesarferreira/rip"            rip
+gh_release_install "MilesCranmer/rip2"            rip2
+gh_release_install "noahgorstein/jqp"             jqp
+gh_release_install "dlvhdr/diffnav"               diffnav
+gh_release_install "rsteube/carapace-bin"         carapace
 
 # ── Step 3: Post-bootstrap tool installs ─────────────────────────────────────
 if command -v uv &>/dev/null; then
@@ -301,11 +403,6 @@ Next steps:
        opencode auth login
        gh auth login
        gcloud auth login
-
-Layer 1a tools (manual install on WSL2 — automated in a later plan):
-  atuin:      bash <(curl -fsSL https://setup.atuin.sh)
-  television: download from https://github.com/alexpasmantier/television/releases
-              (binary name is 'tv')
 
 If install-wsl.sh --restore is needed, backups are in:
   $HOME/.dotfiles-backup/
