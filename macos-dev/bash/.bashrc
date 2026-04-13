@@ -244,7 +244,7 @@ else
   export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 fi
 
-export BAT_THEME="Monokai Extended"
+export BAT_THEME="Dracula"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
@@ -254,6 +254,10 @@ export FZF_DEFAULT_OPTS='
   --border
   --info=inline
   --bind=ctrl-j:down,ctrl-k:up
+  --color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9
+  --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9
+  --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6
+  --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4
 '
 
 # ── 12. Source aliases ─────────────────────────────────────────────────────

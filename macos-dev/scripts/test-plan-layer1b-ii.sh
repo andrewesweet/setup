@@ -149,7 +149,30 @@ check "install-wsl.sh guards TPM clone on [[ ! -d ]]" \
 check "install-wsl.sh mentions tmux-thumbs Rust caveat in next steps" \
   grep -qE 'tmux-thumbs.*Rust|Rust.*tmux-thumbs' install-wsl.sh
 
-# Later tasks append AC-12 through AC-20.
+# ── AC-12: BAT_THEME = Dracula ───────────────────────────────────────────
+echo ""
+echo "AC-12: BAT_THEME is Dracula"
+check "BAT_THEME=Dracula"  grep -qE 'export BAT_THEME="Dracula"' bash/.bashrc
+check "old Monokai theme removed" bash -c '! grep -q "Monokai Extended" bash/.bashrc'
+
+# ── AC-13: FZF_DEFAULT_OPTS has Dracula colors ───────────────────────────
+echo ""
+echo "AC-13: FZF_DEFAULT_OPTS Dracula palette"
+check "FZF opts include fg:#f8f8f2"  grep -q 'fg:#f8f8f2' bash/.bashrc
+check "FZF opts include bg:#282a36"  grep -q 'bg:#282a36' bash/.bashrc
+check "FZF opts include hl:#bd93f9"  grep -q 'hl:#bd93f9' bash/.bashrc
+check "FZF opts retain ctrl-j:down,ctrl-k:up" grep -q 'ctrl-j:down,ctrl-k:up' bash/.bashrc
+check "FZF opts retain --height 40%"  grep -q 'height 40%' bash/.bashrc
+check "FZF opts retain --layout=reverse" grep -q 'layout=reverse' bash/.bashrc
+
+# ── AC-18: .bashrc still 14 sections ─────────────────────────────────────
+echo ""
+echo "AC-18: .bashrc structural invariants"
+n=$(grep -c '^# ── [0-9]' bash/.bashrc)
+if [[ "$n" -eq 14 ]]; then ok ".bashrc has 14 numbered sections"; else nok ".bashrc has $n sections"; fi
+check "test-plan2.sh still passes" bash scripts/test-plan2.sh
+
+# Later tasks append AC-14 through AC-20.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
