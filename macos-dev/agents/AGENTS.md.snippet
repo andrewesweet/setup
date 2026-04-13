@@ -1,0 +1,10 @@
+## Local repo layout
+
+Clone git repos via `ghq get <url>` — never plain `git clone`. The repo root
+is `~/code` and the enforced layout is `<host>/<org>/<repo>`. For bulk-cloning
+an org, use `ghorg clone <org> --path ~/code/<host>` so repos land inside the
+ghq tree. On WSL2 never clone into `/mnt/c/...` (10× perf penalty on the 9P
+bridge; keep everything on ext4).
+
+To navigate to an existing checkout, prefer `cd "$(ghq list -e -p <ref>)"` or
+the interactive `repo` function (Alt-R) over hand-typed `cd ~/code/...` paths.

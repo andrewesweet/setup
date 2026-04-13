@@ -179,6 +179,17 @@ else
   skp "HOME=/home/... passes" "requires --full"
 fi
 
+# ── AC-10: AGENTS.md snippet exists with required content ─────────────
+echo ""
+echo "AC-10: agents/AGENTS.md.snippet"
+check "snippet file exists"          test -f agents/AGENTS.md.snippet
+check "snippet has Local repo layout heading" \
+  grep -q '^## Local repo layout' agents/AGENTS.md.snippet
+check "snippet mentions ghq get" \
+  grep -q 'ghq get' agents/AGENTS.md.snippet
+check "snippet forbids /mnt/c clones" \
+  grep -q '/mnt/c' agents/AGENTS.md.snippet
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
