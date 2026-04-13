@@ -284,6 +284,18 @@ if ! sudo apt install -y \
   exit 1
 fi
 
+# ── Step 1b: TPM (tmux plugin manager) ───────────────────────────────────
+# TPM is not in apt. Clone directly; plugins install on first tmux launch
+# with `prefix + I` (or continuum auto-restore). Idempotent.
+if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+  log "installing TPM"
+  if ! git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"; then
+    warn "TPM clone failed — install manually before first tmux launch"
+  fi
+else
+  log "TPM already installed at ~/.tmux/plugins/tpm"
+fi
+
 # ── Step 2: GitHub release installs (Layer 1a + 1b-i) ────────────────────
 # xh moved here from apt — Ubuntu Jammy (CI image) doesn't ship it; the apt
 # package only landed in Noble (24.04). gh_release_install handles both arches.
@@ -405,6 +417,12 @@ Next steps:
        opencode auth login
        gh auth login
        gcloud auth login
+  4. Layer 1b-ii tmux plugins (first tmux launch):
+       Inside tmux, press \`prefix + I\` (Ctrl-A then Shift-I) to install plugins.
+       Note: tmux-thumbs compiles from source and requires a Rust toolchain.
+       If compilation fails (common on stripped WSL images), install pre-built
+       binary from https://github.com/fcsonline/tmux-thumbs/releases and drop
+       it at ~/.tmux/plugins/tmux-thumbs/target/release/tmux-thumbs.
 
 If install-wsl.sh --restore is needed, backups are in:
   $HOME/.dotfiles-backup/

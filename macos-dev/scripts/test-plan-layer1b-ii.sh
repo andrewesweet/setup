@@ -135,7 +135,21 @@ check "no status-style bg=#1e1e2e" bash -c "! grep -qE 'status-style.*#1e1e2e'  
 check "no window-status-current-style #89b4fa" bash -c "! grep -qE 'window-status-current-style.*#89b4fa' tmux/.tmux.conf"
 check "no remaining #1e1e2e or #89b4fa refs"   bash -c "! grep -qE '#1e1e2e|#89b4fa' tmux/.tmux.conf"
 
-# Later tasks append AC-11 through AC-20.
+# ── AC-11: TPM clone from install scripts ────────────────────────────────
+echo ""
+echo "AC-11: install scripts clone TPM idempotently"
+check "install-macos.sh clones TPM" \
+  grep -qE 'git clone https://github.com/tmux-plugins/tpm' install-macos.sh
+check "install-macos.sh guards TPM clone on [[ ! -d ]]" \
+  bash -c "grep -Pzo '(?s)\\[\\[ ! -d \"\\\$HOME/\\.tmux/plugins/tpm\" \\]\\].{0,200}git clone https://github.com/tmux-plugins/tpm' install-macos.sh >/dev/null 2>&1"
+check "install-wsl.sh clones TPM" \
+  grep -qE 'git clone https://github.com/tmux-plugins/tpm' install-wsl.sh
+check "install-wsl.sh guards TPM clone on [[ ! -d ]]" \
+  bash -c "grep -Pzo '(?s)\\[\\[ ! -d \"\\\$HOME/\\.tmux/plugins/tpm\" \\]\\].{0,200}git clone https://github.com/tmux-plugins/tpm' install-wsl.sh >/dev/null 2>&1"
+check "install-wsl.sh mentions tmux-thumbs Rust caveat in next steps" \
+  grep -qE 'tmux-thumbs.*Rust|Rust.*tmux-thumbs' install-wsl.sh
+
+# Later tasks append AC-12 through AC-20.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
