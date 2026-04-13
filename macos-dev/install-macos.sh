@@ -250,6 +250,14 @@ fi
 # (Intentionally empty in Plan 1. Later plans add link() calls as configs
 # get created.)
 log "symlinking configs"
+
+# ── sesh (generated from template — absolute paths required by schema) ──
+mkdir -p "$HOME/.config/sesh"
+# shellcheck disable=SC2016  # $DOTFILES/$HOME expand at install time, intentional
+sed -e "s|@DOTFILES@|$DOTFILES|g" -e "s|@HOME@|$HOME|g" \
+  "$DOTFILES/sesh/sesh.toml.tmpl" > "$HOME/.config/sesh/sesh.toml"
+printf "  generated %s\n" "$HOME/.config/sesh/sesh.toml"
+
 # bash config (Plan 2)
 link bash/.bash_profile .bash_profile
 link bash/.bashrc       .bashrc

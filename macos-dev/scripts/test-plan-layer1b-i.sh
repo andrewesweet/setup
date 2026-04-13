@@ -76,7 +76,36 @@ echo ""
 echo "AC-2: tools.txt manifest consistency"
 check "check-tool-manifest.sh passes" bash scripts/check-tool-manifest.sh
 
-# Later tasks append AC-3 through AC-18 as they land.
+# ── AC-3: sesh template with substitution markers ─────────────────────────
+echo ""
+echo "AC-3: sesh/sesh.toml.tmpl"
+check "sesh/sesh.toml.tmpl exists" test -f sesh/sesh.toml.tmpl
+check "sesh template contains @DOTFILES@" \
+  grep -q '@DOTFILES@' sesh/sesh.toml.tmpl
+# No $ENV expansion inside [[session]] path fields — sesh requires absolute paths.
+check "sesh template has no \$VAR expansion in paths" \
+  bash -c '! grep -nE "^[[:space:]]*path[[:space:]]*=[[:space:]]*\"\\\$" sesh/sesh.toml.tmpl'
+
+# ── AC-4: install scripts substitute template ─────────────────────────────
+echo ""
+echo "AC-4: install scripts generate ~/.config/sesh/sesh.toml"
+check "install-macos.sh substitutes @DOTFILES@" \
+  grep -q 's|@DOTFILES@|' install-macos.sh
+check "install-wsl.sh substitutes @DOTFILES@" \
+  grep -q 's|@DOTFILES@|' install-wsl.sh
+check "install-macos.sh writes to ~/.config/sesh/sesh.toml" \
+  grep -qE 'sesh/sesh\.toml[^.]' install-macos.sh
+check "install-wsl.sh writes to ~/.config/sesh/sesh.toml" \
+  grep -qE 'sesh/sesh\.toml[^.]' install-wsl.sh
+if [[ "$FULL" == true ]] && [[ -f "$HOME/.config/sesh/sesh.toml" ]]; then
+  if ! grep -q '@DOTFILES@' "$HOME/.config/sesh/sesh.toml"; then
+    ok "generated sesh.toml contains no @DOTFILES@ markers"
+  else
+    nok "generated sesh.toml still contains @DOTFILES@ markers"
+  fi
+else
+  skp "generated sesh.toml marker check" "requires --full + prior install"
+fi
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"

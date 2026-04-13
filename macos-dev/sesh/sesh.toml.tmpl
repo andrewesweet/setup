@@ -1,0 +1,36 @@
+# sesh/sesh.toml.tmpl — template for ~/.config/sesh/sesh.toml
+#
+# sesh requires ABSOLUTE paths in [[session]] path fields — no env-var
+# expansion is performed by sesh itself. Install scripts run `sed` at
+# install time:
+#   sed -e "s|@DOTFILES@|$DOTFILES|g" -e "s|@HOME@|$HOME|g" sesh.toml.tmpl > sesh.toml
+# (Same pattern as the podman LaunchAgent plist.)
+
+[default_session]
+startup_command = ""
+
+# ── Dotfiles session: edit the dotfiles repo itself ──────────────────────
+[[session]]
+name = "dotfiles"
+path = "@DOTFILES@"
+startup_command = "nvim"
+windows = ["editor", "git", "files"]
+
+# ── Home session: quick-access landing pad ───────────────────────────────
+[[session]]
+name = "home"
+path = "@HOME@"
+startup_command = ""
+
+# ── Window definitions (reused by [[session]].windows arrays) ────────────
+[[window]]
+name = "editor"
+startup_script = "nvim"
+
+[[window]]
+name = "git"
+startup_script = "lazygit"
+
+[[window]]
+name = "files"
+startup_script = "yazi"
