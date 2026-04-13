@@ -111,6 +111,27 @@ for color in background current_line foreground comment cyan green orange pink p
     grep -qE "^$color\s*=" starship/starship.toml
 done
 
+# ── AC-8: atuin init is opt-in via ENABLE_ATUIN ───────────────────────────
+echo ""
+echo "AC-8: atuin bash init gated behind ENABLE_ATUIN"
+check "bash/.bashrc mentions ENABLE_ATUIN"    grep -q 'ENABLE_ATUIN' bash/.bashrc
+check "atuin init is guarded"                 \
+  bash -c 'grep -zE "ENABLE_ATUIN:[^}]+\}\" == 1[^f]+fi" bash/.bashrc || grep -E "ENABLE_ATUIN.*==.*1.*atuin init" bash/.bashrc'
+
+if [[ "$FULL" == true ]] && command -v atuin &>/dev/null; then
+  # Spawn an interactive-ish bash with ENABLE_ATUIN unset
+  unset_out="$(ENABLE_ATUIN= bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "^reverse-search-history" || true' 2>/dev/null)"
+  check "with ENABLE_ATUIN unset: Ctrl-R is default readline" \
+    bash -c "echo '$unset_out' | grep -q 'reverse-search-history'"
+
+  set_out="$(ENABLE_ATUIN=1 bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "C-r" || true' 2>/dev/null)"
+  check "with ENABLE_ATUIN=1: Ctrl-R is rebound" \
+    bash -c "echo '$set_out' | grep -qi 'atuin\|_atuin'"
+else
+  skp "with ENABLE_ATUIN unset: Ctrl-R default" "requires --full + atuin installed"
+  skp "with ENABLE_ATUIN=1: Ctrl-R rebound"    "requires --full + atuin installed"
+fi
+
 # ── AC-3, AC-6, AC-11 etc. — stubs to be filled by later tasks ──────────
 # (Placeholders for each AC; each will become a real check as features land.)
 

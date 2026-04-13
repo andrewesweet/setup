@@ -115,6 +115,13 @@ if command -v fzf &>/dev/null; then
   eval "$(fzf --bash)"
 fi
 
+# atuin — OPT-IN via ENABLE_ATUIN=1 in .bashrc.local.
+# Leaves Ctrl-R bound to default readline reverse-search-history when unset,
+# preserving existing bash muscle memory until the user explicitly opts in.
+if [[ "${ENABLE_ATUIN:-0}" == 1 ]] && command -v atuin &>/dev/null; then
+  eval "$(atuin init bash)"
+fi
+
 # zoxide
 if command -v zoxide &>/dev/null; then
   eval "$(zoxide init bash)"
