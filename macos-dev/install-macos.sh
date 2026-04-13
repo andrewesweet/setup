@@ -293,6 +293,9 @@ link yazi/theme.toml   .config/yazi/theme.toml
 # jqp (Plan Layer 1b-i)
 link jqp/.jqp.yaml  .jqp.yaml
 
+# diffnav (Plan Layer 1b-i)
+link diffnav/config.yml  .config/diffnav/config.yml
+
 # opencode (Plan 9)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc
 link opencode/tui.jsonc                         .config/opencode/tui.jsonc

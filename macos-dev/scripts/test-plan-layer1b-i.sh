@@ -147,6 +147,15 @@ check "install-macos.sh links jqp/.jqp.yaml" \
 check "install-wsl.sh links jqp/.jqp.yaml" \
   grep -qE 'link\s+jqp/\.jqp\.yaml' install-wsl.sh
 
+# ── AC-8: diffnav config (Dracula palette) ───────────────────────────────
+echo ""
+echo "AC-8: diffnav/config.yml"
+check "diffnav/config.yml exists" test -f diffnav/config.yml
+check "install-macos.sh links diffnav/config.yml" \
+  grep -qE 'link\s+diffnav/config\.yml' install-macos.sh
+check "install-wsl.sh links diffnav/config.yml" \
+  grep -qE 'link\s+diffnav/config\.yml' install-wsl.sh
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
