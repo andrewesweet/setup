@@ -220,7 +220,12 @@ check "tmux-plugins arm lists prefix+o (sessionx)"  bash -c "cheat_body() { awk 
 check "tmux-plugins arm lists prefix+Space (thumbs)" bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + Space'"
 check "cheatsheet.md has tmux plugins section"  grep -qE '^### tmux plugin keybindings|^### tmux plugins' docs/cheatsheet.md
 
-# Later tasks append AC-18 through AC-20.
+# ── AC-19: starship TOML section invariant preserved ─────────────────────
+echo ""
+echo "AC-19: starship structural invariants"
+check "test-plan6-8.sh still passes" bash scripts/test-plan6-8.sh
+
+# Later tasks append AC-20 (final e2e summary).
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
