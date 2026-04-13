@@ -253,6 +253,18 @@ check "install-macos.sh sesh substitution precedes first link()" \
            link_line=$(grep -n "^link " install-macos.sh | head -1 | cut -d: -f1);
            [[ -n "$sed_line" && -n "$link_line" && $sed_line -lt $link_line ]]'
 
+# ── AC-16: verify.sh Layer 1b-i smoke checks ─────────────────────────────
+echo ""
+echo "AC-16: verify.sh smoke coverage"
+for t in sesh yazi xh rip rip2 jqp diffnav carapace; do
+  check "verify.sh checks '$t'" grep -qE "command -v $t\b" scripts/verify.sh
+done
+check "verify.sh checks yazi/yazi.toml symlink"  grep -qE '\.config/yazi/yazi\.toml' scripts/verify.sh
+check "verify.sh checks jqp/.jqp.yaml symlink"   grep -qE '\.jqp\.yaml' scripts/verify.sh
+check "verify.sh checks diffnav config symlink"  grep -qE 'diffnav/config\.yml' scripts/verify.sh
+check "verify.sh checks sesh.toml is a regular file" \
+  bash -c "grep -qE 'sesh/sesh\\.toml' scripts/verify.sh"
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
