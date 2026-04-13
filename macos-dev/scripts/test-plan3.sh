@@ -76,7 +76,7 @@ check "core.autocrlf = input"         grep -q 'autocrlf.*=.*input' "$REPO_ROOT/g
 check "delta.navigate = true"         grep -q 'navigate.*=.*true' "$REPO_ROOT/git/.gitconfig"
 check "delta.side-by-side = true"     grep -q 'side-by-side.*=.*true' "$REPO_ROOT/git/.gitconfig"
 check "delta.line-numbers = true"     grep -q 'line-numbers.*=.*true' "$REPO_ROOT/git/.gitconfig"
-check "delta.syntax-theme = Monokai"  grep -q 'syntax-theme.*=.*Monokai Extended' "$REPO_ROOT/git/.gitconfig"
+check "delta.syntax-theme = Dracula (1b-ii)"  grep -q 'syntax-theme.*=.*Dracula' "$REPO_ROOT/git/.gitconfig"
 check "delta decorations feature"     grep -q 'features.*=.*decorations' "$REPO_ROOT/git/.gitconfig"
 check "interactive.diffFilter delta"  grep -q 'diffFilter.*=.*delta' "$REPO_ROOT/git/.gitconfig"
 

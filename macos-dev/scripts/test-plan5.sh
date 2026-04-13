@@ -56,8 +56,11 @@ echo ""
 echo "Server and session settings:"
 check "default-terminal = tmux-256color"  grep -q 'default-terminal.*tmux-256color' "$REPO_ROOT/tmux/.tmux.conf"
 check "terminal-overrides RGB for kitty"  grep -q 'terminal-overrides.*xterm-kitty:RGB' "$REPO_ROOT/tmux/.tmux.conf"
-check "escape-time = 10"                 grep -q 'escape-time.*10' "$REPO_ROOT/tmux/.tmux.conf"
-check "history-limit = 50000"            grep -q 'history-limit.*50000' "$REPO_ROOT/tmux/.tmux.conf"
+# escape-time + history-limit are now provided by tmux-plugins/tmux-sensible (1b-ii)
+check "escape-time delegated to tmux-sensible (1b-ii)" \
+  bash -c "grep -qE \"^set -g @plugin 'tmux-plugins/tmux-sensible'\" \"$REPO_ROOT/tmux/.tmux.conf\""
+check "history-limit delegated to tmux-sensible (1b-ii)" \
+  bash -c "! grep -qE 'set -g history-limit 50000' \"$REPO_ROOT/tmux/.tmux.conf\""
 check "mouse = on"                       grep -q 'mouse.*on' "$REPO_ROOT/tmux/.tmux.conf"
 check "base-index = 1"                   grep -q 'base-index.*1' "$REPO_ROOT/tmux/.tmux.conf"
 check "pane-base-index = 1"              grep -q 'pane-base-index.*1' "$REPO_ROOT/tmux/.tmux.conf"
@@ -97,7 +100,7 @@ check "bind -r Right resize right 5"     grep -q 'bind -r Right resize-pane -R 5
 echo ""
 echo "Copy mode:"
 check "mode-keys vi"                     grep -q 'mode-keys vi' "$REPO_ROOT/tmux/.tmux.conf"
-check "set-clipboard on (OSC 52)"        grep -q 'set-clipboard on' "$REPO_ROOT/tmux/.tmux.conf"
+check "set-clipboard on (OSC 52)"        grep -qE 'set-clipboard[[:space:]]+on' "$REPO_ROOT/tmux/.tmux.conf"
 check "bind Enter copy-mode"             grep -q 'bind Enter copy-mode' "$REPO_ROOT/tmux/.tmux.conf"
 check "v begins selection"               grep -q 'copy-mode-vi v.*begin-selection' "$REPO_ROOT/tmux/.tmux.conf"
 check "y copies and cancels"             grep -q 'copy-mode-vi y.*copy-selection-and-cancel' "$REPO_ROOT/tmux/.tmux.conf"
@@ -125,15 +128,15 @@ echo "Workarounds:"
 check "bind C-l send-keys C-l"           grep -q 'bind C-l send-keys C-l' "$REPO_ROOT/tmux/.tmux.conf"
 check "bind L last-window"               grep -q 'bind L last-window' "$REPO_ROOT/tmux/.tmux.conf"
 
-# ── Status bar ────────────────────────────────────────────────────────────
+# ── Status bar (Layer 1b-ii: now provided by dracula/tmux plugin) ─────────
 echo ""
-echo "Status bar:"
-check "status-position bottom"           grep -q 'status-position.*bottom' "$REPO_ROOT/tmux/.tmux.conf"
-check "status bg #1e1e2e"                grep -q 'bg=#1e1e2e' "$REPO_ROOT/tmux/.tmux.conf"
-check "status fg #cdd6f4"                grep -q 'fg=#cdd6f4' "$REPO_ROOT/tmux/.tmux.conf"
-check "status-left session name"         grep -q 'status-left.*#S' "$REPO_ROOT/tmux/.tmux.conf"
-check "status-right time and date"       grep -q 'status-right.*%H:%M' "$REPO_ROOT/tmux/.tmux.conf"
-check "current window bold blue"         grep -q 'window-status-current-style.*bold.*#89b4fa' "$REPO_ROOT/tmux/.tmux.conf"
+echo "Status bar (dracula/tmux plugin, 1b-ii):"
+check "dracula plugin declared"          grep -q "^set -g @plugin 'dracula/tmux'" "$REPO_ROOT/tmux/.tmux.conf"
+check "@dracula-plugins 'git time'"      grep -qE '@dracula-plugins +"git time"' "$REPO_ROOT/tmux/.tmux.conf"
+check "@dracula-show-left-icon session"  grep -qE '@dracula-show-left-icon +session' "$REPO_ROOT/tmux/.tmux.conf"
+check "@dracula-military-time true"      grep -qE '@dracula-military-time +true' "$REPO_ROOT/tmux/.tmux.conf"
+check "@dracula-show-powerline true"     grep -qE '@dracula-show-powerline +true' "$REPO_ROOT/tmux/.tmux.conf"
+check "old catppuccin colors removed"    bash -c "! grep -qE '#1e1e2e|#89b4fa|#cdd6f4' \"$REPO_ROOT/tmux/.tmux.conf\""
 
 # ── Install script link() calls ──────────────────────────────────────────
 echo ""
@@ -144,10 +147,10 @@ check "wsl: .tmux.conf mapping"          grep -q 'link tmux/.tmux.conf.*\.tmux.c
 # Regression: Plans 2–4 link() calls preserved
 check "macos: bash links preserved"      test "$(grep -c 'link bash/' "$REPO_ROOT/install-macos.sh")" -eq 4
 check "macos: git links preserved"       test "$(grep -c 'link git/' "$REPO_ROOT/install-macos.sh")" -eq 2
-check "macos: kitty links preserved"     test "$(grep -c 'link kitty/' "$REPO_ROOT/install-macos.sh")" -eq 1
+check "macos: kitty links preserved (kitty.conf + dracula-pro.conf, 1b-ii)"  test "$(grep -c 'link kitty/' "$REPO_ROOT/install-macos.sh")" -eq 2
 check "wsl: bash links preserved"        test "$(grep -c 'link bash/' "$REPO_ROOT/install-wsl.sh")" -eq 4
 check "wsl: git links preserved"         test "$(grep -c 'link git/' "$REPO_ROOT/install-wsl.sh")" -eq 2
-check "wsl: kitty links preserved"       test "$(grep -c 'link kitty/' "$REPO_ROOT/install-wsl.sh")" -eq 1
+check "wsl: kitty links preserved (kitty.conf + dracula-pro.conf, 1b-ii)"    test "$(grep -c 'link kitty/' "$REPO_ROOT/install-wsl.sh")" -eq 2
 
 # ── Summary ────────────────────────────────────────────────────────────────
 echo ""
