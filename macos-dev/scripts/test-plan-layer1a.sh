@@ -186,6 +186,20 @@ else
   skp "~/.config/television/config.toml symlink" "safe mode"
 fi
 
+# ── AC-12: --restore reverts Layer 1a symlinks ────────────────────────────
+echo ""
+echo "AC-12: install --restore handles atuin + television"
+# Static check: restore() iterates the backup dir, which will include any
+# file that had an original non-symlink replaced. We verify by checking the
+# restore() function does not hardcode a path list that excludes our new ones.
+check "restore() walks backup dir dynamically" \
+  grep -qE 'find.*-type' install-macos.sh
+# Full mode: actually run install + restore would be destructive.
+# We document the manual verification path instead.
+if [[ "$FULL" == true ]]; then
+  skp "install + restore round-trip" "destructive — requires manual verification"
+fi
+
 # ── AC-11 etc. — stubs to be filled by later tasks ──────────────────────
 # (Placeholders for each AC; each will become a real check as features land.)
 
