@@ -79,7 +79,6 @@ Tool for the job — quick commands and aliases.
 | List sesh sessions | sesh | `sesh list` | `sxl` |
 | File manager (cd-on-quit) | yazi | `yazi` | `y` (function) |
 | HTTP client | xh | `xh GET httpbin.org/get` | `http` |
-| rip — fuzzy process killer | rip | `rip` | — |
 | Safe rm (undo-able) | rip2 | `rip2 file` | `rm-safe` |
 | Undo last rip2 delete | rip2 | `rip2 -u` | `rrip` |
 | Interactive jq playground | jqp | `cat file.json \| jqp` | `jqi` |
@@ -160,4 +159,4 @@ This cheatsheet is intentionally limited (two pages of A4) — it is a muscle-me
 | jqp | Inside jqp: `Ctrl+H` for help |
 | diffnav | Inside diffnav: `?` for help |
 | xh | `xh --help`; `cheat xh` for quickstart |
-| rip / rip2 | `cheat rip` / `cheat rip2` |
+| rip2 | `cheat rip2` |

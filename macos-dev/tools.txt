@@ -121,8 +121,7 @@ direnv               brew:direnv                    apt:direnv              apk:
 # ── Shell-agnostic tools (Layer 1b-i) ───────────────────────────────────────
 sesh                 brew:sesh                      apt:-                   apk:-
 yazi                 brew:yazi                      apt:-                   apk:-
-xh                   brew:xh                        apt:xh                  apk:xh
-rip                  brew:cesarferreira/tap/rip     apt:-                   apk:-
+xh                   brew:xh                        apt:-                   apk:xh
 rip2                 brew:rip2                      apt:-                   apk:-
 jqp                  brew:jqp                       apt:-                   apk:-
 diffnav              brew:dlvhdr/formulae/diffnav   apt:-                   apk:-

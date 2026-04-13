@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test-plan-layer1b-i.sh — acceptance tests for Layer 1b-i (sesh + yazi + xh + rip + rip2 + jqp + diffnav + carapace)
+# test-plan-layer1b-i.sh — acceptance tests for Layer 1b-i (sesh + yazi + xh + rip2 + jqp + diffnav + carapace)
 #
 # Platform-aware: runs on macOS and WSL2/Linux.
 #
@@ -53,7 +53,7 @@ check() {
   if "$@" >/dev/null 2>&1; then ok "$desc"; else nok "$desc"; fi
 }
 
-echo "Layer 1b-i acceptance tests (sesh/yazi/xh/rip/rip2/jqp/diffnav/carapace)"
+echo "Layer 1b-i acceptance tests (sesh/yazi/xh/rip2/jqp/diffnav/carapace)"
 echo "Platform: $PLATFORM    Mode: $([ "$FULL" = true ] && echo "full" || echo "safe")"
 echo ""
 
@@ -62,14 +62,12 @@ echo "AC-1: Brewfile declares Layer 1b-i tools"
 for t in sesh yazi xh rip2 jqp carapace; do
   check "Brewfile has brew \"$t\"" grep -qE "^\s*brew\s+\"$t\"" Brewfile
 done
-check "Brewfile has brew \"cesarferreira/tap/rip\"" \
-  grep -qE '^\s*brew\s+"cesarferreira/tap/rip"' Brewfile
 check "Brewfile has brew \"dlvhdr/formulae/diffnav\"" \
   grep -qE '^\s*brew\s+"dlvhdr/formulae/diffnav"' Brewfile
-check "Brewfile taps cesarferreira/tap" \
-  grep -qE '^\s*tap\s+"cesarferreira/tap"' Brewfile
 check "Brewfile taps dlvhdr/formulae" \
   grep -qE '^\s*tap\s+"dlvhdr/formulae"' Brewfile
+# Note: cesarferreira/tap/rip dropped — it conflicts with rip2's bin/rip on
+# /opt/homebrew. See the rip2 comment in Brewfile.
 
 # ── AC-2: tools.txt manifest consistency ──────────────────────────────────
 echo ""
@@ -183,7 +181,7 @@ echo ""
 echo "AC-11: cheat() subcommand coverage"
 # Scope to the cheat() function body so comments elsewhere don't false-positive.
 cheat_body() { awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//'; }
-for tool in atuin "tv|television" sesh yazi xh rip rip2 jqp diffnav; do
+for tool in atuin "tv|television" sesh yazi xh rip2 jqp diffnav; do
   if cheat_body | grep -qE "^[[:space:]]*${tool}\)"; then
     ok "cheat: case arm for '$tool' present"
   else
@@ -191,7 +189,7 @@ for tool in atuin "tv|television" sesh yazi xh rip rip2 jqp diffnav; do
   fi
 done
 check "cheat help lists new subcommands" \
-  bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'sesh, yazi, xh, rip'"
+  bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'sesh, yazi, xh, rip2'"
 
 # ── AC-12: cheatsheet.md tool reference rows ─────────────────────────────
 echo ""
@@ -200,7 +198,6 @@ check "cheatsheet lists sesh/sx"       grep -qE '\bsesh\b.*\bsx\b' docs/cheatshe
 # shellcheck disable=SC2016  # backticks are literal markdown, not command substitution
 check "cheatsheet lists yazi/y"        grep -qE 'yazi.*`y`|\byazi\b.*cd-on-quit' docs/cheatsheet.md
 check "cheatsheet lists xh/http"       grep -qE '\bxh\b.*\bhttp\b' docs/cheatsheet.md
-check "cheatsheet lists rip (killer)"  grep -qiE 'rip.*process.*killer|rip.*fuzzy.*killer' docs/cheatsheet.md
 check "cheatsheet lists rip2/rrip"     grep -qE '\brip2\b.*\brrip\b|rrip.*rip2' docs/cheatsheet.md
 check "cheatsheet lists jqp/jqi"       grep -qE '\bjqp\b.*\bjqi\b|jqi.*jqp' docs/cheatsheet.md
 check "cheatsheet lists diffnav/dn"    grep -qE '\bdiffnav\b.*\bdn\b' docs/cheatsheet.md
@@ -226,8 +223,6 @@ check "install-wsl.sh installs sesh" \
   grep -qE 'gh_release_install\s+"?joshmedeski/sesh"?' install-wsl.sh
 check "install-wsl.sh installs yazi" \
   grep -qE 'gh_release_install\s+"?sxyazi/yazi"?' install-wsl.sh
-check "install-wsl.sh installs rip (cesarferreira)" \
-  grep -qE 'gh_release_install\s+"?cesarferreira/rip"?' install-wsl.sh
 check "install-wsl.sh installs rip2 (MilesCranmer)" \
   grep -qE 'gh_release_install\s+"?MilesCranmer/rip2"?' install-wsl.sh
 check "install-wsl.sh installs jqp (noahgorstein)" \
@@ -236,9 +231,9 @@ check "install-wsl.sh installs diffnav (dlvhdr)" \
   grep -qE 'gh_release_install\s+"?dlvhdr/diffnav"?' install-wsl.sh
 check "install-wsl.sh installs carapace" \
   grep -qE 'gh_release_install\s+"?rsteube/carapace-bin"?' install-wsl.sh
-# xh is in apt.
-check "install-wsl.sh apt-installs xh" \
-  grep -qE 'apt\s+install.*\bxh\b' install-wsl.sh
+# xh moved from apt to gh_release_install — Ubuntu Jammy (CI) doesn't ship it.
+check "install-wsl.sh installs xh via gh_release_install" \
+  grep -qE 'gh_release_install\s+"?ducaale/xh"?' install-wsl.sh
 
 # ── AC-15: install-macos.sh wires all new configs ────────────────────────
 echo ""
@@ -258,7 +253,7 @@ check "install-macos.sh sesh substitution precedes first link()" \
 # ── AC-16: verify.sh Layer 1b-i smoke checks ─────────────────────────────
 echo ""
 echo "AC-16: verify.sh smoke coverage"
-for t in sesh yazi xh rip rip2 jqp diffnav carapace; do
+for t in sesh yazi xh rip2 jqp diffnav carapace; do
   check "verify.sh checks '$t'" grep -qE "command -v $t\b" scripts/verify.sh
 done
 check "verify.sh checks yazi/yazi.toml symlink"  grep -qE '\.config/yazi/yazi\.toml' scripts/verify.sh

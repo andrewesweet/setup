@@ -274,7 +274,7 @@ if ! sudo apt update; then
   err "check that you have passwordless sudo or run interactively"
   exit 1
 fi
-if ! sudo apt install -y xh \
+if ! sudo apt install -y \
   bash bash-completion \
   git tmux tree wget curl \
   jq \
@@ -285,14 +285,16 @@ if ! sudo apt install -y xh \
 fi
 
 # ── Step 2: GitHub release installs (Layer 1a + 1b-i) ────────────────────
+# xh moved here from apt — Ubuntu Jammy (CI image) doesn't ship it; the apt
+# package only landed in Noble (24.04). gh_release_install handles both arches.
 log "installing release binaries (Layer 1a)"
 gh_release_install "atuinsh/atuin"                atuin
 gh_release_install "alexpasmantier/television"    tv
 
 log "installing release binaries (Layer 1b-i)"
+gh_release_install "ducaale/xh"                   xh
 gh_release_install "joshmedeski/sesh"             sesh
 gh_release_install "sxyazi/yazi"                  yazi
-gh_release_install "cesarferreira/rip"            rip
 gh_release_install "MilesCranmer/rip2"            rip2
 gh_release_install "noahgorstein/jqp"             jqp
 gh_release_install "dlvhdr/diffnav"               diffnav

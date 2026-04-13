@@ -316,20 +316,12 @@ Syntax: method-as-first-arg, key=value JSON body, key==value query, key:value he
 Differences from httpie: no Python; smaller binary; --offline flag available.
 EOF
       ;;
-    rip)
-      cat <<'EOF'
-rip (cesarferreira/rip) — fuzzy process killer
-  rip              list processes, select with fzf, send SIGTERM
-  rip -9           send SIGKILL instead
-NOT a safe-rm. For that, use rip2 (see `cheat rip2`).
-EOF
-      ;;
     rip2)
       cat <<'EOF'
 rip2 (MilesCranmer/rip2) — safe rm with undo
   rip2 file ...    move files to the graveyard (not deleted)
   rrip             undo last rip2 deletion (alias for `rip2 -u`)
-  rm-safe file     explicit safe-rm alias (avoid confusion with rip, the killer)
+  rm-safe file     explicit safe-rm alias
 Graveyard: ~/.local/share/graveyard
 EOF
       ;;
@@ -368,10 +360,10 @@ cheat — quick reference for keys, tools, and per-tool discovery
 
 Per-tool subcommands:
   atuin, bash, btop, delta, diffnav, fzf, git, jqp, k9s, lazydocker,
-  lazygit, lnav, nvim, opencode, rip, rip2, sesh, starship, tmux,
+  lazygit, lnav, nvim, opencode, rip2, sesh, starship, tmux,
   tv/television, xh, yazi
 
-New in Layer 1b-i: sesh, yazi, xh, rip, rip2, jqp, diffnav, atuin, tv.
+New in Layer 1b-i: sesh, yazi, xh, rip2, jqp, diffnav, atuin, tv.
 
 The cheatsheet is intentionally limited to 2 pages of A4 — it is a
 muscle-memory refresher, not a complete reference. For the full
@@ -390,13 +382,10 @@ EOF
 # xh — modern httpie replacement. httpie stays installed for team compat.
 alias http='xh'
 
-# rip (cesarferreira/rip) is a fuzzy process killer — no alias needed;
-# invoke as `rip` directly. Do not confuse with rip2 (safe rm).
-
 # rip2 (MilesCranmer/rip2) — safe rm with undo. Graveyard at
 # ~/.local/share/graveyard (per §7.3 of design). Two aliases:
 #   rrip     — undo last deletion
-#   rm-safe  — explicit safe-rm (makes the intent unambiguous in scripts)
+#   rm-safe  — explicit safe-rm
 alias rrip='rip2 -u'
 alias rm-safe='rip2'
 
