@@ -97,6 +97,34 @@ else
   skp "ghq root = \$HOME/code" "requires --full + ghq installed + symlinks"
 fi
 
+# ── AC-5: `repo` function defined ─────────────────────────────────────
+echo ""
+echo "AC-5: repo function invokes ghq+fzf"
+check "bash/.bash_aliases defines repo()" \
+  bash -c "awk '/^repo\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'ghq list --full-path'"
+check "repo body pipes through fzf" \
+  bash -c "awk '/^repo\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'fzf'"
+
+# ── AC-6: `gclone` function with -e -p and guard ─────────────────────
+echo ""
+echo "AC-6: gclone uses exact-path lookup with a guard"
+check "gclone uses 'ghq get -u'" \
+  bash -c "awk '/^gclone\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'ghq get -u'"
+check "gclone uses 'ghq list -e -p'" \
+  bash -c "awk '/^gclone\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'ghq list -e -p'"
+check "gclone has a guard against empty/missing target" \
+  bash -c "awk '/^gclone\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -qE 'return 1|-d '"
+
+# ── AC-7: `ghorg-gh` function ─────────────────────────────────────────
+echo ""
+echo "AC-7: ghorg-gh pins --path into the ghq tree"
+check "ghorg-gh calls 'ghorg clone'" \
+  bash -c "awk '/^ghorg-gh\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'ghorg clone'"
+check "ghorg-gh passes '--path ~/code/github.com'" \
+  bash -c "awk '/^ghorg-gh\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'path ~/code/github.com'"
+check "ghorg-gh does NOT pass --output-dir" \
+  bash -c "! awk '/^ghorg-gh\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'output-dir'"
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
