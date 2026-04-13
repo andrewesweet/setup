@@ -193,6 +193,17 @@ done
 check "cheat help lists new subcommands" \
   bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'sesh, yazi, xh, rip'"
 
+# ── AC-12: cheatsheet.md tool reference rows ─────────────────────────────
+echo ""
+echo "AC-12: cheatsheet.md Tool reference coverage"
+check "cheatsheet lists sesh/sx"       grep -qE '\bsesh\b.*\bsx\b' docs/cheatsheet.md
+check "cheatsheet lists yazi/y"        grep -qE 'yazi.*`y`|\byazi\b.*cd-on-quit' docs/cheatsheet.md
+check "cheatsheet lists xh/http"       grep -qE '\bxh\b.*\bhttp\b' docs/cheatsheet.md
+check "cheatsheet lists rip (killer)"  grep -qiE 'rip.*process.*killer|rip.*fuzzy.*killer' docs/cheatsheet.md
+check "cheatsheet lists rip2/rrip"     grep -qE '\brip2\b.*\brrip\b|rrip.*rip2' docs/cheatsheet.md
+check "cheatsheet lists jqp/jqi"       grep -qE '\bjqp\b.*\bjqi\b|jqi.*jqp' docs/cheatsheet.md
+check "cheatsheet lists diffnav/dn"    grep -qE '\bdiffnav\b.*\bdn\b' docs/cheatsheet.md
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
