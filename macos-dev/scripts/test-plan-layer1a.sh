@@ -125,7 +125,7 @@ check "atuin init is guarded by if/fi block" \
 
 if [[ "$FULL" == true ]] && command -v atuin &>/dev/null; then
   # Spawn an interactive-ish bash with ENABLE_ATUIN unset
-  unset_out="$(ENABLE_ATUIN= bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "^reverse-search-history" || true' 2>/dev/null)"
+  unset_out="$(ENABLE_ATUIN='' bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "^reverse-search-history" || true' 2>/dev/null)"
   if printf '%s' "$unset_out" | grep -q 'reverse-search-history'; then
     ok "with ENABLE_ATUIN unset: Ctrl-R is default readline"
   else
@@ -161,31 +161,41 @@ check "install-macos.sh links television config" \
   grep -qE 'link\s+television/config\.toml\s+\.config/television/config\.toml' install-macos.sh
 
 if [[ "$FULL" == true ]]; then
-  # Check actual symlinks — only meaningful after install-macos.sh has run
+  # Check actual symlinks — only meaningful after install-macos.sh has run.
+  # Tildes in the label strings below are user-facing text, not paths — the
+  # actual path arguments to readlink/test use "$HOME".
   if [[ -L "$HOME/.config/atuin/config.toml" ]]; then
     actual="$(readlink "$HOME/.config/atuin/config.toml")"
     expected="$MACOS_DEV/atuin/config.toml"
     if [[ "$actual" == "$expected" ]]; then
+      # shellcheck disable=SC2088  # tilde is label text, not a path
       ok "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml"
     else
+      # shellcheck disable=SC2088  # tilde is label text, not a path
       nok "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml (got: $actual)"
     fi
   else
+    # shellcheck disable=SC2088  # tilde is label text, not a path
     skp "~/.config/atuin/config.toml symlink" "install not yet run"
   fi
   if [[ -L "$HOME/.config/television/config.toml" ]]; then
     actual="$(readlink "$HOME/.config/television/config.toml")"
     expected="$MACOS_DEV/television/config.toml"
     if [[ "$actual" == "$expected" ]]; then
+      # shellcheck disable=SC2088  # tilde is label text, not a path
       ok "~/.config/television/config.toml → \$DOTFILES/television/config.toml"
     else
+      # shellcheck disable=SC2088  # tilde is label text, not a path
       nok "~/.config/television/config.toml → \$DOTFILES/television/config.toml (got: $actual)"
     fi
   else
+    # shellcheck disable=SC2088  # tilde is label text, not a path
     skp "~/.config/television/config.toml symlink" "install not yet run"
   fi
 else
+  # shellcheck disable=SC2088  # tilde is label text, not a path
   skp "~/.config/atuin/config.toml symlink" "safe mode"
+  # shellcheck disable=SC2088  # tilde is label text, not a path
   skp "~/.config/television/config.toml symlink" "safe mode"
 fi
 

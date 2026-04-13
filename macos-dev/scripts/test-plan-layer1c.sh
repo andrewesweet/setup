@@ -79,6 +79,7 @@ check "check-tool-manifest.sh passes"    bash scripts/check-tool-manifest.sh
 # ── AC-3: git/.gitconfig sets ghq.root ────────────────────────────────
 echo ""
 echo "AC-3: git/.gitconfig declares ghq.root"
+# shellcheck disable=SC2016  # $root is intentionally expanded by inner bash -c
 check "git config ghq.root = ~/code" \
   bash -c 'root=$(git config --file git/.gitconfig ghq.root 2>/dev/null); [[ "$root" == "~/code" ]]'
 
@@ -244,6 +245,7 @@ check "README has 'Repo layout' heading" \
   grep -qE '^##+\s+Repo layout' README.md
 check "README mentions ~/code/<host>/<org>/<repo>" \
   grep -q 'code/<host>/<org>/<repo>' README.md
+# shellcheck disable=SC2016  # Literal backticks are markdown syntax in README, not command substitution
 check "README mentions the repo function or Alt-R" \
   grep -qE '`repo`|Alt-R' README.md
 

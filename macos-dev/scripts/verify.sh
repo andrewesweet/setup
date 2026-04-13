@@ -131,8 +131,10 @@ echo "Layer 1a tools:"
 check "atuin on PATH"            command -v atuin
 check "tv (television) on PATH"  command -v tv
 # Symlink must exist AND its target must resolve (catches dangling symlinks).
+# shellcheck disable=SC2016  # $HOME is intentionally expanded by inner bash -c, not outer shell
 check "atuin config symlink resolves" \
   bash -c 'test -L "$HOME/.config/atuin/config.toml" && test -e "$HOME/.config/atuin/config.toml"'
+# shellcheck disable=SC2016  # $HOME is intentionally expanded by inner bash -c, not outer shell
 check "television config symlink resolves" \
   bash -c 'test -L "$HOME/.config/television/config.toml" && test -e "$HOME/.config/television/config.toml"'
 
