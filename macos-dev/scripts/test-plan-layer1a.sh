@@ -149,7 +149,36 @@ check "bash/.bashrc mentions ENABLE_TV"       grep -q 'ENABLE_TV' bash/.bashrc
 check "tv init is guarded by if/fi block" \
   bash -c "grep -Pzo '(?s)if[^\n]*ENABLE_TV[^\n]*==[^\n]*1[^\n]*\n[^\n]*tv init bash[^\n]*\nfi' bash/.bashrc | grep -q ."
 
-# ── AC-3, AC-6, AC-11 etc. — stubs to be filled by later tasks ──────────
+# ── AC-3 + AC-6: atuin and television configs are symlinked ─────────────
+echo ""
+echo "AC-3 + AC-6: install script creates atuin + television symlinks"
+check "install-macos.sh links atuin config"      \
+  grep -qE 'link\s+atuin/config\.toml\s+\.config/atuin/config\.toml' install-macos.sh
+check "install-macos.sh links television config" \
+  grep -qE 'link\s+television/config\.toml\s+\.config/television/config\.toml' install-macos.sh
+
+if [[ "$FULL" == true ]]; then
+  # Check actual symlinks — only meaningful after install-macos.sh has run
+  if [[ -L "$HOME/.config/atuin/config.toml" ]]; then
+    actual="$(readlink "$HOME/.config/atuin/config.toml")"
+    check "~/.config/atuin/config.toml → \$DOTFILES/atuin/config.toml" \
+      bash -c "[[ '$actual' == '$MACOS_DEV/atuin/config.toml' ]]"
+  else
+    skp "~/.config/atuin/config.toml symlink" "install not yet run"
+  fi
+  if [[ -L "$HOME/.config/television/config.toml" ]]; then
+    actual="$(readlink "$HOME/.config/television/config.toml")"
+    check "~/.config/television/config.toml → \$DOTFILES/television/config.toml" \
+      bash -c "[[ '$actual' == '$MACOS_DEV/television/config.toml' ]]"
+  else
+    skp "~/.config/television/config.toml symlink" "install not yet run"
+  fi
+else
+  skp "~/.config/atuin/config.toml symlink" "safe mode"
+  skp "~/.config/television/config.toml symlink" "safe mode"
+fi
+
+# ── AC-11 etc. — stubs to be filled by later tasks ──────────────────────
 # (Placeholders for each AC; each will become a real check as features land.)
 
 echo ""
