@@ -167,6 +167,17 @@ check "CARAPACE_BRIDGES includes zsh,fish,bash,inshellisense" \
 check "carapace completion source is guarded" \
   bash -c "grep -Pzo '(?s)command -v carapace[^\n]*\n[^\n]*carapace[[:space:]]+_carapace[[:space:]]+bash' bash/.bashrc | grep -q ."
 
+# ── AC-10: new aliases with exact definitions ─────────────────────────────
+echo ""
+echo "AC-10: Layer 1b-i aliases defined"
+check "alias http='xh'"            grep -qE "^alias http='xh'"            bash/.bash_aliases
+check "alias rrip='rip2 -u'"       grep -qE "^alias rrip='rip2 -u'"       bash/.bash_aliases
+check "alias rm-safe='rip2'"       grep -qE "^alias rm-safe='rip2'"       bash/.bash_aliases
+check "alias jqi='jqp'"            grep -qE "^alias jqi='jqp'"            bash/.bash_aliases
+check "alias dn='diffnav'"         grep -qE "^alias dn='diffnav'"         bash/.bash_aliases
+check "alias sx='sesh connect'"    grep -qE "^alias sx='sesh connect'"    bash/.bash_aliases
+check "alias sxl='sesh list'"      grep -qE "^alias sxl='sesh list'"      bash/.bash_aliases
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

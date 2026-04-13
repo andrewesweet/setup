@@ -299,6 +299,30 @@ EOF
   esac
 }
 
+# ── Layer 1b-i aliases ──────────────────────────────────────────────────────
+# xh — modern httpie replacement. httpie stays installed for team compat.
+alias http='xh'
+
+# rip (cesarferreira/rip) is a fuzzy process killer — no alias needed;
+# invoke as `rip` directly. Do not confuse with rip2 (safe rm).
+
+# rip2 (MilesCranmer/rip2) — safe rm with undo. Graveyard at
+# ~/.local/share/graveyard (per §7.3 of design). Two aliases:
+#   rrip     — undo last deletion
+#   rm-safe  — explicit safe-rm (makes the intent unambiguous in scripts)
+alias rrip='rip2 -u'
+alias rm-safe='rip2'
+
+# jqp — interactive jq playground
+alias jqi='jqp'
+
+# diffnav — file-tree navigation pager for delta output
+alias dn='diffnav'
+
+# sesh — tmux session manager. `sx` prefix to avoid collision with Linux `ss`.
+alias sx='sesh connect'
+alias sxl='sesh list'
+
 # ── Repo organisation (Layer 1c: ghq + ghorg) ────────────────────────────────
 # Interactive repo picker — bound to Alt-R (see bash/.bashrc).
 repo() {
