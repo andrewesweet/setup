@@ -172,25 +172,25 @@ check "no alias for gh-token (automation-only per design)" \
 # ── AC-11: cheat() has gh-ext + ghd + channels arms ──────────────────────
 echo ""
 echo "AC-11: cheat() arms for gh extensions and TV channels"
-cheat_body() { awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//'; }
+# Pre-materialise cheat body into a variable (here-string) to avoid SIGPIPE
+# flakiness under `set -o pipefail` — see test-plan-layer1b-i.sh for detail.
+CHEAT_BODY="$(awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//')"
 # Accept either separate `channels)` / `tv-channels)` arms or a combined
 # `channels|tv-channels)` arm — both are valid bash case-label syntax.
 for arm in 'gh-ext' 'ghd'; do
-  if cheat_body | grep -qE "^[[:space:]]*${arm}\)"; then
+  if grep -qE "^[[:space:]]*${arm}\)" <<< "$CHEAT_BODY"; then
     ok "cheat: arm matching '$arm' present"
   else
     nok "cheat: arm matching '$arm' present"
   fi
 done
-if cheat_body | grep -qE '^[[:space:]]*(channels|tv-channels)[|)]'; then
+if grep -qE '^[[:space:]]*(channels|tv-channels)[|)]' <<< "$CHEAT_BODY"; then
   ok "cheat: arm matching 'channels|tv-channels' present"
 else
   nok "cheat: arm matching 'channels|tv-channels' present"
 fi
-check "cheat gh-ext runs gh extension list" \
-  bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'gh extension list'"
-check "cheat ghd mentions C → opencode" \
-  bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -qiE 'C.*opencode|opencode.*C'"
+check "cheat gh-ext runs gh extension list" grep -q 'gh extension list' <<< "$CHEAT_BODY"
+check "cheat ghd mentions C → opencode"    grep -qiE 'C.*opencode|opencode.*C' <<< "$CHEAT_BODY"
 
 # ── AC-12: cheatsheet.md sections ────────────────────────────────────────
 echo ""

@@ -208,16 +208,18 @@ check "install-wsl.sh links dracula-pro.conf" \
 # ── AC-17: cheat tmux-plugins subcommand ─────────────────────────────────
 echo ""
 echo "AC-17: cheat tmux-plugins case arm"
-cheat_body() { awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//'; }
-if cheat_body | grep -qE '^[[:space:]]*tmux-plugins\)'; then
+# Pre-materialise cheat body into a variable (here-string) to avoid SIGPIPE
+# flakiness under `set -o pipefail` — see test-plan-layer1b-i.sh for detail.
+CHEAT_BODY="$(awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//')"
+if grep -qE '^[[:space:]]*tmux-plugins\)' <<< "$CHEAT_BODY"; then
   ok "cheat: 'tmux-plugins' case arm present"
 else
   nok "cheat: 'tmux-plugins' case arm present"
 fi
-check "tmux-plugins arm lists prefix+I"     bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + I'"
-check "tmux-plugins arm lists prefix+p (floax)"     bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + p.*floax\\|floax.*prefix + p'"
-check "tmux-plugins arm lists prefix+o (sessionx)"  bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + o.*sessionx\\|sessionx.*prefix + o'"
-check "tmux-plugins arm lists prefix+Space (thumbs)" bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'prefix + Space'"
+check "tmux-plugins arm lists prefix+I"              grep -q 'prefix + I' <<< "$CHEAT_BODY"
+check "tmux-plugins arm lists prefix+p (floax)"      grep -qE 'prefix \+ p.*floax|floax.*prefix \+ p' <<< "$CHEAT_BODY"
+check "tmux-plugins arm lists prefix+o (sessionx)"   grep -qE 'prefix \+ o.*sessionx|sessionx.*prefix \+ o' <<< "$CHEAT_BODY"
+check "tmux-plugins arm lists prefix+Space (thumbs)" grep -q 'prefix + Space' <<< "$CHEAT_BODY"
 check "cheatsheet.md has tmux plugins section"  grep -qE '^### tmux plugin keybindings|^### tmux plugins' docs/cheatsheet.md
 
 # ── AC-19: starship TOML section invariant preserved ─────────────────────
