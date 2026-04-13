@@ -167,7 +167,7 @@ fi
 warn "step 2 (GitHub releases) is stubbed — later plans add tool installs"
 warn "atuin/television not installed: install manually until WSL tool installer is built"
 warn "  atuin:      bash <(curl -fsSL https://setup.atuin.sh)"
-warn "  television: see github.com/alexpasmantier/television/releases"
+warn "  television: see github.com/alexpasmantier/television/releases (binary is 'tv')"
 
 # ── Step 3: Post-bootstrap tool installs ─────────────────────────────────────
 if command -v uv &>/dev/null; then
@@ -255,6 +255,11 @@ Next steps:
        opencode auth login
        gh auth login
        gcloud auth login
+
+Layer 1a tools (manual install on WSL2 — automated in a later plan):
+  atuin:      bash <(curl -fsSL https://setup.atuin.sh)
+  television: download from https://github.com/alexpasmantier/television/releases
+              (binary name is 'tv')
 
 If install-wsl.sh --restore is needed, backups are in:
   $HOME/.dotfiles-backup/

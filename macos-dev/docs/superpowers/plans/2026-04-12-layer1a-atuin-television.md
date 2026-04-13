@@ -985,31 +985,31 @@ link atuin/config.toml        .config/atuin/config.toml
 link television/config.toml   .config/television/config.toml
 ```
 
-- [ ] **Step 4: Document the tool install gap for WSL2 in install-wsl.sh**
+- [ ] **Step 4: Document the WSL2 install gap (warn-only, no helper added)**
 
-Find the tool install section of `install-wsl.sh`. Add a comment noting that atuin and television are not in Debian/Ubuntu apt repositories. If a `gh_release_install` helper exists, call it:
+  Task 8 deliberately does NOT add a `gh_release_install` helper to install-wsl.sh —
+  that helper belongs to a future plan that introduces the broader WSL tool installer
+  scaffold (likely Layer 1b). For Layer 1a, document the gap clearly in two places:
 
-```bash
-# atuin (no apt package — install script)
-if ! command -v atuin &>/dev/null; then
-  log "installing atuin via the official installer"
-  bash <(curl -fsSL https://setup.atuin.sh) || warn "atuin install failed"
-fi
+  **(a)** Extend the Step 2 stub comment to mention atuin and television by name, with
+  install-source pointers, e.g.:
 
-# television (no apt package — GitHub release)
-if ! command -v tv &>/dev/null; then
-  log "installing television from GitHub releases"
-  # Use gh_release_install if available, else warn
-  if declare -f gh_release_install >/dev/null; then
-    gh_release_install alexpasmantier/television tv "linux.*$(uname -m)" || warn "tv install failed"
-  else
-    warn "gh_release_install helper not defined — install television manually"
-    warn "  https://github.com/alexpasmantier/television/releases"
-  fi
-fi
-```
+  ```
+  #   - atuin (no apt — installer at https://setup.atuin.sh)              [Layer 1a]
+  #   - television (no apt — github.com/alexpasmantier/television releases) [Layer 1a]
+  ```
 
-If this conflicts with existing structure, adapt to the existing pattern — the goal is: WSL users can install atuin + television in some documented way.
+  **(b)** After the existing `warn "step 2 (GitHub releases) is stubbed …"`, add three
+  warn lines giving the user a manual install path:
+
+  ```bash
+  warn "atuin/television not installed: install manually until WSL tool installer is built"
+  warn "  atuin:      bash <(curl -fsSL https://setup.atuin.sh)"
+  warn "  television: see github.com/alexpasmantier/television/releases (binary is 'tv')"
+  ```
+
+  **(c)** Mirror the gap into the Step 5 "Next steps" heredoc so users who run with
+  `2>/dev/null` still see the manual-install guidance.
 
 - [ ] **Step 5: Verify install-wsl.sh parses**
 
