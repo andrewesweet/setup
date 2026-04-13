@@ -190,6 +190,38 @@ check "snippet mentions ghq get" \
 check "snippet forbids /mnt/c clones" \
   grep -q '/mnt/c' agents/AGENTS.md.snippet
 
+# ── AC-11: install-ai-conventions.sh is idempotent ───────────────────
+echo ""
+echo "AC-11: AI conventions installer is idempotent"
+check "install-ai-conventions.sh exists and is executable" \
+  test -x scripts/install-ai-conventions.sh
+
+if [[ "$FULL" == true ]]; then
+  tmp_home="$(mktemp -d)"
+  # First run
+  if HOME="$tmp_home" bash scripts/install-ai-conventions.sh >/dev/null 2>&1; then
+    count1=$(grep -c '^## Local repo layout' "$tmp_home/AGENTS.md" 2>/dev/null || echo 0)
+    if [[ "$count1" -eq 1 ]]; then
+      ok "first run installs snippet exactly once"
+    else
+      nok "first run installs snippet exactly once (got $count1)"
+    fi
+    # Second run — must remain idempotent
+    HOME="$tmp_home" bash scripts/install-ai-conventions.sh >/dev/null 2>&1
+    count2=$(grep -c '^## Local repo layout' "$tmp_home/AGENTS.md" 2>/dev/null || echo 0)
+    if [[ "$count2" -eq 1 ]]; then
+      ok "second run leaves snippet count at 1 (idempotent)"
+    else
+      nok "second run should keep snippet count at 1 (got $count2)"
+    fi
+  else
+    nok "first install-ai-conventions.sh run exited non-zero"
+  fi
+  rm -rf "$tmp_home"
+else
+  skp "install-ai-conventions.sh idempotency" "requires --full"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
