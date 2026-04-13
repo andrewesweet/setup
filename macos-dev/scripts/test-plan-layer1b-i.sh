@@ -197,6 +197,7 @@ check "cheat help lists new subcommands" \
 echo ""
 echo "AC-12: cheatsheet.md Tool reference coverage"
 check "cheatsheet lists sesh/sx"       grep -qE '\bsesh\b.*\bsx\b' docs/cheatsheet.md
+# shellcheck disable=SC2016  # backticks are literal markdown, not command substitution
 check "cheatsheet lists yazi/y"        grep -qE 'yazi.*`y`|\byazi\b.*cd-on-quit' docs/cheatsheet.md
 check "cheatsheet lists xh/http"       grep -qE '\bxh\b.*\bhttp\b' docs/cheatsheet.md
 check "cheatsheet lists rip (killer)"  grep -qiE 'rip.*process.*killer|rip.*fuzzy.*killer' docs/cheatsheet.md
@@ -248,6 +249,7 @@ check "install-macos.sh links yazi/theme.toml"   grep -qE 'link\s+yazi/theme\.to
 check "install-macos.sh links jqp/.jqp.yaml"     grep -qE 'link\s+jqp/\.jqp\.yaml' install-macos.sh
 check "install-macos.sh links diffnav/config"    grep -qE 'link\s+diffnav/config\.yml' install-macos.sh
 # sesh sed block runs BEFORE the first link call (see design § 2.5).
+# shellcheck disable=SC2016  # $-expansion intentionally deferred to inner bash -c
 check "install-macos.sh sesh substitution precedes first link()" \
   bash -c 'sed_line=$(grep -n "sed .*@DOTFILES@" install-macos.sh | head -1 | cut -d: -f1);
            link_line=$(grep -n "^link " install-macos.sh | head -1 | cut -d: -f1);
@@ -264,6 +266,18 @@ check "verify.sh checks jqp/.jqp.yaml symlink"   grep -qE '\.jqp\.yaml' scripts/
 check "verify.sh checks diffnav config symlink"  grep -qE 'diffnav/config\.yml' scripts/verify.sh
 check "verify.sh checks sesh.toml is a regular file" \
   bash -c "grep -qE 'sesh/sesh\\.toml' scripts/verify.sh"
+
+# ── AC-17: .bashrc still has 14 numbered sections ────────────────────────
+echo ""
+echo "AC-17: .bashrc structural invariants preserved"
+section_count=$(grep -c '^# ── [0-9]' bash/.bashrc)
+if [[ "$section_count" -eq 14 ]]; then
+  ok ".bashrc has 14 numbered sections"
+else
+  nok ".bashrc has $section_count sections (expected 14)"
+fi
+# Composite: the full test-plan2.sh must still pass.
+check "test-plan2.sh still passes" bash scripts/test-plan2.sh
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
