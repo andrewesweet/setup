@@ -285,6 +285,11 @@ link atuin/config.toml        .config/atuin/config.toml
 # television (Plan Layer 1a)
 link television/config.toml   .config/television/config.toml
 
+# yazi (Plan Layer 1b-i)
+link yazi/yazi.toml    .config/yazi/yazi.toml
+link yazi/keymap.toml  .config/yazi/keymap.toml
+link yazi/theme.toml   .config/yazi/theme.toml
+
 # opencode (Plan 9)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc
 link opencode/tui.jsonc                         .config/opencode/tui.jsonc

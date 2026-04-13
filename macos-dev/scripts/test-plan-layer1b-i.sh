@@ -107,6 +107,35 @@ else
   skp "generated sesh.toml marker check" "requires --full + prior install"
 fi
 
+# ── AC-5: yazi configs exist and are symlinked ────────────────────────────
+echo ""
+echo "AC-5: yazi configs present and wired"
+for f in yazi/yazi.toml yazi/keymap.toml yazi/theme.toml; do
+  check "$f exists" test -f "$f"
+done
+check "install-macos.sh links yazi.toml" \
+  grep -qE 'link\s+yazi/yazi\.toml' install-macos.sh
+check "install-macos.sh links keymap.toml" \
+  grep -qE 'link\s+yazi/keymap\.toml' install-macos.sh
+check "install-macos.sh links theme.toml" \
+  grep -qE 'link\s+yazi/theme\.toml' install-macos.sh
+check "install-wsl.sh links yazi.toml" \
+  grep -qE 'link\s+yazi/yazi\.toml' install-wsl.sh
+check "install-wsl.sh links keymap.toml" \
+  grep -qE 'link\s+yazi/keymap\.toml' install-wsl.sh
+check "install-wsl.sh links theme.toml" \
+  grep -qE 'link\s+yazi/theme\.toml' install-wsl.sh
+
+# ── AC-6: y() cd-on-quit wrapper ─────────────────────────────────────────
+echo ""
+echo "AC-6: y() cd-on-quit wrapper"
+check "bash/.bash_aliases defines y()" \
+  bash -c "awk '/^y\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q 'yazi'"
+check "y() body uses --cwd-file" \
+  bash -c "awk '/^y\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -q -- '--cwd-file'"
+check "y() body cds into the yazi-selected directory" \
+  bash -c "awk '/^y\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//' | grep -qE 'builtin cd|^[[:space:]]*cd '"
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

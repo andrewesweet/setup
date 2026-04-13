@@ -1,0 +1,81 @@
+# yazi/theme.toml — Dracula theme
+# Source: github.com/dracula/yazi (community-maintained)
+
+[manager]
+cwd = { fg = "#8BE9FD" }
+hovered         = { fg = "#282A36", bg = "#BD93F9" }
+preview_hovered = { underline = true }
+find_keyword    = { fg = "#FFB86C", italic = true }
+find_position   = { fg = "#FF79C6", bg = "reset", italic = true }
+marker_selected = { fg = "#50FA7B", bg = "#50FA7B" }
+marker_copied   = { fg = "#F1FA8C", bg = "#F1FA8C" }
+marker_cut      = { fg = "#FF5555", bg = "#FF5555" }
+tab_active      = { fg = "#282A36", bg = "#BD93F9" }
+tab_inactive    = { fg = "#F8F8F2", bg = "#44475A" }
+tab_width       = 1
+border_symbol   = "│"
+border_style    = { fg = "#6272A4" }
+syntect_theme   = ""
+
+[status]
+separator_open  = ""
+separator_close = ""
+separator_style = { fg = "#44475A", bg = "#44475A" }
+mode_normal = { fg = "#282A36", bg = "#BD93F9", bold = true }
+mode_select = { fg = "#282A36", bg = "#50FA7B", bold = true }
+mode_unset  = { fg = "#282A36", bg = "#FFB86C", bold = true }
+progress_label   = { fg = "#F8F8F2", bold = true }
+progress_normal  = { fg = "#BD93F9", bg = "#44475A" }
+progress_error   = { fg = "#FF5555", bg = "#44475A" }
+permissions_t = { fg = "#8BE9FD" }
+permissions_r = { fg = "#F1FA8C" }
+permissions_w = { fg = "#FF5555" }
+permissions_x = { fg = "#50FA7B" }
+permissions_s = { fg = "#6272A4" }
+
+[input]
+border   = { fg = "#BD93F9" }
+title    = {}
+value    = {}
+selected = { reversed = true }
+
+[select]
+border   = { fg = "#BD93F9" }
+active   = { fg = "#FF79C6" }
+inactive = {}
+
+[tasks]
+border  = { fg = "#BD93F9" }
+title   = {}
+hovered = { underline = true }
+
+[which]
+mask            = { bg = "#282A36" }
+cand            = { fg = "#8BE9FD" }
+rest            = { fg = "#6272A4" }
+desc            = { fg = "#FF79C6" }
+separator       = "  "
+separator_style = { fg = "#44475A" }
+
+[help]
+on      = { fg = "#FF79C6" }
+exec    = { fg = "#8BE9FD" }
+desc    = { fg = "#6272A4" }
+hovered = { bg = "#44475A", bold = true }
+footer  = { fg = "#282A36", bg = "#F8F8F2" }
+
+[filetype]
+rules = [
+  { mime = "image/*",                fg = "#FFB86C" },
+  { mime = "video/*",                fg = "#F1FA8C" },
+  { mime = "audio/*",                fg = "#F1FA8C" },
+  { mime = "application/zip",        fg = "#FF79C6" },
+  { mime = "application/gzip",       fg = "#FF79C6" },
+  { mime = "application/x-tar",      fg = "#FF79C6" },
+  { mime = "application/x-bzip",     fg = "#FF79C6" },
+  { mime = "application/x-bzip2",    fg = "#FF79C6" },
+  { mime = "application/x-7z-compressed", fg = "#FF79C6" },
+  { mime = "application/x-rar",      fg = "#FF79C6" },
+  { name = "*",                      fg = "#F8F8F2" },
+  { name = "*/",                     fg = "#BD93F9" },
+]

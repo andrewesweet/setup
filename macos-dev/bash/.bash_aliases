@@ -333,3 +333,19 @@ ghorg-gh() {
   local org="$1"; shift
   ghorg clone "$org" --path ~/code/github.com "$@"
 }
+
+# ── Yazi — cd-on-quit wrapper (Layer 1b-i) ──────────────────────────────────
+# Launches yazi and, on exit, cd's the parent shell to whatever directory
+# yazi was last in. `yazi` alone can't do this because a child process
+# can't change the parent's cwd — it writes the final cwd to a temp file
+# and the wrapper reads it back.
+y() {
+  local tmp cwd
+  tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  cwd="$(cat -- "$tmp" 2>/dev/null)"
+  if [[ -n "$cwd" && "$cwd" != "$PWD" ]]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
