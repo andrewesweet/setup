@@ -12,6 +12,9 @@ opencode-local/
 # ── Backup directories created by install scripts ─────────────────────────────
 .dotfiles-backup/
 
+# ── Git worktrees ────────────────────────────────────────────────────────────
+.worktrees/
+
 # ── OS artefacts ─────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
