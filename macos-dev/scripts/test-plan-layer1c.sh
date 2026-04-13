@@ -143,6 +143,42 @@ else
   skp "interactive bash binds Alt-R to repo" "requires --full"
 fi
 
+# ── AC-9: install-wsl.sh aborts if $HOME under /mnt/c ─────────────────
+echo ""
+echo "AC-9: WSL /mnt/c precondition"
+# Static: the precondition function exists and references /mnt/c
+check "install-wsl.sh contains check_home_on_ext4() function" \
+  bash -c "awk '/^check_home_on_ext4\\(\\) \\{/,/^\\}/' install-wsl.sh | grep -q '/mnt/c'"
+check "install-wsl.sh supports --check-preconditions" \
+  grep -qE '\-\-check-preconditions' install-wsl.sh
+
+# Full: spawn with simulated HOME
+if [[ "$FULL" == true ]]; then
+  # Case A: HOME under /mnt/c should abort
+  set +e
+  HOME=/mnt/c/Users/test bash install-wsl.sh --check-preconditions >/tmp/wsl-a.out 2>/tmp/wsl-a.err
+  rc_a=$?
+  set -e 2>/dev/null || true
+  if [[ $rc_a -ne 0 ]] && grep -q '/mnt/c' /tmp/wsl-a.err; then
+    ok "HOME=/mnt/c/... causes abort with /mnt/c message"
+  else
+    nok "HOME=/mnt/c/... should abort with /mnt/c message (rc=$rc_a)"
+  fi
+  # Case B: HOME on ext4 should succeed
+  set +e
+  HOME=/home/test-ext4-simulated bash install-wsl.sh --check-preconditions >/tmp/wsl-b.out 2>/tmp/wsl-b.err
+  rc_b=$?
+  set -e 2>/dev/null || true
+  if [[ $rc_b -eq 0 ]]; then
+    ok "HOME=/home/... passes preconditions"
+  else
+    nok "HOME=/home/... should pass preconditions (rc=$rc_b)"
+  fi
+else
+  skp "HOME=/mnt/c/... aborts" "requires --full"
+  skp "HOME=/home/... passes" "requires --full"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
