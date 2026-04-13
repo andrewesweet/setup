@@ -56,6 +56,15 @@ alias ghprl='gh pr list'
 alias ghprc='gh pr checkout'
 alias ghrv='gh repo view --web'
 
+# gh extensions (Layer 1b-iii). gh-token is automation-only (no alias).
+alias ghd='gh dash'
+alias ghce='gh copilot explain'
+alias ghcs='gh copilot suggest'
+alias ghp='gh poi'
+alias ghmd='gh markdown-preview'
+alias ghg='gh grep'
+alias ghaw='gh aw'
+
 # ── Search & find — prefix: f ──────────────────────────────────────────────
 alias ff='fd'
 alias ft='fd --type f'

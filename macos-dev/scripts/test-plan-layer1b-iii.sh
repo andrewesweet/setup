@@ -156,7 +156,20 @@ check "install-macos.sh guards gh extension install on command -v gh" \
 check "install-wsl.sh guards gh extension install on command -v gh" \
   bash -c "grep -Pzo '(?s)command -v gh[^\\n]*\\n.{0,400}gh extension install' install-wsl.sh >/dev/null 2>&1"
 
-# Later tasks append AC-10 through AC-15.
+# ── AC-10: new gh aliases exist with exact definitions ───────────────────
+echo ""
+echo "AC-10: gh extension aliases in bash/.bash_aliases"
+check "alias ghd='gh dash'"                grep -qE "^alias ghd='gh dash'"                bash/.bash_aliases
+check "alias ghce='gh copilot explain'"    grep -qE "^alias ghce='gh copilot explain'"    bash/.bash_aliases
+check "alias ghcs='gh copilot suggest'"    grep -qE "^alias ghcs='gh copilot suggest'"    bash/.bash_aliases
+check "alias ghp='gh poi'"                 grep -qE "^alias ghp='gh poi'"                 bash/.bash_aliases
+check "alias ghmd='gh markdown-preview'"   grep -qE "^alias ghmd='gh markdown-preview'"   bash/.bash_aliases
+check "alias ghg='gh grep'"                grep -qE "^alias ghg='gh grep'"                bash/.bash_aliases
+check "alias ghaw='gh aw'"                 grep -qE "^alias ghaw='gh aw'"                 bash/.bash_aliases
+check "no alias for gh-token (automation-only per design)" \
+  bash -c "! grep -qE \"^alias .*='gh token\" bash/.bash_aliases"
+
+# Later tasks append AC-11 through AC-15.
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
