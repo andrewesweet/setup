@@ -178,6 +178,21 @@ check "alias dn='diffnav'"         grep -qE "^alias dn='diffnav'"         bash/.
 check "alias sx='sesh connect'"    grep -qE "^alias sx='sesh connect'"    bash/.bash_aliases
 check "alias sxl='sesh list'"      grep -qE "^alias sxl='sesh list'"      bash/.bash_aliases
 
+# ── AC-11: cheat() has subcommands for every new tool ────────────────────
+echo ""
+echo "AC-11: cheat() subcommand coverage"
+# Scope to the cheat() function body so comments elsewhere don't false-positive.
+cheat_body() { awk '/^cheat\(\) \{/,/^\}/' bash/.bash_aliases | sed 's/#.*//'; }
+for tool in atuin "tv|television" sesh yazi xh rip rip2 jqp diffnav; do
+  if cheat_body | grep -qE "^[[:space:]]*${tool}\)"; then
+    ok "cheat: case arm for '$tool' present"
+  else
+    nok "cheat: case arm for '$tool' present"
+  fi
+done
+check "cheat help lists new subcommands" \
+  bash -c "cheat_body() { awk '/^cheat\\(\\) \\{/,/^\\}/' bash/.bash_aliases | sed 's/#.*//'; }; cheat_body | grep -q 'sesh, yazi, xh, rip'"
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
