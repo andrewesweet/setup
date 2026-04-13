@@ -61,7 +61,7 @@ echo ""
 echo "Starship — directory module:"
 check "truncation_length = 4"         grep -q 'truncation_length.*4' "$REPO_ROOT/starship/starship.toml"
 check "truncate_to_repo = true"       grep -q 'truncate_to_repo.*true' "$REPO_ROOT/starship/starship.toml"
-check "directory style bold blue"     grep -q 'style.*bold blue' "$REPO_ROOT/starship/starship.toml"
+check "directory style bold purple"   grep -q 'style.*bold purple' "$REPO_ROOT/starship/starship.toml"
 
 echo ""
 echo "Starship — git modules:"
@@ -69,10 +69,10 @@ check "git_branch symbol"             grep -qF 'symbol = " "' "$REPO_ROOT/starsh
 check "git_branch style bold purple"  grep -q 'style.*bold purple' "$REPO_ROOT/starship/starship.toml"
 check "git_status conflicted"         grep -qF 'conflicted = "⚡"' "$REPO_ROOT/starship/starship.toml"
 # shellcheck disable=SC2016 # ${count} is a literal starship template token, not a shell var
-check "git_status ahead"              grep -qF 'ahead      = "↑${count}"' "$REPO_ROOT/starship/starship.toml"
+check "git_status ahead"              grep -qF 'ahead = "↑${count}"' "$REPO_ROOT/starship/starship.toml"
 # shellcheck disable=SC2016
-check "git_status behind"             grep -qF 'behind     = "↓${count}"' "$REPO_ROOT/starship/starship.toml"
-check "git_status diverged"           grep -qF 'diverged   = "⇕"' "$REPO_ROOT/starship/starship.toml"
+check "git_status behind"             grep -qF 'behind = "↓${count}"' "$REPO_ROOT/starship/starship.toml"
+check "git_status diverged"           grep -qF 'diverged = "⇕"' "$REPO_ROOT/starship/starship.toml"
 check "git_status modified"           grep -qF 'modified = "*"' "$REPO_ROOT/starship/starship.toml"
 check "git_status staged"             grep -qF 'staged = "+"' "$REPO_ROOT/starship/starship.toml"
 check "git_status untracked"          grep -qF 'untracked = "?"' "$REPO_ROOT/starship/starship.toml"
@@ -106,8 +106,8 @@ check "kubernetes disabled false"     grep -q 'disabled.*false' "$REPO_ROOT/star
 check "kubernetes format"             grep -q '\[kubernetes\]' "$REPO_ROOT/starship/starship.toml"
 check "terraform format"              grep -q '\[terraform\]' "$REPO_ROOT/starship/starship.toml"
 
-# Section count
-check "10 TOML sections"             test "$(grep -c '^\[' "$REPO_ROOT/starship/starship.toml")" -eq 10
+# Section count (11 after Layer 1a added [palettes.dracula])
+check "11 TOML sections"             test "$(grep -c '^\[' "$REPO_ROOT/starship/starship.toml")" -eq 11
 
 # ══════════════════════════════════════════════════════════════════════════
 # LAZYGIT

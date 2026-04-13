@@ -74,18 +74,18 @@ echo ""
 echo ".bashrc structure:"
 
 section_count=$(grep -c '^# ── [0-9]' "$REPO_ROOT/bash/.bashrc")
-if [[ "$section_count" -eq 13 ]]; then
-  ok ".bashrc has 13 numbered sections"
+if [[ "$section_count" -eq 14 ]]; then
+  ok ".bashrc has 14 numbered sections"
 else
-  nok ".bashrc has $section_count sections, expected 13"
+  nok ".bashrc has $section_count sections, expected 14"
 fi
 
 # Section ordering: extract the leading number from each section header.
 # Uses sed (not grep -oE) to avoid picking up extra digits like "9" from "OSC 9".
 section_order=$(grep '^# ── [0-9]' "$REPO_ROOT/bash/.bashrc" | sed 's/^# ── \([0-9]*\).*/\1/' | tr '\n' ' ')
-expected_order="1 2 3 4 5 6 7 8 9 10 11 12 13 "
+expected_order="1 2 3 4 5 6 7 8 9 10 11 12 13 14 "
 if [[ "$section_order" == "$expected_order" ]]; then
-  ok ".bashrc sections in correct order (1-13)"
+  ok ".bashrc sections in correct order (1-14)"
 else
   nok ".bashrc section order: got '$section_order', expected '$expected_order'"
 fi
