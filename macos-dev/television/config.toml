@@ -1,0 +1,68 @@
+# television/config.toml — fuzzy picker with channel-based selection
+# See docs/plans/2026-04-12-shell-modernisation-design.md § 3.2
+#
+# NOTE: Shell integration claims Ctrl-T ONLY. Ctrl-R is owned by atuin.
+
+tick_rate = 50
+default_channel = "files"
+history_size = 200
+global_history = false
+
+[ui]
+ui_scale = 100
+orientation = "landscape"
+theme = "dracula"
+
+[ui.input_bar]
+position = "top"
+prompt = ">"
+border_type = "rounded"
+
+[ui.results_panel]
+border_type = "rounded"
+
+[ui.preview_panel]
+size = 65
+scrollbar = true
+border_type = "rounded"
+
+[ui.help_panel]
+show_categories = true
+hidden = true
+
+[keybindings]
+esc = "quit"
+ctrl-c = "quit"
+down = "select_next_entry"
+ctrl-n = "select_next_entry"
+ctrl-j = "select_next_entry"
+up = "select_prev_entry"
+ctrl-p = "select_prev_entry"
+ctrl-k = "select_prev_entry"
+tab = "toggle_selection_down"
+backtab = "toggle_selection_up"
+enter = "confirm_selection"
+ctrl-d = "scroll_preview_half_page_down"
+ctrl-u = "scroll_preview_half_page_up"
+ctrl-f = "cycle_previews"
+ctrl-y = "copy_entry_to_clipboard"
+ctrl-s = "cycle_sources"
+# Ctrl-R inside TV is rebound to avoid confusion with shell-level atuin Ctrl-R
+ctrl-g = "toggle_remote_control"
+ctrl-x = "toggle_action_picker"
+ctrl-o = "toggle_preview"
+f9 = "toggle_help"
+f10 = "toggle_status_bar"
+# Ctrl-T inside TV is rebound to avoid confusion with shell-level TV Ctrl-T
+ctrl-shift-t = "toggle_layout"
+
+[shell_integration]
+fallback_channel = "files"
+
+[shell_integration.channel_triggers]
+"files" = ["cat", "less", "head", "tail", "vim", "nvim", "bat", "cp", "mv", "rm"]
+"dirs" = ["cd", "ls", "rmdir", "z"]
+
+[shell_integration.keybindings]
+# Only Ctrl-T is claimed. atuin owns Ctrl-R.
+smart_autocomplete = "ctrl-t"

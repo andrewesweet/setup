@@ -90,6 +90,15 @@ for pat in GITHUB_TOKEN GH_TOKEN SECRET PASSWORD BEARER AUTHORIZATION \
     bash -c "awk '/^history_filter = \[/,/^\]/' atuin/config.toml | grep -Fq '$pat'"
 done
 
+# ── AC-7: television does NOT claim Ctrl-R ────────────────────────────────
+echo ""
+echo "AC-7: television shell integration owns Ctrl-T only"
+check "television/config.toml exists"         test -f television/config.toml
+check "smart_autocomplete = ctrl-t present"   \
+  grep -qE 'smart_autocomplete\s*=\s*"ctrl-t"' television/config.toml
+check "command_history key is ABSENT"         \
+  bash -c "! grep -qE 'command_history\s*=' television/config.toml"
+
 # ── AC-3, AC-6, AC-10, AC-11 etc. — stubs to be filled by later tasks ───
 # (Placeholders for each AC; each will become a real check as features land.)
 
