@@ -136,6 +136,20 @@ check "atuin config symlink resolves" \
 check "television config symlink resolves" \
   bash -c 'test -L "$HOME/.config/television/config.toml" && test -e "$HOME/.config/television/config.toml"'
 
+# ── Layer 1c tools ────────────────────────────────────────────────────────
+echo ""
+echo "Layer 1c tools:"
+check "ghq on PATH"              command -v ghq
+check "ghorg on PATH"            command -v ghorg
+if command -v ghq &>/dev/null; then
+  ghq_root_actual="$(ghq root 2>/dev/null)"
+  if [[ "$ghq_root_actual" == "$HOME/code" ]]; then
+    ok "ghq root resolves to \$HOME/code"
+  else
+    nok "ghq root resolves to \$HOME/code (got: $ghq_root_actual)"
+  fi
+fi
+
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
 echo ""
 echo "${YELLOW}── Remaining manual steps ──${RESET}"

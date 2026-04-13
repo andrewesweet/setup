@@ -222,6 +222,13 @@ else
   skp "install-ai-conventions.sh idempotency" "requires --full"
 fi
 
+# ── AC-12: verify.sh smoke-checks ghq + ghorg ────────────────────────
+echo ""
+echo "AC-12: verify.sh smoke checks"
+check "verify.sh checks ghq on PATH"    grep -q 'command -v ghq' scripts/verify.sh
+check "verify.sh checks ghorg on PATH"  grep -q 'command -v ghorg' scripts/verify.sh
+check "verify.sh checks 'ghq root'"     grep -q 'ghq root' scripts/verify.sh
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
