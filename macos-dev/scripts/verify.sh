@@ -130,8 +130,11 @@ echo ""
 echo "Layer 1a tools:"
 check "atuin on PATH"            command -v atuin
 check "tv (television) on PATH"  command -v tv
-check "atuin config symlink"     test -L "$HOME/.config/atuin/config.toml"
-check "television config symlink" test -L "$HOME/.config/television/config.toml"
+# Symlink must exist AND its target must resolve (catches dangling symlinks).
+check "atuin config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/atuin/config.toml" && test -e "$HOME/.config/atuin/config.toml"'
+check "television config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/television/config.toml" && test -e "$HOME/.config/television/config.toml"'
 
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
 echo ""

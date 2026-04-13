@@ -202,11 +202,13 @@ if [[ "$FULL" == true ]]; then
   skp "install + restore round-trip" "destructive — requires manual verification"
 fi
 
-# ── AC-13: verify.sh passes ──────────────────────────────────────────────
+# ── AC-13: verify.sh checks Layer 1a tools ──────────────────────────────
 echo ""
 echo "AC-13: verify.sh smoke checks"
-check "verify.sh mentions atuin"        grep -q 'atuin' scripts/verify.sh
-check "verify.sh mentions tv"           grep -qE '\btv\b' scripts/verify.sh
+check "verify.sh checks atuin on PATH"      grep -q 'command -v atuin' scripts/verify.sh
+check "verify.sh checks tv on PATH"         grep -q 'command -v tv' scripts/verify.sh
+check "verify.sh checks atuin config link"  grep -q '.config/atuin/config.toml' scripts/verify.sh
+check "verify.sh checks tv config link"     grep -q '.config/television/config.toml' scripts/verify.sh
 
 # ── AC-11 etc. — stubs to be filled by later tasks ──────────────────────
 # (Placeholders for each AC; each will become a real check as features land.)

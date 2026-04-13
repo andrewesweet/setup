@@ -1102,11 +1102,13 @@ Expected: shows existing tool availability checks.
 Modify `scripts/test-plan-layer1a.sh`: add this block:
 
 ```bash
-# ── AC-13: verify.sh passes ──────────────────────────────────────────────
+# ── AC-13: verify.sh checks Layer 1a tools ──────────────────────────────
 echo ""
 echo "AC-13: verify.sh smoke checks"
-check "verify.sh mentions atuin"        grep -q 'atuin' scripts/verify.sh
-check "verify.sh mentions tv"           grep -qE '\btv\b' scripts/verify.sh
+check "verify.sh checks atuin on PATH"      grep -q 'command -v atuin' scripts/verify.sh
+check "verify.sh checks tv on PATH"         grep -q 'command -v tv' scripts/verify.sh
+check "verify.sh checks atuin config link"  grep -q '.config/atuin/config.toml' scripts/verify.sh
+check "verify.sh checks tv config link"     grep -q '.config/television/config.toml' scripts/verify.sh
 ```
 
 - [ ] **Step 3: Run tests to confirm AC-13 fails**
@@ -1124,8 +1126,11 @@ echo ""
 echo "Layer 1a tools:"
 check "atuin on PATH"            command -v atuin
 check "tv (television) on PATH"  command -v tv
-check "atuin config symlink"     test -L "$HOME/.config/atuin/config.toml"
-check "television config symlink" test -L "$HOME/.config/television/config.toml"
+# Symlink must exist AND its target must resolve (catches dangling symlinks).
+check "atuin config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/atuin/config.toml" && test -e "$HOME/.config/atuin/config.toml"'
+check "television config symlink resolves" \
+  bash -c 'test -L "$HOME/.config/television/config.toml" && test -e "$HOME/.config/television/config.toml"'
 ```
 
 - [ ] **Step 5: Verify verify.sh parses**
