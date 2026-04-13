@@ -237,6 +237,16 @@ check "cheatsheet mentions gclone"            grep -q 'gclone' docs/cheatsheet.m
 check "cheatsheet mentions ghorg-gh"          grep -q 'ghorg-gh' docs/cheatsheet.md
 check "cheatsheet mentions Alt-R"             grep -qE 'Alt.R' docs/cheatsheet.md
 
+# ── AC-14: README documents repo layout ──────────────────────────────
+echo ""
+echo "AC-14: README Repo layout section"
+check "README has 'Repo layout' heading" \
+  grep -qE '^##+\s+Repo layout' README.md
+check "README mentions ~/code/<host>/<org>/<repo>" \
+  grep -q 'code/<host>/<org>/<repo>' README.md
+check "README mentions the repo function or Alt-R" \
+  grep -qE '`repo`|Alt-R' README.md
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

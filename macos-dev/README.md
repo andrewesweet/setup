@@ -82,6 +82,33 @@ macos-dev/
 └── scripts/                    # verify.sh, check-configs.sh, test suites
 ```
 
+## Repo layout
+
+All git checkouts live under a single root, organised by host/org/repo:
+
+```
+~/code/<host>/<org>/<repo>
+
+Examples:
+  ~/code/github.com/anthropics/claude-code
+  ~/code/gitlab.com/some-org/service
+  ~/code/gitlab.mycompany.com/team/repo
+```
+
+Enforced by [ghq](https://github.com/x-motemen/ghq) (`ghq.root = ~/code`). Helpers:
+
+- **`repo`** — fzf picker over all ghq-managed checkouts. Bound to `Alt-R`.
+- **`gclone <url>`** — `ghq get -u` + cd to the canonical path.
+- **`ghorg-gh <org>`** — bulk-clone a GitHub org into `~/code/github.com/<org>/`.
+
+For the coding agents' convention (OpenCode, GitHub Copilot), run once:
+
+```bash
+bash scripts/install-ai-conventions.sh
+```
+
+**WSL2**: `~/code` MUST be on ext4, never `/mnt/c/`. `install-wsl.sh` hard-aborts if `$HOME` resolves under `/mnt/c/`.
+
 ## Configuration
 
 ### Local overrides
