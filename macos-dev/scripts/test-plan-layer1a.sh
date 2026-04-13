@@ -83,11 +83,14 @@ check "auto_sync = false"                    grep -qE '^\s*auto_sync\s*=\s*false
 # ── AC-5: history_filter covers token/secret prefixes ───────────────────
 echo ""
 echo "AC-5: atuin history_filter coverage"
+# Scope: extract the history_filter array body then strip comments before
+# matching, so a comment mentioning a token cannot satisfy the assertion.
+# Mirrors the AC-12 idiom (commit 0ca1e06).
 for pat in GITHUB_TOKEN GH_TOKEN SECRET PASSWORD BEARER AUTHORIZATION \
            AWS_ACCESS AWS_SECRET AWS_SESSION ANTHROPIC OPENAI \
            'ghp_' 'gho_' 'github_pat_' 'glpat-' 'sk-' 'xoxb-' 'xoxp-'; do
   check "history_filter contains pattern '$pat'" \
-    bash -c "awk '/^history_filter = \[/,/^\]/' atuin/config.toml | grep -Fq '$pat'"
+    bash -c "awk '/^history_filter = \[/,/^\]/' atuin/config.toml | sed 's/#.*//' | grep -Fq '$pat'"
 done
 
 # ── AC-7: television does NOT claim Ctrl-R ────────────────────────────────
