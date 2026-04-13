@@ -239,6 +239,20 @@ check "install-wsl.sh installs carapace" \
 check "install-wsl.sh apt-installs xh" \
   grep -qE 'apt\s+install.*\bxh\b' install-wsl.sh
 
+# ── AC-15: install-macos.sh wires all new configs ────────────────────────
+echo ""
+echo "AC-15: install-macos.sh Layer 1b-i wiring"
+check "install-macos.sh links yazi/yazi.toml"    grep -qE 'link\s+yazi/yazi\.toml' install-macos.sh
+check "install-macos.sh links yazi/keymap.toml"  grep -qE 'link\s+yazi/keymap\.toml' install-macos.sh
+check "install-macos.sh links yazi/theme.toml"   grep -qE 'link\s+yazi/theme\.toml' install-macos.sh
+check "install-macos.sh links jqp/.jqp.yaml"     grep -qE 'link\s+jqp/\.jqp\.yaml' install-macos.sh
+check "install-macos.sh links diffnav/config"    grep -qE 'link\s+diffnav/config\.yml' install-macos.sh
+# sesh sed block runs BEFORE the first link call (see design § 2.5).
+check "install-macos.sh sesh substitution precedes first link()" \
+  bash -c 'sed_line=$(grep -n "sed .*@DOTFILES@" install-macos.sh | head -1 | cut -d: -f1);
+           link_line=$(grep -n "^link " install-macos.sh | head -1 | cut -d: -f1);
+           [[ -n "$sed_line" && -n "$link_line" && $sed_line -lt $link_line ]]'
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
