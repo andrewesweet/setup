@@ -303,7 +303,13 @@ EOF
 # Interactive repo picker — bound to Alt-R (see bash/.bashrc).
 repo() {
   local dir
-  dir=$(ghq list --full-path | fzf --preview 'ls -la {}') && cd "$dir" || return
+  dir=$(ghq list --full-path | fzf --preview 'ls -la {}') || return
+  if [[ -n "$dir" && -d "$dir" ]]; then
+    cd "$dir"
+  else
+    echo "repo: cannot cd to '$dir' (deleted between list and select?)" >&2
+    return 1
+  fi
 }
 
 # Clone-and-go: ghq get + cd to the canonical path.

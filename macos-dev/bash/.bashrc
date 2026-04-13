@@ -1,5 +1,5 @@
 # .bashrc — interactive shell configuration
-# Structured as 13 numbered sections. See docs/design/shell.md for the spec.
+# Structured as 14 numbered sections. See docs/design/shell.md for the spec.
 
 # ── 1. Guard ────────────────────────────────────────────────────────────────
 [[ $- != *i* ]] && return

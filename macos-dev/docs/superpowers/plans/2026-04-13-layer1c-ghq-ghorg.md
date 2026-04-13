@@ -436,8 +436,8 @@ git commit -m "feat(bash-aliases): add repo, gclone, ghorg-gh functions (Layer 1
 # ── AC-8: Alt-R bound to repo in bash readline ────────────────────────
 echo ""
 echo "AC-8: Alt-R binding for repo"
-check "bash/.bashrc binds \\e-r to repo" \
-  bash -c "grep -qE '^bind\\s+\"\\\\er\":\"repo' bash/.bashrc"
+check "bash/.bashrc binds \\er to repo" \
+  grep -qE '^[[:space:]]*bind[[:space:]]+.*\\\\er.*repo' bash/.bashrc
 
 if [[ "$FULL" == true ]]; then
   bind_out="$(bash --rcfile bash/.bashrc -ic 'bind -P 2>/dev/null | grep "\\\\er" || true' 2>/dev/null)"
