@@ -24,6 +24,10 @@ brew "zoxide"
 brew "fd"
 brew "ripgrep"
 
+# ── History & search (new — Layer 1a) ────────────────────────────────────────
+brew "atuin"
+brew "television"
+
 # ── File viewing ─────────────────────────────────────────────────────────────
 brew "bat"
 brew "eza"

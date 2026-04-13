@@ -26,6 +26,10 @@ zoxide               brew:zoxide                    apt:-                   apk:
 fd                   brew:fd                        apt:fd-find             apk:fd
 ripgrep              brew:ripgrep                   apt:ripgrep             apk:ripgrep
 
+# ── History & search (new — Layer 1a) ────────────────────────────────────────
+atuin                brew:atuin                     apt:-                   apk:atuin
+television           brew:television                apt:-                   apk:-
+
 # ── File viewing ─────────────────────────────────────────────────────────────
 bat                  brew:bat                       apt:bat                 apk:bat
 eza                  brew:eza                       apt:-                   apk:eza
