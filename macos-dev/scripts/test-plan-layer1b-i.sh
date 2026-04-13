@@ -156,6 +156,17 @@ check "install-macos.sh links diffnav/config.yml" \
 check "install-wsl.sh links diffnav/config.yml" \
   grep -qE 'link\s+diffnav/config\.yml' install-wsl.sh
 
+# ── AC-9: carapace bridges wired into bash init ──────────────────────────
+echo ""
+echo "AC-9: carapace completion wiring"
+check "CARAPACE_BRIDGES exported in .bashrc" \
+  grep -qE '^export\s+CARAPACE_BRIDGES=' bash/.bashrc
+check "CARAPACE_BRIDGES includes zsh,fish,bash,inshellisense" \
+  bash -c "grep -E '^export CARAPACE_BRIDGES=' bash/.bashrc | grep -q 'zsh' && grep -E '^export CARAPACE_BRIDGES=' bash/.bashrc | grep -q 'bash' && grep -E '^export CARAPACE_BRIDGES=' bash/.bashrc | grep -q 'fish'"
+# carapace completion source wrapped in a `command -v` guard.
+check "carapace completion source is guarded" \
+  bash -c "grep -Pzo '(?s)command -v carapace[^\n]*\n[^\n]*carapace[[:space:]]+_carapace[[:space:]]+bash' bash/.bashrc | grep -q ."
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
