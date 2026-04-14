@@ -323,6 +323,22 @@ else
   nok "failure modes has ≥ 3 drill items ($failure_items)"
 fi
 
+# ── AC-19: test-plan-desktop-layer2.sh wired into CI ─────────────────
+echo ""
+echo "AC-19: test-plan-desktop-layer2.sh wired into verify.yml"
+REPO_ROOT="$(cd "$MACOS_DEV/.." && pwd)"
+WORKFLOW="$REPO_ROOT/.github/workflows/verify.yml"
+if [[ -f "$WORKFLOW" ]]; then
+  hits=$(grep -c 'test-plan-desktop-layer2.sh' "$WORKFLOW" || true)
+  if (( hits >= 2 )); then
+    ok "verify.yml invokes test-plan-desktop-layer2.sh ($hits times)"
+  else
+    nok "verify.yml invokes test-plan-desktop-layer2.sh ($hits times; need ≥ 2)"
+  fi
+else
+  skp "verify.yml wiring" "workflow not found"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
