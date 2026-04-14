@@ -160,7 +160,23 @@ else
   nok "failure modes has ≥ 2 drill items ($failure_items)"
 fi
 
-# ── AC-8..9 get appended by subsequent tasks ──────────────────────────
+# ── AC-8: test-plan-desktop-layer3.sh wired into CI ──────────────────
+echo ""
+echo "AC-8: test-plan-desktop-layer3.sh wired into verify.yml"
+REPO_ROOT="$(cd "$MACOS_DEV/.." && pwd)"
+WORKFLOW="$REPO_ROOT/.github/workflows/verify.yml"
+if [[ -f "$WORKFLOW" ]]; then
+  hits=$(grep -c 'test-plan-desktop-layer3.sh' "$WORKFLOW" || true)
+  if (( hits >= 2 )); then
+    ok "verify.yml invokes test-plan-desktop-layer3.sh ($hits times)"
+  else
+    nok "verify.yml invokes test-plan-desktop-layer3.sh ($hits times; need ≥ 2)"
+  fi
+else
+  skp "verify.yml wiring" "workflow not found"
+fi
+
+# ── AC-9 gets appended by subsequent tasks ────────────────────────────
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
