@@ -319,11 +319,363 @@
       "kubectl explain *": "allow",
       "kubectx": "allow", "kubens": "allow",
 
-      // ── Cloud: narrow read-only ───────────────────────────────────────────
-      "gcloud auth list": "allow",
-      "gcloud config list": "allow", "gcloud config get-value *": "allow",
-      "gcloud projects list": "allow",
-      "gcloud info": "allow", "gcloud version": "allow",
+      // ── gcloud: safe verbs + singleton utilities (enumerated from SDK 564.0.0)
+      // Policy rubric:
+      //   allow — admin/metadata read AND data read (including `storage ls|cat|
+      //           du|hash`, `logging read`, `pubsub pull`, prediction calls,
+      //           log reads, serial-port-output reads, `asset query`, etc.)
+      //   ask   — admin/metadata write, data write, interactive/session-
+      //           blocking, and (MUST) anything that retrieves tokens,
+      //           credentials, or wrapped-secret material
+      //   ask   — `gcloud alpha *` and `gcloud beta *` (blanket)
+      // Classification catalogued in docs/research/gcloud-cli-policy.md,
+      // derived from docs/research/gcloud-cli-commands.json + two audits:
+      // gcloud-audit-data-plane.md + gcloud-audit-interactive-credential-installs.md.
+      //
+      // Ordering (last-match-wins):
+      //   1. Universal safe-verb allows — one pattern per SAFE verb, covering
+      //      every service/resource depth via `*` greedy-across-whitespace.
+      //   2. Singleton utility allows (info, version, help, topic, auth list,
+      //      config list/configurations list|describe).
+      //   3. Data-read allows for verbs not in the universal SAFE set:
+      //      `storage ls|cat|du|hash`, `logging read`, `pubsub pull` + message
+      //      tests, `kms encrypt|*-verify`, prediction and ml content APIs,
+      //      `vector-search * query|batch-search|aggregate`, consent-store
+      //      reads, logs reads, compute serial/screenshot/route-policy reads,
+      //      asset/policy-intelligence queries, metastore query-metadata,
+      //      netapp encrypt/verify.
+      //   4. Data-write asks — overrides tier 1–3 where a read-ish verb would
+      //      otherwise allow a write (storage cp/mv/rm/rsync/objects create/
+      //      batch-operations, pubsub publish/ack, pubsub pull --auto-ack,
+      //      logging write/copy, DB export/import/execute-sql/rows, ai-
+      //      platform batch prediction, vector-search writes, healthcare
+      //      export/import/deidentify, functions call, compute image/diagnose
+      //      writes + router upload, composer/transfer/backup/redis/looker/
+      //      memorystore/lustre/metastore/scc/infra-manager/artifacts writes).
+      //   5. Interactive / session-blocking asks (ssh, scp, tunnel, wait,
+      //      tail, stream-*, init, emulators start, feedback, survey, docker).
+      //   6. Credential / token retrieval asks (MUST ASK): auth login/print/
+      //      revoke, every `* get-credentials*`, SA keys create/upload/sign,
+      //      sign-url, kms decrypt/sign/decapsulate, secrets versions access,
+      //      redis get-auth-string, sql generate-login-token, developer-
+      //      connect fetch tokens, iap reset-secret, api-keys get-key-string,
+      //      + defensive wildcards for `* fetch-*-token`, `* generate-login-
+      //      token`, `* get-auth-string`, `* get-key-string`.
+      //   7. Components asks (install/update/remove/reinstall/repositories).
+      //   8. Artifacts print-settings demotion (--json-key can embed SA key).
+      //   9. Alpha/beta blanket ask — MUST BE LAST in the gcloud section.
+
+      // Tier 1: universal safe-verb allows
+      "gcloud * list": "allow", "gcloud * list *": "allow",
+      "gcloud * describe": "allow", "gcloud * describe *": "allow",
+      "gcloud * get-iam-policy": "allow", "gcloud * get-iam-policy *": "allow",
+      "gcloud * get-ancestors-iam-policy": "allow", "gcloud * get-ancestors-iam-policy *": "allow",
+      "gcloud * test-iam-permissions": "allow", "gcloud * test-iam-permissions *": "allow",
+      "gcloud * get-value": "allow", "gcloud * get-value *": "allow",
+      "gcloud * get-public-key": "allow", "gcloud * get-public-key *": "allow",
+      "gcloud * search": "allow", "gcloud * search *": "allow",
+      "gcloud * lookup": "allow", "gcloud * lookup *": "allow",
+      "gcloud * explain": "allow", "gcloud * explain *": "allow",
+      "gcloud * print-settings": "allow", "gcloud * print-settings *": "allow",
+
+      // Tier 2: singleton utilities
+      "gcloud info": "allow", "gcloud info *": "allow",
+      "gcloud version": "allow", "gcloud --version": "allow",
+      "gcloud help": "allow", "gcloud help *": "allow",
+      "gcloud topic": "allow", "gcloud topic *": "allow",
+      "gcloud cheat-sheet": "allow",
+      "gcloud auth list": "allow", "gcloud auth list *": "allow",
+      "gcloud config list": "allow", "gcloud config list *": "allow",
+      "gcloud config configurations list": "allow", "gcloud config configurations list *": "allow",
+      "gcloud config configurations describe": "allow", "gcloud config configurations describe *": "allow",
+
+      // Tier 3: data-read allows (verbs not in the universal SAFE set).
+      // Rubric: data-read is eligible for allow. Commands below read user
+      // data or model output without writing, without retrieving credentials,
+      // and without blocking the session.
+      // storage — inspection verbs that print to stdout
+      "gcloud storage ls*": "allow",
+      "gcloud storage cat*": "allow",
+      "gcloud storage du*": "allow",
+      "gcloud storage hash*": "allow",
+      // logging — entry reads (tail is interactive, write/copy are data-write)
+      "gcloud logging read*": "allow",
+      // pubsub — message pulls and read-only message tests
+      "gcloud pubsub subscriptions pull*": "allow",
+      "gcloud pubsub message-transforms test*": "allow",
+      "gcloud pubsub schemas validate-message*": "allow",
+      // kms — encrypt/verify are data transforms that don't retrieve credentials.
+      // decrypt/sign remain ask because decrypted plaintext is typically a
+      // wrapped credential and signatures ARE credentials — see tier 6.
+      "gcloud kms encrypt*": "allow",
+      "gcloud kms raw-encrypt*": "allow",
+      "gcloud kms asymmetric-encrypt*": "allow",
+      "gcloud kms asymmetric-verify*": "allow",
+      "gcloud kms mac-verify*": "allow",
+      // ai / ml / model-armor — model invocation with user payload returning
+      // prediction. Treated as data-read (no state change, no credential
+      // retrieval). Streaming predict is in tier 5 (interactive).
+      "gcloud ai endpoints predict*": "allow",
+      "gcloud ai endpoints raw-predict*": "allow",
+      "gcloud ai endpoints direct-predict*": "allow",
+      "gcloud ai endpoints direct-raw-predict*": "allow",
+      "gcloud ai endpoints explain*": "allow",
+      "gcloud ai-platform predict*": "allow",
+      "gcloud ai-platform local predict*": "allow",
+      "gcloud ml * *": "allow",
+      "gcloud model-armor templates sanitize-*": "allow",
+      // vector-search — read verbs not covered by universal (query/batch-search
+      // /aggregate). list/describe/search fall through to the universal allows.
+      "gcloud vector-search collections data-objects query*": "allow",
+      "gcloud vector-search collections data-objects batch-search*": "allow",
+      "gcloud vector-search collections data-objects aggregate*": "allow",
+      // healthcare — consent-store read queries (PHI access inspection, not
+      // export). export/import/deidentify remain ask in tier 4 (data-write).
+      "gcloud healthcare consent-stores check-data-access*": "allow",
+      "gcloud healthcare consent-stores query-accessible-data*": "allow",
+      "gcloud healthcare consent-stores evaluate-user-consents*": "allow",
+      // logs reads (tails are interactive, call is arbitrary execution)
+      "gcloud functions logs read*": "allow",
+      "gcloud app logs read*": "allow",
+      "gcloud run services logs read*": "allow",
+      "gcloud run jobs logs read*": "allow",
+      // compute — VM output reads (tail variants are interactive)
+      "gcloud compute instances get-serial-port-output*": "allow",
+      "gcloud compute instances get-screenshot*": "allow",
+      "gcloud compute routers download-route-policy*": "allow",
+      // asset / policy-intelligence / metastore — read queries
+      "gcloud asset query*": "allow",
+      "gcloud asset get-history*": "allow",
+      "gcloud policy-intelligence query-activity*": "allow",
+      "gcloud metastore services query-metadata*": "allow",
+      // netapp — crypto data transforms (encrypt/verify; no credential leak)
+      "gcloud netapp kms-configs encrypt*": "allow",
+      "gcloud netapp kms-configs verify*": "allow",
+
+      // Tier 4: data-write asks — override tier 1–3 allows where a read-like
+      // verb name would otherwise admit a write.
+      // storage — writes to remote or local filesystem
+      "gcloud storage cp*": "ask",
+      "gcloud storage mv*": "ask",
+      "gcloud storage rm*": "ask",
+      "gcloud storage rsync*": "ask",
+      "gcloud storage restore*": "ask",
+      "gcloud storage objects create*": "ask",
+      "gcloud storage objects update*": "ask",
+      "gcloud storage objects compose*": "ask",
+      "gcloud storage objects delete*": "ask",
+      "gcloud storage batch-operations *": "ask",
+      "gcloud storage managed-folders create*": "ask",
+      "gcloud storage managed-folders update*": "ask",
+      "gcloud storage managed-folders delete*": "ask",
+      "gcloud storage folders create*": "ask",
+      "gcloud storage folders delete*": "ask",
+      // pubsub — acks are state changes; pull with --auto-ack also mutates.
+      "gcloud pubsub subscriptions ack*": "ask",
+      "gcloud pubsub topics publish*": "ask",
+      "gcloud pubsub lite-topics publish*": "ask",
+      "gcloud pubsub lite-subscriptions ack-up-to*": "ask",
+      "gcloud pubsub subscriptions pull* --auto-ack*": "ask",
+      // logging — data writes
+      "gcloud logging write*": "ask",
+      "gcloud logging copy*": "ask",
+      // kms — signing operations and admin-writes
+      "gcloud kms asymmetric-sign*": "ask",
+      "gcloud kms mac-sign*": "ask",
+      "gcloud kms keys versions import*": "ask",
+      // databases — arbitrary SQL executors can mutate; exports/imports are
+      // data-writes; spanner rows verbs are explicit writes.
+      "gcloud spanner databases execute-sql*": "ask",
+      "gcloud spanner databases sessions execute-sql*": "ask",
+      "gcloud spanner rows *": "ask",
+      "gcloud spanner cli*": "ask",
+      "gcloud sql export *": "ask",
+      "gcloud sql import *": "ask",
+      "gcloud sql instances export*": "ask",
+      "gcloud sql instances import*": "ask",
+      "gcloud sql instances execute-sql*": "ask",
+      "gcloud alloydb clusters export*": "ask",
+      "gcloud alloydb clusters import*": "ask",
+      "gcloud firestore export*": "ask",
+      "gcloud firestore import*": "ask",
+      "gcloud firestore bulk-delete*": "ask",
+      "gcloud datastore export*": "ask",
+      "gcloud datastore import*": "ask",
+      "gcloud bigtable backups copy*": "ask",
+      "gcloud bigtable instances tables restore*": "ask",
+      "gcloud bigtable tables restore*": "ask",
+      // ai/ml - arbitrary execution + batch writes
+      "gcloud ai-platform jobs submit prediction*": "ask",
+      // vector-search — writes/deletes/batch ops
+      "gcloud vector-search collections data-objects create*": "ask",
+      "gcloud vector-search collections data-objects update*": "ask",
+      "gcloud vector-search collections data-objects delete*": "ask",
+      "gcloud vector-search collections data-objects batch-create*": "ask",
+      "gcloud vector-search collections data-objects batch-update*": "ask",
+      "gcloud vector-search collections data-objects batch-delete*": "ask",
+      "gcloud vector-search collections export-data-objects*": "ask",
+      "gcloud vector-search collections import-data-objects*": "ask",
+      // healthcare — PHI writes (export/import/deidentify)
+      "gcloud healthcare datasets deidentify*": "ask",
+      "gcloud healthcare dicom-stores export *": "ask",
+      "gcloud healthcare dicom-stores import *": "ask",
+      "gcloud healthcare dicom-stores deidentify*": "ask",
+      "gcloud healthcare fhir-stores export *": "ask",
+      "gcloud healthcare fhir-stores import *": "ask",
+      "gcloud healthcare fhir-stores deidentify*": "ask",
+      "gcloud healthcare hl7v2-stores export *": "ask",
+      "gcloud healthcare hl7v2-stores import *": "ask",
+      // functions - arbitrary user-payload invocation with unknown side effects
+      "gcloud functions call*": "ask",
+      // compute data-writes (image exports/imports, router uploads, diagnose)
+      "gcloud compute images export*": "ask",
+      "gcloud compute images import*": "ask",
+      "gcloud compute machine-images import*": "ask",
+      "gcloud compute instances import*": "ask",
+      "gcloud compute instances export*": "ask",
+      "gcloud compute diagnose export-logs*": "ask",
+      "gcloud compute routers upload-route-policy*": "ask",
+      // backup / composer / transfer / memorystore / lustre / metastore / redis / looker
+      "gcloud transfer jobs run*": "ask",
+      "gcloud transfer jobs create*": "ask",
+      "gcloud backup-dr backups restore *": "ask",
+      "gcloud composer environments storage *": "ask",
+      "gcloud composer environments snapshots load*": "ask",
+      "gcloud redis instances export*": "ask",
+      "gcloud redis instances import*": "ask",
+      "gcloud redis clusters backups export*": "ask",
+      "gcloud looker instances export*": "ask",
+      "gcloud looker instances import*": "ask",
+      "gcloud memorystore backup-collections backups export*": "ask",
+      "gcloud lustre instances export-data*": "ask",
+      "gcloud lustre instances import-data*": "ask",
+      "gcloud metastore services export *": "ask",
+      "gcloud metastore services import *": "ask",
+      "gcloud netapp volumes restore-backup-files*": "ask",
+      // asset / scc / infra-manager — data exports and state file writes
+      "gcloud asset export*": "ask",
+      "gcloud scc findings export-to-bigquery*": "ask",
+      "gcloud infra-manager deployments export-statefile*": "ask",
+      "gcloud infra-manager deployments import-statefile*": "ask",
+      "gcloud infra-manager deployments export-lock*": "ask",
+      "gcloud infra-manager revisions export-statefile*": "ask",
+      // artifacts — all downloads/uploads/imports write bytes (local or remote)
+      "gcloud artifacts attachments download*": "ask",
+      "gcloud artifacts files download*": "ask",
+      "gcloud artifacts generic download*": "ask",
+      "gcloud artifacts generic upload*": "ask",
+      "gcloud artifacts apt upload*": "ask",
+      "gcloud artifacts apt import*": "ask",
+      "gcloud artifacts yum upload*": "ask",
+      "gcloud artifacts yum import*": "ask",
+      "gcloud artifacts go upload*": "ask",
+      "gcloud artifacts sbom load*": "ask",
+      "gcloud artifacts sbom export*": "ask",
+      "gcloud artifacts vulnerabilities load-vex*": "ask",
+
+      // Tier 5: interactive / session-blocking asks
+      "gcloud init": "ask", "gcloud init *": "ask",
+      "gcloud docker*": "ask",
+      "gcloud feedback": "ask", "gcloud feedback *": "ask",
+      "gcloud survey": "ask", "gcloud survey *": "ask",
+      "gcloud * operations wait*": "ask",
+      "gcloud * wait": "ask", "gcloud * wait *": "ask",
+      "gcloud * stream-logs*": "ask",
+      "gcloud app open-console*": "ask",
+      "gcloud app instances ssh*": "ask",
+      "gcloud app instances scp*": "ask",
+      "gcloud cloud-shell ssh*": "ask",
+      "gcloud cloud-shell scp*": "ask",
+      "gcloud cloud-shell get-mount-command*": "ask",
+      "gcloud compute ssh*": "ask",
+      "gcloud compute scp*": "ask",
+      "gcloud compute config-ssh*": "ask",
+      "gcloud compute copy-files*": "ask",
+      "gcloud compute start-iap-tunnel*": "ask",
+      "gcloud compute connect-to-serial-port*": "ask",
+      "gcloud compute reset-windows-password*": "ask",
+      "gcloud compute instances tail-serial-port-output*": "ask",
+      "gcloud compute instance-groups managed wait-until*": "ask",
+      "gcloud compute tpus * ssh*": "ask",
+      "gcloud compute tpus * scp*": "ask",
+      "gcloud dataproc batches wait*": "ask",
+      "gcloud dataproc jobs wait*": "ask",
+      "gcloud emulators * start*": "ask",
+      "gcloud workflows executions wait*": "ask",
+      "gcloud workflows executions wait-last*": "ask",
+      "gcloud workstations ssh*": "ask",
+      "gcloud workstations start-tcp-tunnel*": "ask",
+
+      // Tier 6: credential / token retrieval asks (MUST ASK per policy).
+      // Every command that returns credential material, mints a token, writes
+      // credentials to disk, or decrypts wrapped-secret material MUST be ask.
+      // auth — credential mutation and token prints
+      "gcloud auth login*": "ask",
+      "gcloud auth logout*": "ask",
+      "gcloud auth revoke*": "ask",
+      "gcloud auth activate-service-account*": "ask",
+      "gcloud auth print-access-token*": "ask",
+      "gcloud auth print-identity-token*": "ask",
+      "gcloud auth application-default *": "ask",
+      "gcloud auth configure-docker*": "ask",
+      "gcloud auth enterprise-certificate-config *": "ask",
+      "gcloud anthos auth login*": "ask",
+      "gcloud anthos create-login-config*": "ask",
+      // All `get-credentials` variants across GKE / Fleet / Hub / Anthos /
+      // Attached / AWS / Azure / bare-metal / edge-cloud — wildcard covers them.
+      "gcloud * get-credentials*": "ask",
+      // iam service-accounts key material and key-use operations
+      "gcloud iam service-accounts keys create*": "ask",
+      "gcloud iam service-accounts keys upload*": "ask",
+      "gcloud iam service-accounts sign-blob*": "ask",
+      "gcloud iam service-accounts sign-jwt*": "ask",
+      "gcloud iam workforce-pools create-login-config*": "ask",
+      "gcloud iam workforce-pools providers keys create*": "ask",
+      "gcloud iam workload-identity-pools providers keys create*": "ask",
+      // signed URLs embed credential material
+      "gcloud compute sign-url*": "ask",
+      "gcloud storage sign-url*": "ask",
+      // kms — returns plaintext (typically a wrapped credential) or produces
+      // signatures / MACs (which are themselves credentials).
+      "gcloud kms decrypt*": "ask",
+      "gcloud kms raw-decrypt*": "ask",
+      "gcloud kms asymmetric-decrypt*": "ask",
+      "gcloud kms decapsulate*": "ask",
+      "gcloud kms asymmetric-sign*": "ask",
+      "gcloud kms mac-sign*": "ask",
+      // secrets, redis AUTH, SQL login token, developer-connect tokens, api keys
+      "gcloud secrets versions access*": "ask",
+      "gcloud redis instances get-auth-string*": "ask",
+      "gcloud sql generate-login-token*": "ask",
+      "gcloud developer-connect connections git-repository-links fetch-read-token*": "ask",
+      "gcloud developer-connect connections git-repository-links fetch-read-write-token*": "ask",
+      "gcloud iap oauth-clients reset-secret*": "ask",
+      "gcloud services api-keys get-key-string*": "ask",
+      // Defensive wildcards for future-introduced credential verbs that don't
+      // happen to match any universal SAFE verb. These never cover a
+      // universal-SAFE verb, so they don't over-ask existing metadata reads.
+      "gcloud * fetch-read-token*": "ask",
+      "gcloud * fetch-read-write-token*": "ask",
+      "gcloud * get-auth-string*": "ask",
+      "gcloud * generate-login-token*": "ask",
+      "gcloud * get-key-string*": "ask",
+
+      // Tier 7: components (installs code)
+      "gcloud components install*": "ask",
+      "gcloud components update*": "ask",
+      "gcloud components remove*": "ask",
+      "gcloud components reinstall*": "ask",
+      "gcloud components repositories *": "ask",
+
+      // Tier 8: artifacts print-settings demotion
+      // `--json-key=<path>` can embed SA key material into the printed snippet,
+      // so this service's print-settings must ask even though the universal
+      // SAFE verb `print-settings` allows it in tier 1.
+      "gcloud artifacts print-settings*": "ask",
+
+      // Tier 9: alpha/beta blanket ask (MUST BE LAST in gcloud section)
+      "gcloud alpha": "ask", "gcloud alpha *": "ask",
+      "gcloud beta": "ask", "gcloud beta *": "ask",
 
       // ── Cocogitto / changelog (read-only) ─────────────────────────────────
       "cog verify *": "allow",
