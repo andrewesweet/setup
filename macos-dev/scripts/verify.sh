@@ -249,6 +249,17 @@ if [[ "$PLATFORM" == "macos" ]]; then
     bash -c "launchctl print gui/\$(id -u)/com.felixkratz.sketchybar"
   check "borders LaunchAgent loaded" \
     bash -c "launchctl print gui/\$(id -u)/com.felixkratz.borders"
+
+  echo ""
+  echo "Desktop Layer 2:"
+  # shellcheck disable=SC2016
+  check "hammerspoon init symlink resolves" \
+    bash -c 'test -L "$HOME/.hammerspoon/init.lua" && test -e "$HOME/.hammerspoon/init.lua"'
+  # shellcheck disable=SC2016
+  check "skhdrc symlink resolves" \
+    bash -c 'test -L "$HOME/.config/skhd/skhdrc" && test -e "$HOME/.config/skhd/skhdrc"'
+  check "skhd LaunchAgent loaded" \
+    bash -c "launchctl print gui/\$(id -u)/com.koekeishiya.skhd"
 fi
 
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
