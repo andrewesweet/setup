@@ -238,14 +238,14 @@ CASES: list[tuple[str, str, str]] = [
     ("gh api repos/cli/cli --raw-field x=1","ask","gh api --raw-field"),
     ("gh api repos/cli/cli --input in.json","ask","gh api --input body"),
 
-    # ── Extension explicit denies (must win over help/version etc.) ──
-    ("gh extension install owner/repo","deny",  "extension install denied"),
-    ("gh extension install owner/repo --help","deny","install --help still deny"),
-    ("gh extension install --force x", "deny",  "install --force denied"),
-    ("gh extension remove foo",        "deny",  "extension remove denied"),
-    ("gh extension upgrade --all",     "deny",  "extension upgrade denied"),
-    ("gh extension exec foo",          "deny",  "extension exec denied"),
-    ("gh extension create my-ext",     "deny",  "extension create denied"),
+    # ── Extension explicit asks (must win over help/version etc.) ──
+    ("gh extension install owner/repo","ask",   "extension install asks"),
+    ("gh extension install owner/repo --help","ask","install --help still asks"),
+    ("gh extension install --force x", "ask",   "install --force asks"),
+    ("gh extension remove foo",        "ask",   "extension remove asks"),
+    ("gh extension upgrade --all",     "ask",   "extension upgrade asks"),
+    ("gh extension exec foo",          "ask",   "extension exec asks"),
+    ("gh extension create my-ext",     "ask",   "extension create asks"),
 
     # ── Extension SAFE allows still work (not in deny set) ──
     ("gh extension list",              "allow", "extension list still allowed"),

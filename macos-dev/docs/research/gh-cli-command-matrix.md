@@ -12,12 +12,12 @@
 | WRITES-LOCAL    | 9     | Writes files or gh config; no workspace scoping per plan §Open Questions. |
 | AUTH            | 6     | Credential mutation; never auto-allow. |
 | INTERACTIVE     | 10    | Blocks AI session (TTY / browser / long stream). |
-| INSTALLS-CODE   | 6     | Downloads or runs arbitrary third-party code. 5 extension verbs denied explicitly; `gh copilot` falls through to ask. |
+| INSTALLS-CODE   | 6     | Downloads or runs arbitrary third-party code. 5 extension verbs demoted to explicit ask; `gh copilot` falls through to ask. |
 | **Total leaves**| **183** | — |
 
 SAFE verbs that accept side-effect flags (`--web`, `--edit`/`--editor`, `--output`, `--dir`, `--clobber`, `--watch`, `--follow`, `-w`) are re-asked by the **global gh flag demotion layer** in `opencode.jsonc`, emitted immediately after the per-family allows. `gh auth status --show-token` / `-t` is re-asked by its own per-command override because the flag leaks a credential even on a SAFE verb.
 
-`gh extension install|remove|upgrade|exec|create` are **explicitly denied** at the absolute end of the bash block so the denies win over every prior rule — including `* --help` and `* --version` — preventing bypass via help/version suffixes.
+`gh extension install|remove|upgrade|exec|create` are **explicitly demoted to ask** at the absolute end of the bash block so the asks win over every prior rule — including `* --help` and `* --version` — preventing bypass via help/version suffixes. The user is prompted for each extension operation rather than blocked outright.
 
 `gh api` is handled by the pre-existing three-layer GET-only block (broad allow → method/body-flag asks → explicit GET re-allow); it is left untouched.
 
@@ -327,13 +327,13 @@ User-defined aliases (`gh <my-alias>`) expand to arbitrary commands and are deli
 | gh extension list    | SAFE          | — | `"gh extension list"`, `"gh extension list *"` |
 | gh extension search  | SAFE          | `--web` | `"gh extension search"`, `"gh extension search *"` |
 | gh extension browse  | INTERACTIVE   | — | (no allow; TUI marketplace) |
-| gh extension install | INSTALLS-CODE | — | **`"gh extension install*": "deny"`** |
-| gh extension remove  | INSTALLS-CODE | — | **`"gh extension remove*": "deny"`** |
-| gh extension upgrade | INSTALLS-CODE | — | **`"gh extension upgrade*": "deny"`** |
-| gh extension exec    | INSTALLS-CODE | — | **`"gh extension exec*": "deny"`** |
-| gh extension create  | INSTALLS-CODE | — | **`"gh extension create*": "deny"`** (scaffolds extension code on disk) |
+| gh extension install | INSTALLS-CODE | — | **`"gh extension install*": "ask"`** |
+| gh extension remove  | INSTALLS-CODE | — | **`"gh extension remove*": "ask"`** |
+| gh extension upgrade | INSTALLS-CODE | — | **`"gh extension upgrade*": "ask"`** |
+| gh extension exec    | INSTALLS-CODE | — | **`"gh extension exec*": "ask"`** |
+| gh extension create  | INSTALLS-CODE | — | **`"gh extension create*": "ask"`** (scaffolds extension code on disk) |
 
-Denies are placed at the **absolute end of the bash rules block** so they win over `* --help`, `* --version`, and any other prior rule. A user cannot bypass these denies by appending `--help`.
+Asks are placed at the **absolute end of the bash rules block** so they win over `* --help`, `* --version`, and any other prior rule. A user cannot bypass these asks by appending `--help`; each invocation prompts the user.
 
 Note: gh 2.89.0 does NOT expose `gh extension view` — the enumeration shows only `browse`, `create`, `exec`, `install`, `list`, `remove`, `search`, `upgrade`. No pattern is emitted for a nonexistent verb.
 

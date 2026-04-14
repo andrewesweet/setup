@@ -372,16 +372,18 @@
       // for `rm -rf /tmp/opencode-*` paths only.
       "rm -rf /tmp/opencode-*": "allow",
 
-      // ── gh extension explicit denies (ABSOLUTE LAST) ──────────────────────
-      // Placed at the very end so these denies win over every prior rule —
+      // ── gh extension: explicit ask for side-effectful verbs (ABSOLUTE LAST)
+      // Placed at the very end so these asks win over every prior rule —
       // including `* --help`, `* --version`, and any gh family allow. Extension
-      // install/remove/upgrade/exec/create invoke arbitrary third-party code
-      // and MUST NEVER auto-allow. See docs/research/gh-cli-command-matrix.md.
-      "gh extension install*": "deny",
-      "gh extension remove*": "deny",
-      "gh extension upgrade*": "deny",
-      "gh extension exec*": "deny",
-      "gh extension create*": "deny"
+      // install/remove/upgrade/exec/create invoke arbitrary third-party code;
+      // they are demoted here so the user can approve individually rather than
+      // falling through to the default ask by silence (which could otherwise
+      // be shadowed by a broader allow pattern added in the future).
+      "gh extension install*": "ask",
+      "gh extension remove*": "ask",
+      "gh extension upgrade*": "ask",
+      "gh extension exec*": "ask",
+      "gh extension create*": "ask"
     },
     "edit": {
       "*": "ask",
