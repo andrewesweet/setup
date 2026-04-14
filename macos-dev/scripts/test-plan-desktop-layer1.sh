@@ -445,6 +445,33 @@ for needle in 'Accessibility' 'AeroSpace' 'aerospace list-monitors' '<office-cen
   fi
 done
 
+# ── AC-23: manual-smoke/desktop-layer1.md populated ──────────────────
+echo ""
+echo "AC-23: manual-smoke/desktop-layer1.md populated"
+check "manual-smoke/desktop-layer1.md exists" \
+  test -f docs/manual-smoke/desktop-layer1.md
+check "manual-smoke has 'When to run' section" \
+  grep -qE '^## When to run' docs/manual-smoke/desktop-layer1.md
+check "manual-smoke has 'Checklist' section" \
+  grep -qE '^## Checklist' docs/manual-smoke/desktop-layer1.md
+check "manual-smoke has 'Failure modes' section" \
+  grep -qE '^## Failure modes' docs/manual-smoke/desktop-layer1.md
+# Count checklist items — expect ≥ 10 in main + ≥ 3 in failure modes.
+checklist_items=$(awk '/^## Checklist/,/^## Failure modes/' docs/manual-smoke/desktop-layer1.md \
+                  | grep -cE '^- \[ \]')
+failure_items=$(awk '/^## Failure modes/,0' docs/manual-smoke/desktop-layer1.md \
+               | grep -cE '^- \[ \]')
+if (( checklist_items >= 10 )); then
+  ok "checklist has ≥ 10 items ($checklist_items)"
+else
+  nok "checklist has ≥ 10 items ($checklist_items)"
+fi
+if (( failure_items >= 3 )); then
+  ok "failure modes has ≥ 3 drill items ($failure_items)"
+else
+  nok "failure modes has ≥ 3 drill items ($failure_items)"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
