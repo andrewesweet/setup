@@ -128,6 +128,110 @@ else
   nok "\$HOME/Applications mkdir precedes brew bundle (mkdir=$mkdir_line brew=$brew_bundle_line)"
 fi
 
+# ── AC-6: aerospace.toml parses as valid TOML ─────────────────────────
+echo ""
+echo "AC-6: aerospace.toml parses as valid TOML"
+if command -v python3 &>/dev/null; then
+  if python3 -c "import tomllib, sys; tomllib.load(open(sys.argv[1], 'rb'))" \
+       aerospace/aerospace.toml 2>/dev/null; then
+    ok "aerospace.toml parses"
+  else
+    nok "aerospace.toml parses"
+  fi
+else
+  skp "aerospace.toml parses" "python3 not available"
+fi
+
+# ── AC-7: aerospace.toml core settings ───────────────────────────────
+echo ""
+echo "AC-7: aerospace.toml core settings"
+check "start-at-login = true"             grep -qE '^start-at-login[[:space:]]*=[[:space:]]*true' aerospace/aerospace.toml
+check "default-root-container-layout tiles" \
+  grep -qE "default-root-container-layout[[:space:]]*=[[:space:]]*'tiles'" aerospace/aerospace.toml
+check "default-root-container-orientation auto" \
+  grep -qE "default-root-container-orientation[[:space:]]*=[[:space:]]*'auto'" aerospace/aerospace.toml
+check "accordion-padding = 30"            grep -qE 'accordion-padding[[:space:]]*=[[:space:]]*30' aerospace/aerospace.toml
+# gaps.outer.top = 36 verified via TOML parse (more robust than a regex).
+if command -v python3 &>/dev/null; then
+  top_gap="$(python3 -c "import tomllib; d=tomllib.load(open('aerospace/aerospace.toml','rb')); print(d.get('gaps',{}).get('outer',{}).get('top',''))" 2>/dev/null)"
+  if [[ "$top_gap" == "36" ]]; then
+    ok "gaps.outer.top == 36"
+  else
+    nok "gaps.outer.top == 36 (got: $top_gap)"
+  fi
+else
+  skp "gaps.outer.top == 36" "python3 not available"
+fi
+
+# ── AC-8: aerospace.toml main-mode bindings ──────────────────────────
+echo ""
+echo "AC-8: aerospace.toml main-mode bindings"
+toml="$(cat aerospace/aerospace.toml)"
+for b in 'alt-1' 'alt-2' 'alt-3' 'alt-4' \
+         'alt-shift-1' 'alt-shift-2' 'alt-shift-3' 'alt-shift-4' \
+         'alt-h' 'alt-j' 'alt-k' 'alt-l' \
+         'alt-shift-h' 'alt-shift-j' 'alt-shift-k' 'alt-shift-l' \
+         'alt-slash' 'alt-comma' 'alt-f' 'alt-shift-space'; do
+  if printf '%s' "$toml" | grep -qE "^${b}[[:space:]]*="; then
+    ok "binding $b declared"
+  else
+    nok "binding $b declared"
+  fi
+done
+
+# ── AC-9: aerospace.toml on-window-detected pins ─────────────────────
+echo ""
+echo "AC-9: aerospace.toml on-window-detected pins"
+# Count [[on-window-detected]] occurrences — expect at least 4.
+owd_count=$(grep -cE '^\[\[on-window-detected\]\]' aerospace/aerospace.toml)
+if (( owd_count >= 4 )); then
+  ok "at least 4 [[on-window-detected]] blocks ($owd_count)"
+else
+  nok "at least 4 [[on-window-detected]] blocks ($owd_count)"
+fi
+check "kitty app-id pinned" \
+  grep -qE "app-id[[:space:]]*=[[:space:]]*'net\.kovidgoyal\.kitty'" aerospace/aerospace.toml
+check "MS Edge app-id pinned" \
+  grep -qE "app-id[[:space:]]*=[[:space:]]*'com\.microsoft\.edgemac'" aerospace/aerospace.toml
+check "MS Teams app-id pinned" \
+  grep -qE "app-id[[:space:]]*=[[:space:]]*'com\.microsoft\.teams2'" aerospace/aerospace.toml
+check "MS Outlook app-id pinned" \
+  grep -qE "app-id[[:space:]]*=[[:space:]]*'com\.microsoft\.Outlook'" aerospace/aerospace.toml
+
+# ── AC-10: workspace-to-monitor-force-assignment placeholders ────────
+echo ""
+echo "AC-10: workspace-to-monitor-force-assignment placeholders"
+check "section declared" \
+  grep -qE '^\[workspace-to-monitor-force-assignment\]' aerospace/aerospace.toml
+check "workspace 1 names office-central + home-centre placeholders" \
+  grep -qE '^1[[:space:]]*=.*<office-central-monitor-name>.*<home-centre-monitor-name>' aerospace/aerospace.toml
+check "workspace 2 names office-central + built-in" \
+  grep -qE '^2[[:space:]]*=.*<office-central-monitor-name>.*built-in' aerospace/aerospace.toml
+check "workspace 3 names home-left + built-in" \
+  grep -qE '^3[[:space:]]*=.*<home-left-monitor-name>.*built-in' aerospace/aerospace.toml
+# Workspace 4 must be absent from the force-assignment table.
+if awk '/^\[workspace-to-monitor-force-assignment\]/,/^\[/' aerospace/aerospace.toml \
+   | grep -qE '^4[[:space:]]*='; then
+  nok "workspace 4 absent from force-assignment (scratch follows focused monitor)"
+else
+  ok "workspace 4 absent from force-assignment (scratch follows focused monitor)"
+fi
+
+# ── AC-11: exec-on-workspace-change trigger ──────────────────────────
+echo ""
+echo "AC-11: exec-on-workspace-change trigger uses @HOMEBREW_PREFIX@"
+exec_body="$(awk '/^exec-on-workspace-change[[:space:]]*=/,/^\]/' aerospace/aerospace.toml)"
+if printf '%s' "$exec_body" | grep -q '@HOMEBREW_PREFIX@/bin/sketchybar'; then
+  ok "exec-on-workspace-change uses @HOMEBREW_PREFIX@/bin/sketchybar"
+else
+  nok "exec-on-workspace-change uses @HOMEBREW_PREFIX@/bin/sketchybar"
+fi
+if printf '%s' "$exec_body" | grep -q 'aerospace_workspace_change'; then
+  ok "trigger name is aerospace_workspace_change"
+else
+  nok "trigger name is aerospace_workspace_change"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
