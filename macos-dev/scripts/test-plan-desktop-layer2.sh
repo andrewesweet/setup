@@ -147,6 +147,42 @@ else
   nok "init.lua contains pcall("
 fi
 
+# ── AC-8: skhd/.skhdrc parses via skhd --parse (else skp) ────────────
+echo ""
+echo "AC-8: skhd/.skhdrc parses via skhd --parse"
+if [[ "$PLATFORM" == "macos" ]] && command -v skhd &>/dev/null; then
+  if skhd --parse skhd/.skhdrc >/dev/null 2>&1; then
+    ok "skhd --parse skhd/.skhdrc"
+  else
+    nok "skhd --parse skhd/.skhdrc"
+  fi
+else
+  skp "skhd --parse skhd/.skhdrc" "skhd not installed"
+fi
+
+# ── AC-9: skhd/.skhdrc declares all 11 Hyper bindings ────────────────
+echo ""
+echo "AC-9: skhd/.skhdrc declares 11 Hyper bindings"
+skhd_body="$(sed 's/#.*//' skhd/.skhdrc)"
+for key in 'e' 'o' 't' 'k' 'n' 'w' 'x' 'p' 'f' 'space' 'r'; do
+  if printf '%s' "$skhd_body" \
+       | grep -qE "cmd[[:space:]]*\\+[[:space:]]*alt[[:space:]]*\\+[[:space:]]*ctrl[[:space:]]*\\+[[:space:]]*shift[[:space:]]*-[[:space:]]*${key}[[:space:]]*:"; then
+    ok "Hyper+$key binding declared"
+  else
+    nok "Hyper+$key binding declared"
+  fi
+done
+
+# ── AC-10: Hyper+r binding uses @HOMEBREW_PREFIX@/bin/aerospace ──────
+echo ""
+echo "AC-10: Hyper+r calls @HOMEBREW_PREFIX@/bin/aerospace reload-config"
+if printf '%s' "$skhd_body" \
+     | grep -qE "cmd[[:space:]]*\\+[[:space:]]*alt[[:space:]]*\\+[[:space:]]*ctrl[[:space:]]*\\+[[:space:]]*shift[[:space:]]*-[[:space:]]*r[[:space:]]*:.*@HOMEBREW_PREFIX@/bin/aerospace[[:space:]]+reload-config"; then
+  ok "Hyper+r uses @HOMEBREW_PREFIX@/bin/aerospace reload-config"
+else
+  nok "Hyper+r uses @HOMEBREW_PREFIX@/bin/aerospace reload-config"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
