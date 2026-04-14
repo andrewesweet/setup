@@ -313,6 +313,37 @@ else
   skp "shellcheck all sketchybar/plugins/*.sh" "shellcheck not available"
 fi
 
+# ── AC-16: zscaler.sh uses pgrep -qx ZscalerTunnel ───────────────────
+echo ""
+echo "AC-16: zscaler.sh uses pgrep -qx ZscalerTunnel"
+# Strip comments so commented-out pgrep examples don't leak.
+zscaler_body="$(sed 's/#.*//' sketchybar/plugins/zscaler.sh)"
+if printf '%s' "$zscaler_body" | grep -q 'pgrep -qx ZscalerTunnel'; then
+  ok "zscaler.sh uses pgrep -qx ZscalerTunnel"
+else
+  nok "zscaler.sh uses pgrep -qx ZscalerTunnel"
+fi
+
+# ── AC-17: focus_mode.sh reads Assertions.json with jq -e guard ──────
+echo ""
+echo "AC-17: focus_mode.sh reads Assertions.json with jq -e guard"
+focus_body="$(sed 's/#.*//' sketchybar/plugins/focus_mode.sh)"
+if printf '%s' "$focus_body" | grep -q 'Library/DoNotDisturb/DB/Assertions.json'; then
+  ok "focus_mode.sh references Assertions.json"
+else
+  nok "focus_mode.sh references Assertions.json"
+fi
+if printf '%s' "$focus_body" | grep -q 'jq -e'; then
+  ok "focus_mode.sh uses jq -e guard"
+else
+  nok "focus_mode.sh uses jq -e guard"
+fi
+if printf '%s' "$focus_body" | grep -qE 'drawing=off|drawing off'; then
+  ok "focus_mode.sh falls back to drawing=off on failure"
+else
+  nok "focus_mode.sh falls back to drawing=off on failure"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
