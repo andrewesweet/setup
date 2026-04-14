@@ -133,3 +133,6 @@ code                 brew:visual-studio-code        apt:-                   apk:
 # ── Desktop (macOS-only formulae — Layer 1 desktop) ─────────────────────────
 sketchybar           brew:sketchybar                apt:-                   apk:-
 borders              brew:FelixKratz/formulae/borders apt:-                   apk:-
+
+# ── Desktop keyboard (Layer 2 desktop) ───────────────────────────────
+skhd                 brew:koekeishiya/formulae/skhd              apt:-                   apk:-

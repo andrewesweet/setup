@@ -57,7 +57,28 @@ echo "Desktop Layer 2 acceptance tests (Hammerspoon + skhd + dormant Karabiner)"
 echo "Platform: $PLATFORM    Mode: $([ "$FULL" = true ] && echo "full" || echo "safe")"
 echo ""
 
-# ── AC-1..20 get appended by subsequent tasks ─────────────────────────
+# ── AC-1: Brewfile declares Hammerspoon + skhd ──────────────────────
+echo ""
+echo "AC-1: Brewfile declares keyboard-layer tooling"
+check "Brewfile has cask \"hammerspoon\"" \
+  grep -qE '^cask "hammerspoon"' Brewfile
+check "Brewfile has tap \"koekeishiya/formulae\"" \
+  grep -qE '^tap "koekeishiya/formulae"' Brewfile
+check "Brewfile has brew \"koekeishiya/formulae/skhd\"" \
+  grep -qE '^brew "koekeishiya/formulae/skhd"' Brewfile
+
+# ── AC-2: tools.txt declares skhd; casks intentionally absent ────────
+echo ""
+echo "AC-2: tools.txt declares skhd formula (no cask rows)"
+check "tools.txt has brew:koekeishiya/formulae/skhd" \
+  grep -qE '^skhd[[:space:]]+brew:koekeishiya/formulae/skhd' tools.txt
+if grep -qE '^[a-z].*brew:hammerspoon' tools.txt; then
+  nok "tools.txt does NOT list hammerspoon (cask)"
+else
+  ok "tools.txt does NOT list hammerspoon (cask)"
+fi
+check "check-tool-manifest.sh still passes" \
+  bash scripts/check-tool-manifest.sh
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
