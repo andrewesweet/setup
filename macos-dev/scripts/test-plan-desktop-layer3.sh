@@ -65,7 +65,51 @@ check "Brewfile has cask \"raycast\"" \
 check "check-tool-manifest.sh still passes" \
   bash scripts/check-tool-manifest.sh
 
-# ── AC-2..9 get appended by subsequent tasks ──────────────────────────
+# ── AC-2: raycast/extensions.md two-section structure ────────────────
+echo ""
+echo "AC-2: raycast/extensions.md two-section structure"
+check "file exists" test -f raycast/extensions.md
+check "top-level '# Raycast' header" \
+  grep -qE '^# Raycast' raycast/extensions.md
+check "## Summary header" \
+  grep -qE '^## Summary' raycast/extensions.md
+check "## Post-install checklist header" \
+  grep -qE '^## Post-install checklist' raycast/extensions.md
+check "## Recommended extensions header" \
+  grep -qE '^## Recommended extensions' raycast/extensions.md
+
+# ── AC-3: Post-install checklist 8 documented steps ──────────────────
+echo ""
+echo "AC-3: Post-install checklist covers 8 documented steps"
+checklist="$(awk '/^## Post-install checklist/,/^## Recommended extensions/' raycast/extensions.md)"
+for needle in 'Launch Raycast' \
+              'Accessibility' \
+              'Start at login' \
+              'Cmd.*Space' \
+              'Spotlight' \
+              'Pop to root' \
+              'Auto-switch input source' \
+              'sign.in\|Account'; do
+  if printf '%s' "$checklist" | grep -qE "$needle"; then
+    ok "checklist mentions: $needle"
+  else
+    nok "checklist mentions: $needle"
+  fi
+done
+
+# ── AC-4: Recommended extensions — 7 curated items ──────────────────
+echo ""
+echo "AC-4: Recommended extensions lists 7 curated items"
+recommended="$(awk '/^## Recommended extensions/,0' raycast/extensions.md)"
+for ext in 'Brew' 'GitHub' 'Kill Process' 'System' 'Clipboard History' 'Color Picker' 'Visual Studio Code'; do
+  if printf '%s' "$recommended" | grep -qF "$ext"; then
+    ok "Recommended extensions lists: $ext"
+  else
+    nok "Recommended extensions lists: $ext"
+  fi
+done
+
+# ── AC-5..9 get appended by subsequent tasks ──────────────────────────
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
