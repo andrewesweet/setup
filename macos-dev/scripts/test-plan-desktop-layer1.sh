@@ -59,6 +59,34 @@ echo ""
 
 # ── AC-1..25 get appended by subsequent tasks ─────────────────────────
 
+# ── AC-1: Brewfile declares AeroSpace cask + tap ──────────────────────
+echo ""
+echo "AC-1: Brewfile declares AeroSpace cask and tap"
+check "Brewfile has tap \"nikitabobko/tap\"" \
+  grep -qE '^tap "nikitabobko/tap"' Brewfile
+check "Brewfile has cask \"nikitabobko/tap/aerospace\"" \
+  grep -qE '^cask "nikitabobko/tap/aerospace"' Brewfile
+
+# ── AC-2: Brewfile declares SketchyBar + JankyBorders + tap ──────────
+echo ""
+echo "AC-2: Brewfile declares SketchyBar + JankyBorders"
+check "Brewfile has tap \"FelixKratz/formulae\"" \
+  grep -qE '^tap "FelixKratz/formulae"' Brewfile
+check "Brewfile has brew \"sketchybar\"" \
+  grep -qE '^brew "sketchybar"' Brewfile
+check "Brewfile has brew \"FelixKratz/formulae/borders\"" \
+  grep -qE '^brew "FelixKratz/formulae/borders"' Brewfile
+
+# ── AC-3: tools.txt declares the two new formulae ────────────────────
+echo ""
+echo "AC-3: tools.txt declares the two new formulae"
+check "tools.txt has brew:sketchybar row" \
+  grep -qE '^sketchybar[[:space:]]+brew:sketchybar' tools.txt
+check "tools.txt has brew:FelixKratz/formulae/borders row" \
+  grep -qE '^borders[[:space:]]+brew:FelixKratz/formulae/borders' tools.txt
+check "check-tool-manifest.sh still passes" \
+  bash scripts/check-tool-manifest.sh
+
 # ── AC-4: check-tool-manifest.sh skips cask lines ──────────────────────
 echo ""
 echo "AC-4: check-tool-manifest.sh skips cask lines"

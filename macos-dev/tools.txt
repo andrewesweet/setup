@@ -129,3 +129,7 @@ carapace             brew:carapace                  apt:-                   apk:
 
 # ── VS Code (macOS only — Windows installs on Windows side for WSL2) ─────────
 code                 brew:visual-studio-code        apt:-                   apk:-
+
+# ── Desktop (macOS-only formulae — Layer 1 desktop) ─────────────────────────
+sketchybar           brew:sketchybar                apt:-                   apk:-
+borders              brew:FelixKratz/formulae/borders apt:-                   apk:-

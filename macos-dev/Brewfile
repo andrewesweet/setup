@@ -159,3 +159,15 @@ brew "carapace"
 
 # ── VS Code (macOS cask) ─────────────────────────────────────────────────────
 cask "visual-studio-code"
+
+# ── Desktop · window manager (Layer 1 desktop) ────────────────────────
+# AeroSpace is pre-1.0 (semver disclaims backwards compatibility).
+# Pin the minimum version in this comment if breaking changes are seen:
+#   Last verified compatible: AeroSpace 0.x.y (check nikitabobko/aerospace releases)
+tap "nikitabobko/tap"
+cask "nikitabobko/tap/aerospace"
+
+# ── Desktop · status bar & focus indicator (Layer 1 desktop) ──────────
+tap "FelixKratz/formulae"
+brew "sketchybar"
+brew "FelixKratz/formulae/borders"
