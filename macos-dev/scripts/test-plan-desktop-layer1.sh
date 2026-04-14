@@ -294,6 +294,25 @@ else
   nok "sketchybarrc adds ≥ 8 items ($add_item_count)"
 fi
 
+# ── AC-15: all sketchybar/plugins/*.sh shellcheck-clean ──────────────
+echo ""
+echo "AC-15: sketchybar plugins shellcheck-clean"
+if command -v shellcheck &>/dev/null; then
+  all_ok=true
+  for plugin in sketchybar/plugins/*.sh; do
+    [[ -f "$plugin" ]] || continue
+    if ! shellcheck "$plugin" >/dev/null 2>&1; then
+      nok "shellcheck $plugin"
+      all_ok=false
+    fi
+  done
+  if $all_ok; then
+    ok "shellcheck all sketchybar/plugins/*.sh"
+  fi
+else
+  skp "shellcheck all sketchybar/plugins/*.sh" "shellcheck not available"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
