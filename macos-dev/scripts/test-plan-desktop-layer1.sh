@@ -388,6 +388,63 @@ for plist in launchagents/com.felixkratz.sketchybar.plist \
     grep -q '@HOME@' "$plist"
 done
 
+# ── AC-20: install-macos.sh symlinks Layer 1 desktop configs ──────────
+echo ""
+echo "AC-20: install-macos.sh symlinks Layer 1 desktop configs"
+check "link aerospace/aerospace.toml" \
+  grep -qE 'link[[:space:]]+aerospace/aerospace\.toml[[:space:]]+\.config/aerospace/aerospace\.toml' install-macos.sh
+check "link sketchybar/sketchybarrc" \
+  grep -qE 'link[[:space:]]+sketchybar/sketchybarrc[[:space:]]+\.config/sketchybar/sketchybarrc' install-macos.sh
+check "link sketchybar/colors.sh" \
+  grep -qE 'link[[:space:]]+sketchybar/colors\.sh[[:space:]]+\.config/sketchybar/colors\.sh' install-macos.sh
+check "link sketchybar/icons.sh" \
+  grep -qE 'link[[:space:]]+sketchybar/icons\.sh[[:space:]]+\.config/sketchybar/icons\.sh' install-macos.sh
+check "link sketchybar/plugins (directory)" \
+  grep -qE 'link[[:space:]]+sketchybar/plugins[[:space:]]+\.config/sketchybar/plugins' install-macos.sh
+check "link jankyborders/bordersrc" \
+  grep -qE 'link[[:space:]]+jankyborders/bordersrc[[:space:]]+\.config/borders/bordersrc' install-macos.sh
+
+# ── AC-21: install-macos.sh sed-substitutes plists + bootstraps ──────
+echo ""
+echo "AC-21: install-macos.sh bootstraps Layer 1 LaunchAgents"
+block="$(awk '/Desktop LaunchAgents \(macOS only\)/,/Desktop LaunchAgents loaded/' install-macos.sh)"
+for la in 'com.felixkratz.sketchybar.plist' 'com.felixkratz.borders.plist'; do
+  if printf '%s' "$block" | grep -q "$la"; then
+    ok "desktop LaunchAgent block names $la"
+  else
+    nok "desktop LaunchAgent block names $la"
+  fi
+done
+if printf '%s' "$block" | grep -qE 'sed.*@HOMEBREW_PREFIX@.*@HOME@'; then
+  ok "sed substitutes both @HOMEBREW_PREFIX@ and @HOME@"
+else
+  nok "sed substitutes both @HOMEBREW_PREFIX@ and @HOME@"
+fi
+if printf '%s' "$block" | grep -q 'launchctl bootout'; then
+  ok "block calls launchctl bootout"
+else
+  nok "block calls launchctl bootout"
+fi
+if printf '%s' "$block" | grep -q 'launchctl bootstrap'; then
+  ok "block calls launchctl bootstrap"
+else
+  nok "block calls launchctl bootstrap"
+fi
+check "desktop LaunchAgent block guarded by Darwin check" \
+  bash -c "grep -qE 'if \[\[.*uname.*Darwin' install-macos.sh"
+
+# ── AC-22: install-macos.sh Next-steps covers desktop first-run ──────
+echo ""
+echo "AC-22: install-macos.sh Next-steps mentions desktop first-run"
+next="$(awk '/Next steps:/,/EOF/' install-macos.sh)"
+for needle in 'Accessibility' 'AeroSpace' 'aerospace list-monitors' '<office-central-monitor-name>'; do
+  if printf '%s' "$next" | grep -q -F "$needle"; then
+    ok "Next-steps mentions: $needle"
+  else
+    nok "Next-steps mentions: $needle"
+  fi
+done
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
