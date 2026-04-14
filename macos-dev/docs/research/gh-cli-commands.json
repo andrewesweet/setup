@@ -1,0 +1,6314 @@
+{
+  "gh_version": "gh version 2.89.0 (2026-03-26)",
+  "generated_at": "2026-04-14T14:49:47+00:00",
+  "schema": "gh-cli-commands.v1",
+  "leaf_count": 183,
+  "root": {
+    "path": "gh",
+    "depth": 0,
+    "kind": "branch",
+    "children": [
+      {
+        "path": "gh agent-task",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh agent-task create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --base string",
+              "-a, --custom-agent string",
+              "--follow",
+              "-F, --from-file file"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh agent-task create \"build me a new app\""
+            ],
+            "short": "Create an agent task (preview)"
+          },
+          {
+            "path": "gh agent-task list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-q, --jq expression",
+              "--json fields",
+              "-L, --limit int",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List agent tasks (preview)"
+          },
+          {
+            "path": "gh agent-task view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--follow",
+              "-q, --jq expression",
+              "--json fields",
+              "--log",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh agent-task view e2fa49d2-f164-4a56-ab99-498090b8fcdf"
+            ],
+            "short": "View an agent task session (preview)"
+          }
+        ],
+        "short": "Work with agent tasks (preview)"
+      },
+      {
+        "path": "gh alias",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh alias delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--all"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete set aliases"
+          },
+          {
+            "path": "gh alias import",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--clobber"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh alias import aliases.yml"
+            ],
+            "short": "Import aliases from a YAML file"
+          },
+          {
+            "path": "gh alias list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List your aliases"
+          },
+          {
+            "path": "gh alias set",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--clobber",
+              "-s, --shell"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh alias set pv 'pr view'",
+              "gh pv -w 123  #=> gh pr view -w 123"
+            ],
+            "short": "Create a shortcut for a gh command"
+          }
+        ],
+        "short": "Create command shortcuts"
+      },
+      {
+        "path": "gh api",
+        "depth": 1,
+        "kind": "leaf",
+        "flags": [
+          "--cache duration",
+          "--hostname string",
+          "-i, --include",
+          "--input file",
+          "-q, --jq string",
+          "-X, --method string",
+          "--paginate",
+          "-p, --preview strings",
+          "--silent",
+          "--slurp",
+          "-t, --template string",
+          "--verbose"
+        ],
+        "inherited": [
+          "--help"
+        ],
+        "examples": [
+          "gh api repos/{owner}/{repo}/releases"
+        ],
+        "short": "Make an authenticated GitHub API request"
+      },
+      {
+        "path": "gh attestation",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh attestation download",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-d, --digest-alg string",
+              "--hostname string",
+              "-L, --limit int",
+              "-o, --owner string",
+              "--predicate-type string",
+              "-R, --repo string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh attestation download example.bin -o github"
+            ],
+            "short": "Download an artifact's attestations for offline use"
+          },
+          {
+            "path": "gh attestation trusted-root",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--hostname string",
+              "--tuf-root string",
+              "--tuf-url string",
+              "--verify-only"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh attestation trusted-root"
+            ],
+            "short": "Output trusted_root.jsonl contents, likely for offline verification"
+          },
+          {
+            "path": "gh attestation verify",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --bundle string",
+              "--bundle-from-oci",
+              "--cert-identity string",
+              "-i, --cert-identity-regex string",
+              "--cert-oidc-issuer string",
+              "--custom-trusted-root string",
+              "--deny-self-hosted-runners",
+              "-d, --digest-alg string",
+              "--format string",
+              "--hostname string",
+              "-q, --jq expression",
+              "-L, --limit int",
+              "--no-public-good",
+              "-o, --owner string",
+              "--predicate-type string",
+              "-R, --repo string",
+              "--signer-digest string",
+              "--signer-repo string",
+              "--signer-workflow string",
+              "--source-digest string",
+              "--source-ref string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh attestation verify example.bin --repo github/example"
+            ],
+            "short": "Verify an artifact's integrity using attestations"
+          }
+        ],
+        "short": "Work with artifact attestations"
+      },
+      {
+        "path": "gh auth",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh auth login",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --clipboard",
+              "-p, --git-protocol string",
+              "-h, --hostname string",
+              "--insecure-storage",
+              "-s, --scopes strings",
+              "--skip-ssh-key",
+              "-w, --web",
+              "--with-token"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh auth login"
+            ],
+            "short": "Log in to a GitHub account"
+          },
+          {
+            "path": "gh auth logout",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-h, --hostname string",
+              "-u, --user string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh auth logout"
+            ],
+            "short": "Log out of a GitHub account"
+          },
+          {
+            "path": "gh auth refresh",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --clipboard",
+              "-h, --hostname string",
+              "--insecure-storage",
+              "-r, --remove-scopes strings",
+              "--reset-scopes",
+              "-s, --scopes strings"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh auth refresh --scopes write:org,read:public_key"
+            ],
+            "short": "Refresh stored authentication credentials"
+          },
+          {
+            "path": "gh auth setup-git",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-h, --hostname string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh auth setup-git"
+            ],
+            "short": "Setup git with GitHub CLI"
+          },
+          {
+            "path": "gh auth status",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --active",
+              "-h, --hostname string",
+              "--jq expression",
+              "--json fields",
+              "-t, --show-token",
+              "--template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh auth status"
+            ],
+            "short": "Display active account and authentication state on each known GitHub host"
+          },
+          {
+            "path": "gh auth switch",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-h, --hostname string",
+              "-u, --user string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh auth switch"
+            ],
+            "short": "Switch active GitHub account"
+          },
+          {
+            "path": "gh auth token",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-h, --hostname string",
+              "-u, --user string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Print the authentication token gh uses for a hostname and account"
+          }
+        ],
+        "short": "Authenticate gh and git with GitHub"
+      },
+      {
+        "path": "gh browse",
+        "depth": 1,
+        "kind": "leaf",
+        "flags": [
+          "-a, --actions",
+          "--blame",
+          "-b, --branch string",
+          "-n, --no-browser",
+          "-p, --projects",
+          "-r, --releases",
+          "-s, --settings",
+          "-w, --wiki"
+        ],
+        "inherited": [
+          "--help"
+        ],
+        "examples": [
+          "gh browse"
+        ],
+        "short": "Open repositories, issues, pull requests, and more in the browser"
+      },
+      {
+        "path": "gh cache",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh cache delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --all",
+              "-r, --ref string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh cache delete 1234"
+            ],
+            "short": "Delete GitHub Actions caches"
+          },
+          {
+            "path": "gh cache list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-q, --jq expression",
+              "--json fields",
+              "-k, --key string",
+              "-L, --limit int",
+              "-O, --order string",
+              "-r, --ref string",
+              "-S, --sort string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh cache list"
+            ],
+            "short": "List GitHub Actions caches"
+          }
+        ],
+        "short": "Manage GitHub Actions caches"
+      },
+      {
+        "path": "gh codespace",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh codespace code",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "--insiders",
+              "-R, --repo string",
+              "--repo-owner string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Open a codespace in Visual Studio Code"
+          },
+          {
+            "path": "gh codespace cp",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "-e, --expand",
+              "-p, --profile string",
+              "-r, --recursive",
+              "-R, --repo string",
+              "--repo-owner string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh codespace cp -e README.md 'remote:/workspaces/$RepositoryName/'",
+              "gh codespace cp -e 'remote:~/*.go' ./gofiles/",
+              "gh codespace cp -e 'remote:/workspaces/myproj/go.{mod,sum}' ./gofiles/",
+              "gh codespace cp -e -- -F ~/.ssh/codespaces_config 'remote:~/*.go' ./gofiles/"
+            ],
+            "short": "Copy files between local and remote file systems"
+          },
+          {
+            "path": "gh codespace create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --branch string",
+              "--default-permissions",
+              "--devcontainer-path string",
+              "-d, --display-name string",
+              "--idle-timeout duration",
+              "-l, --location string",
+              "-m, --machine string",
+              "-R, --repo string",
+              "--retention-period duration",
+              "-s, --status",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Create a codespace"
+          },
+          {
+            "path": "gh codespace delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--all",
+              "-c, --codespace string",
+              "--days N",
+              "-f, --force",
+              "-o, --org login",
+              "-R, --repo string",
+              "--repo-owner string",
+              "-u, --user username"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete codespaces"
+          },
+          {
+            "path": "gh codespace edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "-d, --display-name string",
+              "-m, --machine string",
+              "-R, --repo string",
+              "--repo-owner string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Edit a codespace"
+          },
+          {
+            "path": "gh codespace jupyter",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "-R, --repo string",
+              "--repo-owner string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Open a codespace in JupyterLab"
+          },
+          {
+            "path": "gh codespace list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-q, --jq expression",
+              "--json fields",
+              "-L, --limit int",
+              "-o, --org login",
+              "-R, --repo string",
+              "-t, --template string",
+              "-u, --user username",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List codespaces"
+          },
+          {
+            "path": "gh codespace logs",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "-f, --follow",
+              "-R, --repo string",
+              "--repo-owner string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Access codespace logs"
+          },
+          {
+            "path": "gh codespace ports",
+            "depth": 2,
+            "kind": "branch",
+            "children": [
+              {
+                "path": "gh codespace ports forward",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [],
+                "inherited": [
+                  "-c, --codespace string",
+                  "--help",
+                  "-R, --repo string",
+                  "--repo-owner string"
+                ],
+                "examples": [],
+                "short": "Forward ports"
+              },
+              {
+                "path": "gh codespace ports visibility",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [],
+                "inherited": [
+                  "-c, --codespace string",
+                  "--help",
+                  "-R, --repo string",
+                  "--repo-owner string"
+                ],
+                "examples": [
+                  "gh codespace ports visibility 80:org 3000:private 8000:public"
+                ],
+                "short": "Change the visibility of the forwarded port"
+              }
+            ],
+            "short": "List ports in a codespace"
+          },
+          {
+            "path": "gh codespace rebuild",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "--full",
+              "-R, --repo string",
+              "--repo-owner string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Rebuild a codespace"
+          },
+          {
+            "path": "gh codespace ssh",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "--config",
+              "-d, --debug",
+              "--debug-file string",
+              "--profile string",
+              "-R, --repo string",
+              "--repo-owner string",
+              "--server-port int"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh codespace ssh"
+            ],
+            "short": "SSH into a codespace"
+          },
+          {
+            "path": "gh codespace stop",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "-o, --org login",
+              "-R, --repo string",
+              "--repo-owner string",
+              "-u, --user username"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Stop a running codespace"
+          },
+          {
+            "path": "gh codespace view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --codespace string",
+              "-q, --jq expression",
+              "--json fields",
+              "-R, --repo string",
+              "--repo-owner string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh cs view"
+            ],
+            "short": "View details about a codespace"
+          }
+        ],
+        "short": "Connect to and manage codespaces"
+      },
+      {
+        "path": "gh completion",
+        "depth": 1,
+        "kind": "leaf",
+        "flags": [
+          "-s, --shell string"
+        ],
+        "inherited": [
+          "--help"
+        ],
+        "examples": [],
+        "short": "Generate shell completion scripts"
+      },
+      {
+        "path": "gh config",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh config clear-cache",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh config clear-cache"
+            ],
+            "short": "Clear the cli cache"
+          },
+          {
+            "path": "gh config get",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-h, --host string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh config get git_protocol"
+            ],
+            "short": "Print the value of a given configuration key"
+          },
+          {
+            "path": "gh config list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-h, --host string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Print a list of configuration keys and values"
+          },
+          {
+            "path": "gh config set",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-h, --host string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh config set editor vim",
+              "gh config set editor \"code --wait\"",
+              "gh config set git_protocol ssh --host github.com",
+              "gh config set prompt disabled"
+            ],
+            "short": "Update configuration with a value for the given key"
+          }
+        ],
+        "short": "Manage configuration for gh"
+      },
+      {
+        "path": "gh copilot",
+        "depth": 1,
+        "kind": "leaf",
+        "flags": [
+          "--remove"
+        ],
+        "inherited": [
+          "--help"
+        ],
+        "examples": [
+          "gh copilot"
+        ],
+        "short": "Run the GitHub Copilot CLI (preview)"
+      },
+      {
+        "path": "gh extension",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh extension browse",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--debug",
+              "-s, --single-column"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Enter a UI for browsing, adding, and removing extensions"
+          },
+          {
+            "path": "gh extension create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--precompiled string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh extension create"
+            ],
+            "short": "Create a new extension"
+          },
+          {
+            "path": "gh extension exec",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [],
+            "examples": [],
+            "short": "Execute an installed extension"
+          },
+          {
+            "path": "gh extension install",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--force",
+              "--pin string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh extension install owner/gh-extension"
+            ],
+            "short": "Install a gh extension from a repository"
+          },
+          {
+            "path": "gh extension list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List installed extension commands"
+          },
+          {
+            "path": "gh extension remove",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Remove an installed extension"
+          },
+          {
+            "path": "gh extension search",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-q, --jq expression",
+              "--json fields",
+              "--license strings",
+              "-L, --limit int",
+              "--order string",
+              "--owner strings",
+              "--sort string",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh ext search"
+            ],
+            "short": "Search extensions to the GitHub CLI"
+          },
+          {
+            "path": "gh extension upgrade",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--all",
+              "--dry-run",
+              "--force"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Upgrade installed extensions"
+          }
+        ],
+        "short": "Manage gh extensions"
+      },
+      {
+        "path": "gh gist",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh gist clone",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Clone a gist locally"
+          },
+          {
+            "path": "gh gist create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-d, --desc string",
+              "-f, --filename string",
+              "-p, --public",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh gist create --public hello.py"
+            ],
+            "short": "Create a new gist"
+          },
+          {
+            "path": "gh gist delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh gist delete"
+            ],
+            "short": "Delete a gist"
+          },
+          {
+            "path": "gh gist edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --add string",
+              "-d, --desc string",
+              "-f, --filename string",
+              "-r, --remove string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh gist edit"
+            ],
+            "short": "Edit one of your gists"
+          },
+          {
+            "path": "gh gist list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--filter expression",
+              "--include-content",
+              "-L, --limit int",
+              "--public",
+              "--secret"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh gist list --secret"
+            ],
+            "short": "List your gists"
+          },
+          {
+            "path": "gh gist rename",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Rename a file in a gist"
+          },
+          {
+            "path": "gh gist view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-f, --filename string",
+              "--files",
+              "-r, --raw",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "View a gist"
+          }
+        ],
+        "short": "Manage gists"
+      },
+      {
+        "path": "gh gpg-key",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh gpg-key add",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-t, --title string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Add a GPG key to your GitHub account"
+          },
+          {
+            "path": "gh gpg-key delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-y, --yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete a GPG key from your GitHub account"
+          },
+          {
+            "path": "gh gpg-key list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Lists GPG keys in your GitHub account"
+          }
+        ],
+        "short": "Manage GPG keys"
+      },
+      {
+        "path": "gh issue",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh issue close",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --comment string",
+              "--duplicate-of string",
+              "-r, --reason string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh issue close 123"
+            ],
+            "short": "Close issue"
+          },
+          {
+            "path": "gh issue comment",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --body text",
+              "-F, --body-file file",
+              "--create-if-none",
+              "--delete-last",
+              "--edit-last",
+              "-e, --editor",
+              "-w, --web",
+              "--yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh issue comment 12 --body \"Hi from GitHub CLI\""
+            ],
+            "short": "Add a comment to an issue"
+          },
+          {
+            "path": "gh issue create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --assignee login",
+              "-b, --body string",
+              "-F, --body-file file",
+              "-e, --editor",
+              "-l, --label name",
+              "-m, --milestone name",
+              "-p, --project title",
+              "--recover string",
+              "-T, --template name",
+              "-t, --title string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh issue create --title \"I found a bug\" --body \"Nothing works\"",
+              "gh issue create --label \"bug,help wanted\"",
+              "gh issue create --label bug --label \"help wanted\"",
+              "gh issue create --assignee monalisa,hubot",
+              "gh issue create --assignee \"@me\"",
+              "gh issue create --assignee \"@copilot\"",
+              "gh issue create --project \"Roadmap\"",
+              "gh issue create --template \"Bug Report\""
+            ],
+            "short": "Create a new issue"
+          },
+          {
+            "path": "gh issue delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete issue"
+          },
+          {
+            "path": "gh issue develop",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --base string",
+              "--branch-repo string",
+              "-c, --checkout",
+              "-l, --list",
+              "-n, --name string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh issue develop --list 123"
+            ],
+            "short": "Manage linked branches for an issue"
+          },
+          {
+            "path": "gh issue edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--add-assignee login",
+              "--add-label name",
+              "--add-project title",
+              "-b, --body string",
+              "-F, --body-file file",
+              "-m, --milestone name",
+              "--remove-assignee login",
+              "--remove-label name",
+              "--remove-milestone",
+              "--remove-project title",
+              "-t, --title string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh issue edit 23 --title \"I found a bug\" --body \"Nothing works\"",
+              "gh issue edit 23 --add-label \"bug,help wanted\" --remove-label \"core\"",
+              "gh issue edit 23 --add-assignee \"@me\" --remove-assignee monalisa,hubot",
+              "gh issue edit 23 --add-assignee \"@copilot\"",
+              "gh issue edit 23 --add-project \"Roadmap\" --remove-project v1,v2",
+              "gh issue edit 23 --milestone \"Version 1\"",
+              "gh issue edit 23 --remove-milestone",
+              "gh issue edit 23 --body-file body.txt",
+              "gh issue edit 23 34 --add-label \"help wanted\""
+            ],
+            "short": "Edit issues"
+          },
+          {
+            "path": "gh issue list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--app string",
+              "-a, --assignee string",
+              "-A, --author string",
+              "-q, --jq expression",
+              "--json fields",
+              "-l, --label strings",
+              "-L, --limit int",
+              "--mention string",
+              "-m, --milestone string",
+              "-S, --search query",
+              "-s, --state string",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh issue list --label \"bug\" --label \"help wanted\"",
+              "gh issue list --author monalisa",
+              "gh issue list --assignee \"@me\"",
+              "gh issue list --milestone \"The big 1.0\"",
+              "gh issue list --search \"error no:assignee sort:created-asc\"",
+              "gh issue list --state all"
+            ],
+            "short": "List issues in a repository"
+          },
+          {
+            "path": "gh issue lock",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-r, --reason string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Lock issue conversation"
+          },
+          {
+            "path": "gh issue pin",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh issue pin 23"
+            ],
+            "short": "Pin a issue"
+          },
+          {
+            "path": "gh issue reopen",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --comment string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Reopen issue"
+          },
+          {
+            "path": "gh issue status",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-q, --jq expression",
+              "--json fields",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Show status of relevant issues"
+          },
+          {
+            "path": "gh issue transfer",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Transfer issue to another repository"
+          },
+          {
+            "path": "gh issue unlock",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Unlock issue conversation"
+          },
+          {
+            "path": "gh issue unpin",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh issue unpin 23"
+            ],
+            "short": "Unpin a issue"
+          },
+          {
+            "path": "gh issue view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --comments",
+              "-q, --jq expression",
+              "--json fields",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "View an issue"
+          }
+        ],
+        "short": "Manage issues"
+      },
+      {
+        "path": "gh label",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh label clone",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-f, --force"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh label clone cli/cli --force"
+            ],
+            "short": "Clones labels from one repository to another"
+          },
+          {
+            "path": "gh label create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --color string",
+              "-d, --description string",
+              "-f, --force"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh label create bug --description \"Something isn't working\" --color E99695"
+            ],
+            "short": "Create a new label"
+          },
+          {
+            "path": "gh label delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete a label from a repository"
+          },
+          {
+            "path": "gh label edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --color string",
+              "-d, --description string",
+              "-n, --name string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh label edit bug --color FF0000"
+            ],
+            "short": "Edit a label"
+          },
+          {
+            "path": "gh label list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-q, --jq expression",
+              "--json fields",
+              "-L, --limit int",
+              "--order string",
+              "-S, --search string",
+              "--sort string",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh label list --sort name"
+            ],
+            "short": "List labels in a repository"
+          }
+        ],
+        "short": "Manage labels"
+      },
+      {
+        "path": "gh licenses",
+        "depth": 1,
+        "kind": "leaf",
+        "flags": [],
+        "inherited": [
+          "--help"
+        ],
+        "examples": [],
+        "short": "View third-party license information"
+      },
+      {
+        "path": "gh org",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh org list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-L, --limit int"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh org list"
+            ],
+            "short": "List organizations for the authenticated user."
+          }
+        ],
+        "short": "Manage organizations"
+      },
+      {
+        "path": "gh pr",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh pr checkout",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --branch string",
+              "--detach",
+              "-f, --force",
+              "--recurse-submodules"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh pr checkout"
+            ],
+            "short": "Check out a pull request in git"
+          },
+          {
+            "path": "gh pr checks",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--fail-fast",
+              "-i, --interval int",
+              "-q, --jq expression",
+              "--json fields",
+              "--required",
+              "-t, --template string",
+              "--watch",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Show CI status for a single pull request"
+          },
+          {
+            "path": "gh pr close",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --comment string",
+              "-d, --delete-branch"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Close a pull request"
+          },
+          {
+            "path": "gh pr comment",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --body text",
+              "-F, --body-file file",
+              "--create-if-none",
+              "--delete-last",
+              "--edit-last",
+              "-e, --editor",
+              "-w, --web",
+              "--yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh pr comment 13 --body \"Hi from GitHub CLI\""
+            ],
+            "short": "Add a comment to a pull request"
+          },
+          {
+            "path": "gh pr create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --assignee login",
+              "-B, --base branch",
+              "-b, --body string",
+              "-F, --body-file file",
+              "-d, --draft",
+              "--dry-run",
+              "-e, --editor",
+              "-f, --fill",
+              "--fill-first",
+              "--fill-verbose",
+              "-H, --head branch",
+              "-l, --label name",
+              "-m, --milestone name",
+              "--no-maintainer-edit",
+              "-p, --project title",
+              "--recover string",
+              "-r, --reviewer handle",
+              "-T, --template file",
+              "-t, --title string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh pr create --title \"The bug is fixed\" --body \"Everything works again\"",
+              "gh pr create --reviewer monalisa,hubot  --reviewer myorg/team-name",
+              "gh pr create --project \"Roadmap\"",
+              "gh pr create --base develop --head monalisa:feature",
+              "gh pr create --template \"pull_request_template.md\""
+            ],
+            "short": "Create a pull request"
+          },
+          {
+            "path": "gh pr diff",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--color string",
+              "-e, --exclude patterns",
+              "--name-only",
+              "--patch",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh pr diff"
+            ],
+            "short": "View changes in a pull request"
+          },
+          {
+            "path": "gh pr edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--add-assignee login",
+              "--add-label name",
+              "--add-project title",
+              "--add-reviewer login",
+              "-B, --base branch",
+              "-b, --body string",
+              "-F, --body-file file",
+              "-m, --milestone name",
+              "--remove-assignee login",
+              "--remove-label name",
+              "--remove-milestone",
+              "--remove-project title",
+              "--remove-reviewer login",
+              "-t, --title string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh pr edit 23 --title \"I found a bug\" --body \"Nothing works\""
+            ],
+            "short": "Edit a pull request"
+          },
+          {
+            "path": "gh pr list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--app string",
+              "-a, --assignee string",
+              "-A, --author string",
+              "-B, --base string",
+              "-d, --draft",
+              "-H, --head string",
+              "-q, --jq expression",
+              "--json fields",
+              "-l, --label strings",
+              "-L, --limit int",
+              "-S, --search query",
+              "-s, --state string",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh pr list --author \"@me\""
+            ],
+            "short": "List pull requests in a repository"
+          },
+          {
+            "path": "gh pr lock",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-r, --reason string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Lock pull request conversation"
+          },
+          {
+            "path": "gh pr merge",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--admin",
+              "-A, --author-email text",
+              "--auto",
+              "-b, --body text",
+              "-F, --body-file file",
+              "-d, --delete-branch",
+              "--disable-auto",
+              "--match-head-commit SHA",
+              "-m, --merge",
+              "-r, --rebase",
+              "-s, --squash",
+              "-t, --subject text"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Merge a pull request"
+          },
+          {
+            "path": "gh pr ready",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--undo"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Mark a pull request as ready for review"
+          },
+          {
+            "path": "gh pr reopen",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --comment string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Reopen a pull request"
+          },
+          {
+            "path": "gh pr revert",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --body string",
+              "-F, --body-file file",
+              "-d, --draft",
+              "-t, --title string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Revert a pull request"
+          },
+          {
+            "path": "gh pr review",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --approve",
+              "-b, --body string",
+              "-F, --body-file file",
+              "-c, --comment",
+              "-r, --request-changes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh pr review --approve"
+            ],
+            "short": "Add a review to a pull request"
+          },
+          {
+            "path": "gh pr status",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --conflict-status",
+              "-q, --jq expression",
+              "--json fields",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Show status of relevant pull requests"
+          },
+          {
+            "path": "gh pr unlock",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Unlock pull request conversation"
+          },
+          {
+            "path": "gh pr update-branch",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--rebase"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh pr update-branch 23",
+              "gh pr update-branch 23 --rebase",
+              "gh pr update-branch 23 --repo owner/repo"
+            ],
+            "short": "Update a pull request branch"
+          },
+          {
+            "path": "gh pr view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-c, --comments",
+              "-q, --jq expression",
+              "--json fields",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "View a pull request"
+          }
+        ],
+        "short": "Manage pull requests"
+      },
+      {
+        "path": "gh preview",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh preview prompter",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Execute a test program to preview the prompter"
+          }
+        ],
+        "short": "Execute previews for gh features"
+      },
+      {
+        "path": "gh project",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh project close",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string",
+              "--undo"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project close 1 --owner monalisa"
+            ],
+            "short": "Close a project"
+          },
+          {
+            "path": "gh project copy",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--drafts",
+              "--format string",
+              "-q, --jq expression",
+              "--source-owner string",
+              "--target-owner string",
+              "-t, --template string",
+              "--title string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project copy 1 --source-owner monalisa --target-owner github --title \"a new project\""
+            ],
+            "short": "Copy a project"
+          },
+          {
+            "path": "gh project create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string",
+              "--title string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project create --owner monalisa --title \"a new project\""
+            ],
+            "short": "Create a project"
+          },
+          {
+            "path": "gh project delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project delete 1 --owner \"@me\""
+            ],
+            "short": "Delete a project"
+          },
+          {
+            "path": "gh project edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-d, --description string",
+              "--format string",
+              "-q, --jq expression",
+              "--owner string",
+              "--readme string",
+              "-t, --template string",
+              "--title string",
+              "--visibility string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project edit 1 --owner monalisa --title \"New title\""
+            ],
+            "short": "Edit a project"
+          },
+          {
+            "path": "gh project field-create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--data-type string",
+              "--format string",
+              "-q, --jq expression",
+              "--name string",
+              "--owner string",
+              "--single-select-options strings",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project field-create 1 --owner \"@me\" --name \"new field\" --data-type \"text\""
+            ],
+            "short": "Create a field in a project"
+          },
+          {
+            "path": "gh project field-delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "--id string",
+              "-q, --jq expression",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete a field in a project"
+          },
+          {
+            "path": "gh project field-list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "-L, --limit int",
+              "--owner string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project field-list 1 --owner \"@me\""
+            ],
+            "short": "List the fields in a project"
+          },
+          {
+            "path": "gh project item-add",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string",
+              "--url string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project item-add 1 --owner monalisa --url https://github.com/monalisa/myproject/issues/23"
+            ],
+            "short": "Add a pull request or an issue to a project"
+          },
+          {
+            "path": "gh project item-archive",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "--id string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string",
+              "--undo"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project item-archive 1 --owner \"@me\" --id <item-ID>"
+            ],
+            "short": "Archive an item in a project"
+          },
+          {
+            "path": "gh project item-create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--body string",
+              "--format string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string",
+              "--title string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project item-create 1 --owner \"@me\" --title \"new item\" --body \"new item body\""
+            ],
+            "short": "Create a draft issue item in a project"
+          },
+          {
+            "path": "gh project item-delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "--id string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project item-delete 1 --owner \"@me\" --id <item-id>"
+            ],
+            "short": "Delete an item from a project by ID"
+          },
+          {
+            "path": "gh project item-edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--body string",
+              "--clear",
+              "--date string",
+              "--field-id string",
+              "--format string",
+              "--id string",
+              "--iteration-id string",
+              "-q, --jq expression",
+              "--number float",
+              "--project-id string",
+              "--single-select-option-id string",
+              "-t, --template string",
+              "--text string",
+              "--title string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project item-edit --id <item-id> --field-id <field-id> --project-id <project-id> --text \"new text\""
+            ],
+            "short": "Edit an item in a project"
+          },
+          {
+            "path": "gh project item-list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "-L, --limit int",
+              "--owner string",
+              "--query string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project item-list 1 --owner \"@me\""
+            ],
+            "short": "List the items in a project"
+          },
+          {
+            "path": "gh project link",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--owner string",
+              "-R, --repo string",
+              "-T, --team string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project link 1 --owner monalisa --repo my_repo"
+            ],
+            "short": "Link a project to a repository or a team"
+          },
+          {
+            "path": "gh project list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--closed",
+              "--format string",
+              "-q, --jq expression",
+              "-L, --limit int",
+              "--owner string",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project list"
+            ],
+            "short": "List the projects for an owner"
+          },
+          {
+            "path": "gh project mark-template",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string",
+              "--undo"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project mark-template 1 --owner \"github\""
+            ],
+            "short": "Mark a project as a template"
+          },
+          {
+            "path": "gh project unlink",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--owner string",
+              "-R, --repo string",
+              "-T, --team string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project unlink 1 --owner monalisa --repo my_repo"
+            ],
+            "short": "Unlink a project from a repository or a team"
+          },
+          {
+            "path": "gh project view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "--owner string",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh project view 1"
+            ],
+            "short": "View a project"
+          }
+        ],
+        "short": "Work with GitHub Projects."
+      },
+      {
+        "path": "gh release",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh release create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--discussion-category string",
+              "-d, --draft",
+              "--fail-on-no-commits",
+              "--generate-notes",
+              "--latest",
+              "-n, --notes string",
+              "-F, --notes-file file",
+              "--notes-from-tag",
+              "--notes-start-tag string",
+              "-p, --prerelease",
+              "--target branch",
+              "-t, --title string",
+              "--verify-tag"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh release create"
+            ],
+            "short": "Create a new release"
+          },
+          {
+            "path": "gh release delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--cleanup-tag",
+              "-y, --yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete a release"
+          },
+          {
+            "path": "gh release delete-asset",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-y, --yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete an asset from a release"
+          },
+          {
+            "path": "gh release download",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-A, --archive format",
+              "--clobber",
+              "-D, --dir directory",
+              "-O, --output file",
+              "-p, --pattern stringArray",
+              "--skip-existing"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh release download v1.2.3"
+            ],
+            "short": "Download release assets"
+          },
+          {
+            "path": "gh release edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--discussion-category string",
+              "--draft",
+              "--latest",
+              "-n, --notes string",
+              "-F, --notes-file file",
+              "--prerelease",
+              "--tag string",
+              "--target branch",
+              "-t, --title string",
+              "--verify-tag"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh release edit v1.0 --draft=false"
+            ],
+            "short": "Edit a release"
+          },
+          {
+            "path": "gh release list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--exclude-drafts",
+              "--exclude-pre-releases",
+              "-q, --jq expression",
+              "--json fields",
+              "-L, --limit int",
+              "-O, --order string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List releases in a repository"
+          },
+          {
+            "path": "gh release upload",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--clobber"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Upload assets to a release"
+          },
+          {
+            "path": "gh release verify",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Verify the attestation for a release"
+          },
+          {
+            "path": "gh release verify-asset",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--format string",
+              "-q, --jq expression",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh release verify-asset ./dist/my-asset.zip"
+            ],
+            "short": "Verify that a given asset originated from a release"
+          },
+          {
+            "path": "gh release view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-q, --jq expression",
+              "--json fields",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "View information about a release"
+          }
+        ],
+        "short": "Manage releases"
+      },
+      {
+        "path": "gh repo",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh repo archive",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-y, --yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Archive a repository"
+          },
+          {
+            "path": "gh repo autolink",
+            "depth": 2,
+            "kind": "branch",
+            "children": [
+              {
+                "path": "gh repo autolink create",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [
+                  "-n, --numeric"
+                ],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [
+                  "gh repo autolink create TICKET- \"https://example.com/TICKET?query=<num>\""
+                ],
+                "short": "Create a new autolink reference"
+              },
+              {
+                "path": "gh repo autolink delete",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [
+                  "--yes"
+                ],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [],
+                "short": "Delete an autolink reference"
+              },
+              {
+                "path": "gh repo autolink list",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [
+                  "-q, --jq expression",
+                  "--json fields",
+                  "-t, --template string",
+                  "-w, --web"
+                ],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [],
+                "short": "List autolink references for a GitHub repository"
+              },
+              {
+                "path": "gh repo autolink view",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [
+                  "-q, --jq expression",
+                  "--json fields",
+                  "-t, --template string"
+                ],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [],
+                "short": "View an autolink reference"
+              }
+            ],
+            "short": "Manage autolink references"
+          },
+          {
+            "path": "gh repo clone",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--no-upstream",
+              "-u, --upstream-remote-name string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh repo clone cli/cli"
+            ],
+            "short": "Clone a repository locally"
+          },
+          {
+            "path": "gh repo create",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--add-readme",
+              "-c, --clone",
+              "-d, --description string",
+              "--disable-issues",
+              "--disable-wiki",
+              "-g, --gitignore string",
+              "-h, --homepage URL",
+              "--include-all-branches",
+              "--internal",
+              "-l, --license string",
+              "--private",
+              "--public",
+              "--push",
+              "-r, --remote string",
+              "-s, --source string",
+              "-t, --team name",
+              "-p, --template repository"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh repo create"
+            ],
+            "short": "Create a new repository"
+          },
+          {
+            "path": "gh repo delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete a repository"
+          },
+          {
+            "path": "gh repo deploy-key",
+            "depth": 2,
+            "kind": "branch",
+            "children": [
+              {
+                "path": "gh repo deploy-key add",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [
+                  "-w, --allow-write",
+                  "-t, --title string"
+                ],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [
+                  "ssh-keygen -t ed25519 -C \"my description\" -N \"\" -f ~/.ssh/gh-test",
+                  "gh repo deploy-key add ~/.ssh/gh-test.pub"
+                ],
+                "short": "Add a deploy key to a GitHub repository"
+              },
+              {
+                "path": "gh repo deploy-key delete",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [],
+                "short": "Delete a deploy key from a GitHub repository"
+              },
+              {
+                "path": "gh repo deploy-key list",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [
+                  "-q, --jq expression",
+                  "--json fields",
+                  "-t, --template string"
+                ],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [],
+                "short": "List deploy keys in a GitHub repository"
+              }
+            ],
+            "short": "Manage deploy keys in a repository"
+          },
+          {
+            "path": "gh repo edit",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--accept-visibility-change-consequences",
+              "--add-topic strings",
+              "--allow-forking",
+              "--allow-update-branch",
+              "--default-branch name",
+              "--delete-branch-on-merge",
+              "-d, --description string",
+              "--enable-advanced-security",
+              "--enable-auto-merge",
+              "--enable-discussions",
+              "--enable-issues",
+              "--enable-merge-commit",
+              "--enable-projects",
+              "--enable-rebase-merge",
+              "--enable-secret-scanning",
+              "--enable-secret-scanning-push-protection",
+              "--enable-squash-merge",
+              "--enable-wiki",
+              "-h, --homepage URL",
+              "--remove-topic strings",
+              "--squash-merge-commit-message string",
+              "--template",
+              "--visibility string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh repo edit --enable-issues --enable-wiki"
+            ],
+            "short": "Edit repository settings"
+          },
+          {
+            "path": "gh repo fork",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--clone",
+              "--default-branch-only",
+              "--fork-name string",
+              "--org string",
+              "--remote",
+              "--remote-name string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Create a fork of a repository"
+          },
+          {
+            "path": "gh repo gitignore",
+            "depth": 2,
+            "kind": "branch",
+            "children": [
+              {
+                "path": "gh repo gitignore list",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [],
+                "short": "List available repository gitignore templates"
+              },
+              {
+                "path": "gh repo gitignore view",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [
+                  "gh repo gitignore view Go"
+                ],
+                "short": "View an available repository gitignore template"
+              }
+            ],
+            "short": "List and view available repository gitignore templates"
+          },
+          {
+            "path": "gh repo license",
+            "depth": 2,
+            "kind": "branch",
+            "children": [
+              {
+                "path": "gh repo license list",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [],
+                "short": "List common repository licenses"
+              },
+              {
+                "path": "gh repo license view",
+                "depth": 3,
+                "kind": "leaf",
+                "flags": [
+                  "-w, --web"
+                ],
+                "inherited": [
+                  "--help"
+                ],
+                "examples": [
+                  "gh repo license view MIT"
+                ],
+                "short": "View a specific repository license"
+              }
+            ],
+            "short": "Explore repository licenses"
+          },
+          {
+            "path": "gh repo list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--archived",
+              "--fork",
+              "-q, --jq expression",
+              "--json fields",
+              "-l, --language string",
+              "-L, --limit int",
+              "--no-archived",
+              "--source",
+              "-t, --template string",
+              "--topic strings",
+              "--visibility string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List repositories owned by user or organization"
+          },
+          {
+            "path": "gh repo rename",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-y, --yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh repo rename baz"
+            ],
+            "short": "Rename a repository"
+          },
+          {
+            "path": "gh repo set-default",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-u, --unset",
+              "-v, --view"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh repo set-default"
+            ],
+            "short": "Configure default repository for this directory"
+          },
+          {
+            "path": "gh repo sync",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --branch string",
+              "--force",
+              "-s, --source string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh repo sync"
+            ],
+            "short": "Sync a repository"
+          },
+          {
+            "path": "gh repo unarchive",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-y, --yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Unarchive a repository"
+          },
+          {
+            "path": "gh repo view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --branch string",
+              "-q, --jq expression",
+              "--json fields",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "View a repository"
+          }
+        ],
+        "short": "Manage repositories"
+      },
+      {
+        "path": "gh ruleset",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh ruleset check",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--default",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh ruleset check"
+            ],
+            "short": "View rules that would apply to a given branch"
+          },
+          {
+            "path": "gh ruleset list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-L, --limit int",
+              "-o, --org string",
+              "-p, --parents",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh ruleset list"
+            ],
+            "short": "List rulesets for a repository or organization"
+          },
+          {
+            "path": "gh ruleset view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-o, --org string",
+              "-p, --parents",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh ruleset view"
+            ],
+            "short": "View information about a ruleset"
+          }
+        ],
+        "short": "View info about repo rulesets"
+      },
+      {
+        "path": "gh run",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh run cancel",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--force"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Cancel a workflow run"
+          },
+          {
+            "path": "gh run delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh run delete"
+            ],
+            "short": "Delete a workflow run"
+          },
+          {
+            "path": "gh run download",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-D, --dir string",
+              "-n, --name stringArray",
+              "-p, --pattern stringArray"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh run download <run-id>"
+            ],
+            "short": "Download artifacts generated by a workflow run"
+          },
+          {
+            "path": "gh run list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --all",
+              "-b, --branch string",
+              "-c, --commit SHA",
+              "--created date",
+              "-e, --event event",
+              "-q, --jq expression",
+              "--json fields",
+              "-L, --limit int",
+              "-s, --status string",
+              "-t, --template string",
+              "-u, --user string",
+              "-w, --workflow string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List recent workflow runs"
+          },
+          {
+            "path": "gh run rerun",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-d, --debug",
+              "--failed",
+              "-j, --job string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Rerun a run"
+          },
+          {
+            "path": "gh run view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --attempt uint",
+              "--exit-status",
+              "-j, --job string",
+              "-q, --jq expression",
+              "--json fields",
+              "--log",
+              "--log-failed",
+              "-t, --template string",
+              "-v, --verbose",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh run view"
+            ],
+            "short": "View a summary of a workflow run"
+          },
+          {
+            "path": "gh run watch",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--compact",
+              "--exit-status",
+              "-i, --interval int"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh run watch"
+            ],
+            "short": "Watch a run until it completes, showing its progress"
+          }
+        ],
+        "short": "View details about workflow runs"
+      },
+      {
+        "path": "gh search",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh search code",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--extension string",
+              "--filename string",
+              "-q, --jq expression",
+              "--json fields",
+              "--language string",
+              "-L, --limit int",
+              "--match strings",
+              "--owner strings",
+              "-R, --repo strings",
+              "--size string",
+              "-t, --template string",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh search code react lifecycle"
+            ],
+            "short": "Search within code"
+          },
+          {
+            "path": "gh search commits",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--author string",
+              "--author-date date",
+              "--author-email string",
+              "--author-name string",
+              "--committer string",
+              "--committer-date date",
+              "--committer-email string",
+              "--committer-name string",
+              "--hash string",
+              "-q, --jq expression",
+              "--json fields",
+              "-L, --limit int",
+              "--merge",
+              "--order string",
+              "--owner strings",
+              "--parent string",
+              "-R, --repo strings",
+              "--sort string",
+              "-t, --template string",
+              "--tree string",
+              "--visibility strings",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh search commits readme typo"
+            ],
+            "short": "Search for commits"
+          },
+          {
+            "path": "gh search issues",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--app string",
+              "--archived",
+              "--assignee string",
+              "--author string",
+              "--closed date",
+              "--commenter user",
+              "--comments number",
+              "--created date",
+              "--include-prs",
+              "--interactions number",
+              "--involves user",
+              "-q, --jq expression",
+              "--json fields",
+              "--label strings",
+              "--language string",
+              "-L, --limit int",
+              "--locked",
+              "--match strings",
+              "--mentions user",
+              "--milestone title",
+              "--no-assignee",
+              "--no-label",
+              "--no-milestone",
+              "--no-project",
+              "--order string",
+              "--owner strings",
+              "--reactions number",
+              "-R, --repo strings",
+              "--sort string",
+              "--state string",
+              "--team-mentions string",
+              "-t, --template string",
+              "--updated date",
+              "--visibility strings",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh search issues readme typo"
+            ],
+            "short": "Search for issues"
+          },
+          {
+            "path": "gh search prs",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--app string",
+              "--archived",
+              "--assignee string",
+              "--author string",
+              "-B, --base string",
+              "--checks string",
+              "--closed date",
+              "--commenter user",
+              "--comments number",
+              "--created date",
+              "--draft",
+              "-H, --head string",
+              "--interactions number",
+              "--involves user",
+              "-q, --jq expression",
+              "--json fields",
+              "--label strings",
+              "--language string",
+              "-L, --limit int",
+              "--locked",
+              "--match strings",
+              "--mentions user",
+              "--merged",
+              "--merged-at date",
+              "--milestone title",
+              "--no-assignee",
+              "--no-label",
+              "--no-milestone",
+              "--no-project",
+              "--order string",
+              "--owner strings",
+              "--reactions number",
+              "-R, --repo strings",
+              "--review string",
+              "--review-requested user",
+              "--reviewed-by user",
+              "--sort string",
+              "--state string",
+              "--team-mentions string",
+              "-t, --template string",
+              "--updated date",
+              "--visibility strings",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh search prs fix bug"
+            ],
+            "short": "Search for pull requests"
+          },
+          {
+            "path": "gh search repos",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--archived",
+              "--created date",
+              "--followers number",
+              "--forks number",
+              "--good-first-issues number",
+              "--help-wanted-issues number",
+              "--include-forks string",
+              "-q, --jq expression",
+              "--json fields",
+              "--language string",
+              "--license strings",
+              "-L, --limit int",
+              "--match strings",
+              "--number-topics number",
+              "--order string",
+              "--owner strings",
+              "--size string",
+              "--sort string",
+              "--stars number",
+              "-t, --template string",
+              "--topic strings",
+              "--updated date",
+              "--visibility strings",
+              "-w, --web"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh search repos cli shell"
+            ],
+            "short": "Search for repositories"
+          }
+        ],
+        "short": "Search for repositories, issues, and pull requests"
+      },
+      {
+        "path": "gh secret",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh secret delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --app string",
+              "-e, --env string",
+              "-o, --org string",
+              "-u, --user"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete secrets"
+          },
+          {
+            "path": "gh secret list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --app string",
+              "-e, --env string",
+              "-q, --jq expression",
+              "--json fields",
+              "-o, --org string",
+              "-t, --template string",
+              "-u, --user"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List secrets"
+          },
+          {
+            "path": "gh secret set",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --app string",
+              "-b, --body string",
+              "-e, --env environment",
+              "-f, --env-file file",
+              "--no-repos-selected",
+              "--no-store",
+              "-o, --org organization",
+              "-r, --repos repositories",
+              "-u, --user",
+              "-v, --visibility string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh secret set MYSECRET"
+            ],
+            "short": "Create or update secrets"
+          }
+        ],
+        "short": "Manage GitHub secrets"
+      },
+      {
+        "path": "gh ssh-key",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh ssh-key add",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-t, --title string",
+              "--type string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Add an SSH key to your GitHub account"
+          },
+          {
+            "path": "gh ssh-key delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-y, --yes"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete an SSH key from your GitHub account"
+          },
+          {
+            "path": "gh ssh-key list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Lists SSH keys in your GitHub account"
+          }
+        ],
+        "short": "Manage SSH keys"
+      },
+      {
+        "path": "gh status",
+        "depth": 1,
+        "kind": "leaf",
+        "flags": [
+          "-e, --exclude strings",
+          "-o, --org string"
+        ],
+        "inherited": [
+          "--help"
+        ],
+        "examples": [
+          "gh status -e cli/cli -e cli/go-gh # Exclude multiple repositories",
+          "gh status -o cli # Limit results to a single organization"
+        ],
+        "short": "Print information about relevant issues, pull requests, and notifications across repositories"
+      },
+      {
+        "path": "gh variable",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh variable delete",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-e, --env string",
+              "-o, --org string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Delete variables"
+          },
+          {
+            "path": "gh variable get",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-e, --env string",
+              "-q, --jq expression",
+              "--json fields",
+              "-o, --org string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Get variables"
+          },
+          {
+            "path": "gh variable list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-e, --env string",
+              "-q, --jq expression",
+              "--json fields",
+              "-o, --org string",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List variables"
+          },
+          {
+            "path": "gh variable set",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-b, --body string",
+              "-e, --env environment",
+              "-f, --env-file file",
+              "-o, --org organization",
+              "-r, --repos repositories",
+              "-v, --visibility string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh variable set MYVARIABLE"
+            ],
+            "short": "Create or update variables"
+          }
+        ],
+        "short": "Manage GitHub Actions variables"
+      },
+      {
+        "path": "gh workflow",
+        "depth": 1,
+        "kind": "branch",
+        "children": [
+          {
+            "path": "gh workflow disable",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Disable a workflow"
+          },
+          {
+            "path": "gh workflow enable",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "Enable a workflow"
+          },
+          {
+            "path": "gh workflow list",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-a, --all",
+              "-q, --jq expression",
+              "--json fields",
+              "-L, --limit int",
+              "-t, --template string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [],
+            "short": "List workflows"
+          },
+          {
+            "path": "gh workflow run",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "--json",
+              "-r, --ref string"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh workflow run"
+            ],
+            "short": "Run a workflow by creating a workflow_dispatch event"
+          },
+          {
+            "path": "gh workflow view",
+            "depth": 2,
+            "kind": "leaf",
+            "flags": [
+              "-r, --ref string",
+              "-w, --web",
+              "-y, --yaml"
+            ],
+            "inherited": [
+              "--help"
+            ],
+            "examples": [
+              "gh workflow view"
+            ],
+            "short": "View the summary of a workflow"
+          }
+        ],
+        "short": "View details about GitHub Actions workflows"
+      }
+    ]
+  },
+  "leaves": [
+    {
+      "path": "gh agent-task create",
+      "flags": [
+        "-b, --base string",
+        "-a, --custom-agent string",
+        "--follow",
+        "-F, --from-file file"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh agent-task create \"build me a new app\""
+      ]
+    },
+    {
+      "path": "gh agent-task list",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-L, --limit int",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh agent-task view",
+      "flags": [
+        "--follow",
+        "-q, --jq expression",
+        "--json fields",
+        "--log",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh agent-task view e2fa49d2-f164-4a56-ab99-498090b8fcdf"
+      ]
+    },
+    {
+      "path": "gh alias delete",
+      "flags": [
+        "--all"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh alias import",
+      "flags": [
+        "--clobber"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh alias import aliases.yml"
+      ]
+    },
+    {
+      "path": "gh alias list",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh alias set",
+      "flags": [
+        "--clobber",
+        "-s, --shell"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh alias set pv 'pr view'",
+        "gh pv -w 123  #=> gh pr view -w 123"
+      ]
+    },
+    {
+      "path": "gh api",
+      "flags": [
+        "--cache duration",
+        "--hostname string",
+        "-i, --include",
+        "--input file",
+        "-q, --jq string",
+        "-X, --method string",
+        "--paginate",
+        "-p, --preview strings",
+        "--silent",
+        "--slurp",
+        "-t, --template string",
+        "--verbose"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh api repos/{owner}/{repo}/releases"
+      ]
+    },
+    {
+      "path": "gh attestation download",
+      "flags": [
+        "-d, --digest-alg string",
+        "--hostname string",
+        "-L, --limit int",
+        "-o, --owner string",
+        "--predicate-type string",
+        "-R, --repo string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh attestation download example.bin -o github"
+      ]
+    },
+    {
+      "path": "gh attestation trusted-root",
+      "flags": [
+        "--hostname string",
+        "--tuf-root string",
+        "--tuf-url string",
+        "--verify-only"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh attestation trusted-root"
+      ]
+    },
+    {
+      "path": "gh attestation verify",
+      "flags": [
+        "-b, --bundle string",
+        "--bundle-from-oci",
+        "--cert-identity string",
+        "-i, --cert-identity-regex string",
+        "--cert-oidc-issuer string",
+        "--custom-trusted-root string",
+        "--deny-self-hosted-runners",
+        "-d, --digest-alg string",
+        "--format string",
+        "--hostname string",
+        "-q, --jq expression",
+        "-L, --limit int",
+        "--no-public-good",
+        "-o, --owner string",
+        "--predicate-type string",
+        "-R, --repo string",
+        "--signer-digest string",
+        "--signer-repo string",
+        "--signer-workflow string",
+        "--source-digest string",
+        "--source-ref string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh attestation verify example.bin --repo github/example"
+      ]
+    },
+    {
+      "path": "gh auth login",
+      "flags": [
+        "-c, --clipboard",
+        "-p, --git-protocol string",
+        "-h, --hostname string",
+        "--insecure-storage",
+        "-s, --scopes strings",
+        "--skip-ssh-key",
+        "-w, --web",
+        "--with-token"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh auth login"
+      ]
+    },
+    {
+      "path": "gh auth logout",
+      "flags": [
+        "-h, --hostname string",
+        "-u, --user string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh auth logout"
+      ]
+    },
+    {
+      "path": "gh auth refresh",
+      "flags": [
+        "-c, --clipboard",
+        "-h, --hostname string",
+        "--insecure-storage",
+        "-r, --remove-scopes strings",
+        "--reset-scopes",
+        "-s, --scopes strings"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh auth refresh --scopes write:org,read:public_key"
+      ]
+    },
+    {
+      "path": "gh auth setup-git",
+      "flags": [
+        "-h, --hostname string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh auth setup-git"
+      ]
+    },
+    {
+      "path": "gh auth status",
+      "flags": [
+        "-a, --active",
+        "-h, --hostname string",
+        "--jq expression",
+        "--json fields",
+        "-t, --show-token",
+        "--template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh auth status"
+      ]
+    },
+    {
+      "path": "gh auth switch",
+      "flags": [
+        "-h, --hostname string",
+        "-u, --user string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh auth switch"
+      ]
+    },
+    {
+      "path": "gh auth token",
+      "flags": [
+        "-h, --hostname string",
+        "-u, --user string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh browse",
+      "flags": [
+        "-a, --actions",
+        "--blame",
+        "-b, --branch string",
+        "-n, --no-browser",
+        "-p, --projects",
+        "-r, --releases",
+        "-s, --settings",
+        "-w, --wiki"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh browse"
+      ]
+    },
+    {
+      "path": "gh cache delete",
+      "flags": [
+        "-a, --all",
+        "-r, --ref string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh cache delete 1234"
+      ]
+    },
+    {
+      "path": "gh cache list",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-k, --key string",
+        "-L, --limit int",
+        "-O, --order string",
+        "-r, --ref string",
+        "-S, --sort string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh cache list"
+      ]
+    },
+    {
+      "path": "gh codespace code",
+      "flags": [
+        "-c, --codespace string",
+        "--insiders",
+        "-R, --repo string",
+        "--repo-owner string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace cp",
+      "flags": [
+        "-c, --codespace string",
+        "-e, --expand",
+        "-p, --profile string",
+        "-r, --recursive",
+        "-R, --repo string",
+        "--repo-owner string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh codespace cp -e README.md 'remote:/workspaces/$RepositoryName/'",
+        "gh codespace cp -e 'remote:~/*.go' ./gofiles/",
+        "gh codespace cp -e 'remote:/workspaces/myproj/go.{mod,sum}' ./gofiles/",
+        "gh codespace cp -e -- -F ~/.ssh/codespaces_config 'remote:~/*.go' ./gofiles/"
+      ]
+    },
+    {
+      "path": "gh codespace create",
+      "flags": [
+        "-b, --branch string",
+        "--default-permissions",
+        "--devcontainer-path string",
+        "-d, --display-name string",
+        "--idle-timeout duration",
+        "-l, --location string",
+        "-m, --machine string",
+        "-R, --repo string",
+        "--retention-period duration",
+        "-s, --status",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace delete",
+      "flags": [
+        "--all",
+        "-c, --codespace string",
+        "--days N",
+        "-f, --force",
+        "-o, --org login",
+        "-R, --repo string",
+        "--repo-owner string",
+        "-u, --user username"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace edit",
+      "flags": [
+        "-c, --codespace string",
+        "-d, --display-name string",
+        "-m, --machine string",
+        "-R, --repo string",
+        "--repo-owner string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace jupyter",
+      "flags": [
+        "-c, --codespace string",
+        "-R, --repo string",
+        "--repo-owner string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace list",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-L, --limit int",
+        "-o, --org login",
+        "-R, --repo string",
+        "-t, --template string",
+        "-u, --user username",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace logs",
+      "flags": [
+        "-c, --codespace string",
+        "-f, --follow",
+        "-R, --repo string",
+        "--repo-owner string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace ports forward",
+      "flags": [],
+      "inherited": [
+        "-c, --codespace string",
+        "--help",
+        "-R, --repo string",
+        "--repo-owner string"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace ports visibility",
+      "flags": [],
+      "inherited": [
+        "-c, --codespace string",
+        "--help",
+        "-R, --repo string",
+        "--repo-owner string"
+      ],
+      "examples": [
+        "gh codespace ports visibility 80:org 3000:private 8000:public"
+      ]
+    },
+    {
+      "path": "gh codespace rebuild",
+      "flags": [
+        "-c, --codespace string",
+        "--full",
+        "-R, --repo string",
+        "--repo-owner string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace ssh",
+      "flags": [
+        "-c, --codespace string",
+        "--config",
+        "-d, --debug",
+        "--debug-file string",
+        "--profile string",
+        "-R, --repo string",
+        "--repo-owner string",
+        "--server-port int"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh codespace ssh"
+      ]
+    },
+    {
+      "path": "gh codespace stop",
+      "flags": [
+        "-c, --codespace string",
+        "-o, --org login",
+        "-R, --repo string",
+        "--repo-owner string",
+        "-u, --user username"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh codespace view",
+      "flags": [
+        "-c, --codespace string",
+        "-q, --jq expression",
+        "--json fields",
+        "-R, --repo string",
+        "--repo-owner string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh cs view"
+      ]
+    },
+    {
+      "path": "gh completion",
+      "flags": [
+        "-s, --shell string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh config clear-cache",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh config clear-cache"
+      ]
+    },
+    {
+      "path": "gh config get",
+      "flags": [
+        "-h, --host string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh config get git_protocol"
+      ]
+    },
+    {
+      "path": "gh config list",
+      "flags": [
+        "-h, --host string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh config set",
+      "flags": [
+        "-h, --host string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh config set editor vim",
+        "gh config set editor \"code --wait\"",
+        "gh config set git_protocol ssh --host github.com",
+        "gh config set prompt disabled"
+      ]
+    },
+    {
+      "path": "gh copilot",
+      "flags": [
+        "--remove"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh copilot"
+      ]
+    },
+    {
+      "path": "gh extension browse",
+      "flags": [
+        "--debug",
+        "-s, --single-column"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh extension create",
+      "flags": [
+        "--precompiled string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh extension create"
+      ]
+    },
+    {
+      "path": "gh extension exec",
+      "flags": [],
+      "inherited": [],
+      "examples": []
+    },
+    {
+      "path": "gh extension install",
+      "flags": [
+        "--force",
+        "--pin string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh extension install owner/gh-extension"
+      ]
+    },
+    {
+      "path": "gh extension list",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh extension remove",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh extension search",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "--license strings",
+        "-L, --limit int",
+        "--order string",
+        "--owner strings",
+        "--sort string",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh ext search"
+      ]
+    },
+    {
+      "path": "gh extension upgrade",
+      "flags": [
+        "--all",
+        "--dry-run",
+        "--force"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh gist clone",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh gist create",
+      "flags": [
+        "-d, --desc string",
+        "-f, --filename string",
+        "-p, --public",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh gist create --public hello.py"
+      ]
+    },
+    {
+      "path": "gh gist delete",
+      "flags": [
+        "--yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh gist delete"
+      ]
+    },
+    {
+      "path": "gh gist edit",
+      "flags": [
+        "-a, --add string",
+        "-d, --desc string",
+        "-f, --filename string",
+        "-r, --remove string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh gist edit"
+      ]
+    },
+    {
+      "path": "gh gist list",
+      "flags": [
+        "--filter expression",
+        "--include-content",
+        "-L, --limit int",
+        "--public",
+        "--secret"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh gist list --secret"
+      ]
+    },
+    {
+      "path": "gh gist rename",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh gist view",
+      "flags": [
+        "-f, --filename string",
+        "--files",
+        "-r, --raw",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh gpg-key add",
+      "flags": [
+        "-t, --title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh gpg-key delete",
+      "flags": [
+        "-y, --yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh gpg-key list",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh issue close",
+      "flags": [
+        "-c, --comment string",
+        "--duplicate-of string",
+        "-r, --reason string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh issue close 123"
+      ]
+    },
+    {
+      "path": "gh issue comment",
+      "flags": [
+        "-b, --body text",
+        "-F, --body-file file",
+        "--create-if-none",
+        "--delete-last",
+        "--edit-last",
+        "-e, --editor",
+        "-w, --web",
+        "--yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh issue comment 12 --body \"Hi from GitHub CLI\""
+      ]
+    },
+    {
+      "path": "gh issue create",
+      "flags": [
+        "-a, --assignee login",
+        "-b, --body string",
+        "-F, --body-file file",
+        "-e, --editor",
+        "-l, --label name",
+        "-m, --milestone name",
+        "-p, --project title",
+        "--recover string",
+        "-T, --template name",
+        "-t, --title string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh issue create --title \"I found a bug\" --body \"Nothing works\"",
+        "gh issue create --label \"bug,help wanted\"",
+        "gh issue create --label bug --label \"help wanted\"",
+        "gh issue create --assignee monalisa,hubot",
+        "gh issue create --assignee \"@me\"",
+        "gh issue create --assignee \"@copilot\"",
+        "gh issue create --project \"Roadmap\"",
+        "gh issue create --template \"Bug Report\""
+      ]
+    },
+    {
+      "path": "gh issue delete",
+      "flags": [
+        "--yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh issue develop",
+      "flags": [
+        "-b, --base string",
+        "--branch-repo string",
+        "-c, --checkout",
+        "-l, --list",
+        "-n, --name string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh issue develop --list 123"
+      ]
+    },
+    {
+      "path": "gh issue edit",
+      "flags": [
+        "--add-assignee login",
+        "--add-label name",
+        "--add-project title",
+        "-b, --body string",
+        "-F, --body-file file",
+        "-m, --milestone name",
+        "--remove-assignee login",
+        "--remove-label name",
+        "--remove-milestone",
+        "--remove-project title",
+        "-t, --title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh issue edit 23 --title \"I found a bug\" --body \"Nothing works\"",
+        "gh issue edit 23 --add-label \"bug,help wanted\" --remove-label \"core\"",
+        "gh issue edit 23 --add-assignee \"@me\" --remove-assignee monalisa,hubot",
+        "gh issue edit 23 --add-assignee \"@copilot\"",
+        "gh issue edit 23 --add-project \"Roadmap\" --remove-project v1,v2",
+        "gh issue edit 23 --milestone \"Version 1\"",
+        "gh issue edit 23 --remove-milestone",
+        "gh issue edit 23 --body-file body.txt",
+        "gh issue edit 23 34 --add-label \"help wanted\""
+      ]
+    },
+    {
+      "path": "gh issue list",
+      "flags": [
+        "--app string",
+        "-a, --assignee string",
+        "-A, --author string",
+        "-q, --jq expression",
+        "--json fields",
+        "-l, --label strings",
+        "-L, --limit int",
+        "--mention string",
+        "-m, --milestone string",
+        "-S, --search query",
+        "-s, --state string",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh issue list --label \"bug\" --label \"help wanted\"",
+        "gh issue list --author monalisa",
+        "gh issue list --assignee \"@me\"",
+        "gh issue list --milestone \"The big 1.0\"",
+        "gh issue list --search \"error no:assignee sort:created-asc\"",
+        "gh issue list --state all"
+      ]
+    },
+    {
+      "path": "gh issue lock",
+      "flags": [
+        "-r, --reason string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh issue pin",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh issue pin 23"
+      ]
+    },
+    {
+      "path": "gh issue reopen",
+      "flags": [
+        "-c, --comment string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh issue status",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh issue transfer",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh issue unlock",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh issue unpin",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh issue unpin 23"
+      ]
+    },
+    {
+      "path": "gh issue view",
+      "flags": [
+        "-c, --comments",
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh label clone",
+      "flags": [
+        "-f, --force"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh label clone cli/cli --force"
+      ]
+    },
+    {
+      "path": "gh label create",
+      "flags": [
+        "-c, --color string",
+        "-d, --description string",
+        "-f, --force"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh label create bug --description \"Something isn't working\" --color E99695"
+      ]
+    },
+    {
+      "path": "gh label delete",
+      "flags": [
+        "--yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh label edit",
+      "flags": [
+        "-c, --color string",
+        "-d, --description string",
+        "-n, --name string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh label edit bug --color FF0000"
+      ]
+    },
+    {
+      "path": "gh label list",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-L, --limit int",
+        "--order string",
+        "-S, --search string",
+        "--sort string",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh label list --sort name"
+      ]
+    },
+    {
+      "path": "gh licenses",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh org list",
+      "flags": [
+        "-L, --limit int"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh org list"
+      ]
+    },
+    {
+      "path": "gh pr checkout",
+      "flags": [
+        "-b, --branch string",
+        "--detach",
+        "-f, --force",
+        "--recurse-submodules"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh pr checkout"
+      ]
+    },
+    {
+      "path": "gh pr checks",
+      "flags": [
+        "--fail-fast",
+        "-i, --interval int",
+        "-q, --jq expression",
+        "--json fields",
+        "--required",
+        "-t, --template string",
+        "--watch",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr close",
+      "flags": [
+        "-c, --comment string",
+        "-d, --delete-branch"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr comment",
+      "flags": [
+        "-b, --body text",
+        "-F, --body-file file",
+        "--create-if-none",
+        "--delete-last",
+        "--edit-last",
+        "-e, --editor",
+        "-w, --web",
+        "--yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh pr comment 13 --body \"Hi from GitHub CLI\""
+      ]
+    },
+    {
+      "path": "gh pr create",
+      "flags": [
+        "-a, --assignee login",
+        "-B, --base branch",
+        "-b, --body string",
+        "-F, --body-file file",
+        "-d, --draft",
+        "--dry-run",
+        "-e, --editor",
+        "-f, --fill",
+        "--fill-first",
+        "--fill-verbose",
+        "-H, --head branch",
+        "-l, --label name",
+        "-m, --milestone name",
+        "--no-maintainer-edit",
+        "-p, --project title",
+        "--recover string",
+        "-r, --reviewer handle",
+        "-T, --template file",
+        "-t, --title string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh pr create --title \"The bug is fixed\" --body \"Everything works again\"",
+        "gh pr create --reviewer monalisa,hubot  --reviewer myorg/team-name",
+        "gh pr create --project \"Roadmap\"",
+        "gh pr create --base develop --head monalisa:feature",
+        "gh pr create --template \"pull_request_template.md\""
+      ]
+    },
+    {
+      "path": "gh pr diff",
+      "flags": [
+        "--color string",
+        "-e, --exclude patterns",
+        "--name-only",
+        "--patch",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh pr diff"
+      ]
+    },
+    {
+      "path": "gh pr edit",
+      "flags": [
+        "--add-assignee login",
+        "--add-label name",
+        "--add-project title",
+        "--add-reviewer login",
+        "-B, --base branch",
+        "-b, --body string",
+        "-F, --body-file file",
+        "-m, --milestone name",
+        "--remove-assignee login",
+        "--remove-label name",
+        "--remove-milestone",
+        "--remove-project title",
+        "--remove-reviewer login",
+        "-t, --title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh pr edit 23 --title \"I found a bug\" --body \"Nothing works\""
+      ]
+    },
+    {
+      "path": "gh pr list",
+      "flags": [
+        "--app string",
+        "-a, --assignee string",
+        "-A, --author string",
+        "-B, --base string",
+        "-d, --draft",
+        "-H, --head string",
+        "-q, --jq expression",
+        "--json fields",
+        "-l, --label strings",
+        "-L, --limit int",
+        "-S, --search query",
+        "-s, --state string",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh pr list --author \"@me\""
+      ]
+    },
+    {
+      "path": "gh pr lock",
+      "flags": [
+        "-r, --reason string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr merge",
+      "flags": [
+        "--admin",
+        "-A, --author-email text",
+        "--auto",
+        "-b, --body text",
+        "-F, --body-file file",
+        "-d, --delete-branch",
+        "--disable-auto",
+        "--match-head-commit SHA",
+        "-m, --merge",
+        "-r, --rebase",
+        "-s, --squash",
+        "-t, --subject text"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr ready",
+      "flags": [
+        "--undo"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr reopen",
+      "flags": [
+        "-c, --comment string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr revert",
+      "flags": [
+        "-b, --body string",
+        "-F, --body-file file",
+        "-d, --draft",
+        "-t, --title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr review",
+      "flags": [
+        "-a, --approve",
+        "-b, --body string",
+        "-F, --body-file file",
+        "-c, --comment",
+        "-r, --request-changes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh pr review --approve"
+      ]
+    },
+    {
+      "path": "gh pr status",
+      "flags": [
+        "-c, --conflict-status",
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr unlock",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh pr update-branch",
+      "flags": [
+        "--rebase"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh pr update-branch 23",
+        "gh pr update-branch 23 --rebase",
+        "gh pr update-branch 23 --repo owner/repo"
+      ]
+    },
+    {
+      "path": "gh pr view",
+      "flags": [
+        "-c, --comments",
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh preview prompter",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh project close",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string",
+        "--undo"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project close 1 --owner monalisa"
+      ]
+    },
+    {
+      "path": "gh project copy",
+      "flags": [
+        "--drafts",
+        "--format string",
+        "-q, --jq expression",
+        "--source-owner string",
+        "--target-owner string",
+        "-t, --template string",
+        "--title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project copy 1 --source-owner monalisa --target-owner github --title \"a new project\""
+      ]
+    },
+    {
+      "path": "gh project create",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string",
+        "--title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project create --owner monalisa --title \"a new project\""
+      ]
+    },
+    {
+      "path": "gh project delete",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project delete 1 --owner \"@me\""
+      ]
+    },
+    {
+      "path": "gh project edit",
+      "flags": [
+        "-d, --description string",
+        "--format string",
+        "-q, --jq expression",
+        "--owner string",
+        "--readme string",
+        "-t, --template string",
+        "--title string",
+        "--visibility string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project edit 1 --owner monalisa --title \"New title\""
+      ]
+    },
+    {
+      "path": "gh project field-create",
+      "flags": [
+        "--data-type string",
+        "--format string",
+        "-q, --jq expression",
+        "--name string",
+        "--owner string",
+        "--single-select-options strings",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project field-create 1 --owner \"@me\" --name \"new field\" --data-type \"text\""
+      ]
+    },
+    {
+      "path": "gh project field-delete",
+      "flags": [
+        "--format string",
+        "--id string",
+        "-q, --jq expression",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh project field-list",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "-L, --limit int",
+        "--owner string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project field-list 1 --owner \"@me\""
+      ]
+    },
+    {
+      "path": "gh project item-add",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string",
+        "--url string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project item-add 1 --owner monalisa --url https://github.com/monalisa/myproject/issues/23"
+      ]
+    },
+    {
+      "path": "gh project item-archive",
+      "flags": [
+        "--format string",
+        "--id string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string",
+        "--undo"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project item-archive 1 --owner \"@me\" --id <item-ID>"
+      ]
+    },
+    {
+      "path": "gh project item-create",
+      "flags": [
+        "--body string",
+        "--format string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string",
+        "--title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project item-create 1 --owner \"@me\" --title \"new item\" --body \"new item body\""
+      ]
+    },
+    {
+      "path": "gh project item-delete",
+      "flags": [
+        "--format string",
+        "--id string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project item-delete 1 --owner \"@me\" --id <item-id>"
+      ]
+    },
+    {
+      "path": "gh project item-edit",
+      "flags": [
+        "--body string",
+        "--clear",
+        "--date string",
+        "--field-id string",
+        "--format string",
+        "--id string",
+        "--iteration-id string",
+        "-q, --jq expression",
+        "--number float",
+        "--project-id string",
+        "--single-select-option-id string",
+        "-t, --template string",
+        "--text string",
+        "--title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project item-edit --id <item-id> --field-id <field-id> --project-id <project-id> --text \"new text\""
+      ]
+    },
+    {
+      "path": "gh project item-list",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "-L, --limit int",
+        "--owner string",
+        "--query string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project item-list 1 --owner \"@me\""
+      ]
+    },
+    {
+      "path": "gh project link",
+      "flags": [
+        "--owner string",
+        "-R, --repo string",
+        "-T, --team string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project link 1 --owner monalisa --repo my_repo"
+      ]
+    },
+    {
+      "path": "gh project list",
+      "flags": [
+        "--closed",
+        "--format string",
+        "-q, --jq expression",
+        "-L, --limit int",
+        "--owner string",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project list"
+      ]
+    },
+    {
+      "path": "gh project mark-template",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string",
+        "--undo"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project mark-template 1 --owner \"github\""
+      ]
+    },
+    {
+      "path": "gh project unlink",
+      "flags": [
+        "--owner string",
+        "-R, --repo string",
+        "-T, --team string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project unlink 1 --owner monalisa --repo my_repo"
+      ]
+    },
+    {
+      "path": "gh project view",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "--owner string",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh project view 1"
+      ]
+    },
+    {
+      "path": "gh release create",
+      "flags": [
+        "--discussion-category string",
+        "-d, --draft",
+        "--fail-on-no-commits",
+        "--generate-notes",
+        "--latest",
+        "-n, --notes string",
+        "-F, --notes-file file",
+        "--notes-from-tag",
+        "--notes-start-tag string",
+        "-p, --prerelease",
+        "--target branch",
+        "-t, --title string",
+        "--verify-tag"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh release create"
+      ]
+    },
+    {
+      "path": "gh release delete",
+      "flags": [
+        "--cleanup-tag",
+        "-y, --yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh release delete-asset",
+      "flags": [
+        "-y, --yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh release download",
+      "flags": [
+        "-A, --archive format",
+        "--clobber",
+        "-D, --dir directory",
+        "-O, --output file",
+        "-p, --pattern stringArray",
+        "--skip-existing"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh release download v1.2.3"
+      ]
+    },
+    {
+      "path": "gh release edit",
+      "flags": [
+        "--discussion-category string",
+        "--draft",
+        "--latest",
+        "-n, --notes string",
+        "-F, --notes-file file",
+        "--prerelease",
+        "--tag string",
+        "--target branch",
+        "-t, --title string",
+        "--verify-tag"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh release edit v1.0 --draft=false"
+      ]
+    },
+    {
+      "path": "gh release list",
+      "flags": [
+        "--exclude-drafts",
+        "--exclude-pre-releases",
+        "-q, --jq expression",
+        "--json fields",
+        "-L, --limit int",
+        "-O, --order string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh release upload",
+      "flags": [
+        "--clobber"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh release verify",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh release verify-asset",
+      "flags": [
+        "--format string",
+        "-q, --jq expression",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh release verify-asset ./dist/my-asset.zip"
+      ]
+    },
+    {
+      "path": "gh release view",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo archive",
+      "flags": [
+        "-y, --yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo autolink create",
+      "flags": [
+        "-n, --numeric"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo autolink create TICKET- \"https://example.com/TICKET?query=<num>\""
+      ]
+    },
+    {
+      "path": "gh repo autolink delete",
+      "flags": [
+        "--yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo autolink list",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo autolink view",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo clone",
+      "flags": [
+        "--no-upstream",
+        "-u, --upstream-remote-name string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo clone cli/cli"
+      ]
+    },
+    {
+      "path": "gh repo create",
+      "flags": [
+        "--add-readme",
+        "-c, --clone",
+        "-d, --description string",
+        "--disable-issues",
+        "--disable-wiki",
+        "-g, --gitignore string",
+        "-h, --homepage URL",
+        "--include-all-branches",
+        "--internal",
+        "-l, --license string",
+        "--private",
+        "--public",
+        "--push",
+        "-r, --remote string",
+        "-s, --source string",
+        "-t, --team name",
+        "-p, --template repository"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo create"
+      ]
+    },
+    {
+      "path": "gh repo delete",
+      "flags": [
+        "--yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo deploy-key add",
+      "flags": [
+        "-w, --allow-write",
+        "-t, --title string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "ssh-keygen -t ed25519 -C \"my description\" -N \"\" -f ~/.ssh/gh-test",
+        "gh repo deploy-key add ~/.ssh/gh-test.pub"
+      ]
+    },
+    {
+      "path": "gh repo deploy-key delete",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo deploy-key list",
+      "flags": [
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo edit",
+      "flags": [
+        "--accept-visibility-change-consequences",
+        "--add-topic strings",
+        "--allow-forking",
+        "--allow-update-branch",
+        "--default-branch name",
+        "--delete-branch-on-merge",
+        "-d, --description string",
+        "--enable-advanced-security",
+        "--enable-auto-merge",
+        "--enable-discussions",
+        "--enable-issues",
+        "--enable-merge-commit",
+        "--enable-projects",
+        "--enable-rebase-merge",
+        "--enable-secret-scanning",
+        "--enable-secret-scanning-push-protection",
+        "--enable-squash-merge",
+        "--enable-wiki",
+        "-h, --homepage URL",
+        "--remove-topic strings",
+        "--squash-merge-commit-message string",
+        "--template",
+        "--visibility string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo edit --enable-issues --enable-wiki"
+      ]
+    },
+    {
+      "path": "gh repo fork",
+      "flags": [
+        "--clone",
+        "--default-branch-only",
+        "--fork-name string",
+        "--org string",
+        "--remote",
+        "--remote-name string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo gitignore list",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo gitignore view",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo gitignore view Go"
+      ]
+    },
+    {
+      "path": "gh repo license list",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo license view",
+      "flags": [
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo license view MIT"
+      ]
+    },
+    {
+      "path": "gh repo list",
+      "flags": [
+        "--archived",
+        "--fork",
+        "-q, --jq expression",
+        "--json fields",
+        "-l, --language string",
+        "-L, --limit int",
+        "--no-archived",
+        "--source",
+        "-t, --template string",
+        "--topic strings",
+        "--visibility string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo rename",
+      "flags": [
+        "-y, --yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo rename baz"
+      ]
+    },
+    {
+      "path": "gh repo set-default",
+      "flags": [
+        "-u, --unset",
+        "-v, --view"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo set-default"
+      ]
+    },
+    {
+      "path": "gh repo sync",
+      "flags": [
+        "-b, --branch string",
+        "--force",
+        "-s, --source string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh repo sync"
+      ]
+    },
+    {
+      "path": "gh repo unarchive",
+      "flags": [
+        "-y, --yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh repo view",
+      "flags": [
+        "-b, --branch string",
+        "-q, --jq expression",
+        "--json fields",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh ruleset check",
+      "flags": [
+        "--default",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh ruleset check"
+      ]
+    },
+    {
+      "path": "gh ruleset list",
+      "flags": [
+        "-L, --limit int",
+        "-o, --org string",
+        "-p, --parents",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh ruleset list"
+      ]
+    },
+    {
+      "path": "gh ruleset view",
+      "flags": [
+        "-o, --org string",
+        "-p, --parents",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh ruleset view"
+      ]
+    },
+    {
+      "path": "gh run cancel",
+      "flags": [
+        "--force"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh run delete",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh run delete"
+      ]
+    },
+    {
+      "path": "gh run download",
+      "flags": [
+        "-D, --dir string",
+        "-n, --name stringArray",
+        "-p, --pattern stringArray"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh run download <run-id>"
+      ]
+    },
+    {
+      "path": "gh run list",
+      "flags": [
+        "-a, --all",
+        "-b, --branch string",
+        "-c, --commit SHA",
+        "--created date",
+        "-e, --event event",
+        "-q, --jq expression",
+        "--json fields",
+        "-L, --limit int",
+        "-s, --status string",
+        "-t, --template string",
+        "-u, --user string",
+        "-w, --workflow string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh run rerun",
+      "flags": [
+        "-d, --debug",
+        "--failed",
+        "-j, --job string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh run view",
+      "flags": [
+        "-a, --attempt uint",
+        "--exit-status",
+        "-j, --job string",
+        "-q, --jq expression",
+        "--json fields",
+        "--log",
+        "--log-failed",
+        "-t, --template string",
+        "-v, --verbose",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh run view"
+      ]
+    },
+    {
+      "path": "gh run watch",
+      "flags": [
+        "--compact",
+        "--exit-status",
+        "-i, --interval int"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh run watch"
+      ]
+    },
+    {
+      "path": "gh search code",
+      "flags": [
+        "--extension string",
+        "--filename string",
+        "-q, --jq expression",
+        "--json fields",
+        "--language string",
+        "-L, --limit int",
+        "--match strings",
+        "--owner strings",
+        "-R, --repo strings",
+        "--size string",
+        "-t, --template string",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh search code react lifecycle"
+      ]
+    },
+    {
+      "path": "gh search commits",
+      "flags": [
+        "--author string",
+        "--author-date date",
+        "--author-email string",
+        "--author-name string",
+        "--committer string",
+        "--committer-date date",
+        "--committer-email string",
+        "--committer-name string",
+        "--hash string",
+        "-q, --jq expression",
+        "--json fields",
+        "-L, --limit int",
+        "--merge",
+        "--order string",
+        "--owner strings",
+        "--parent string",
+        "-R, --repo strings",
+        "--sort string",
+        "-t, --template string",
+        "--tree string",
+        "--visibility strings",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh search commits readme typo"
+      ]
+    },
+    {
+      "path": "gh search issues",
+      "flags": [
+        "--app string",
+        "--archived",
+        "--assignee string",
+        "--author string",
+        "--closed date",
+        "--commenter user",
+        "--comments number",
+        "--created date",
+        "--include-prs",
+        "--interactions number",
+        "--involves user",
+        "-q, --jq expression",
+        "--json fields",
+        "--label strings",
+        "--language string",
+        "-L, --limit int",
+        "--locked",
+        "--match strings",
+        "--mentions user",
+        "--milestone title",
+        "--no-assignee",
+        "--no-label",
+        "--no-milestone",
+        "--no-project",
+        "--order string",
+        "--owner strings",
+        "--reactions number",
+        "-R, --repo strings",
+        "--sort string",
+        "--state string",
+        "--team-mentions string",
+        "-t, --template string",
+        "--updated date",
+        "--visibility strings",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh search issues readme typo"
+      ]
+    },
+    {
+      "path": "gh search prs",
+      "flags": [
+        "--app string",
+        "--archived",
+        "--assignee string",
+        "--author string",
+        "-B, --base string",
+        "--checks string",
+        "--closed date",
+        "--commenter user",
+        "--comments number",
+        "--created date",
+        "--draft",
+        "-H, --head string",
+        "--interactions number",
+        "--involves user",
+        "-q, --jq expression",
+        "--json fields",
+        "--label strings",
+        "--language string",
+        "-L, --limit int",
+        "--locked",
+        "--match strings",
+        "--mentions user",
+        "--merged",
+        "--merged-at date",
+        "--milestone title",
+        "--no-assignee",
+        "--no-label",
+        "--no-milestone",
+        "--no-project",
+        "--order string",
+        "--owner strings",
+        "--reactions number",
+        "-R, --repo strings",
+        "--review string",
+        "--review-requested user",
+        "--reviewed-by user",
+        "--sort string",
+        "--state string",
+        "--team-mentions string",
+        "-t, --template string",
+        "--updated date",
+        "--visibility strings",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh search prs fix bug"
+      ]
+    },
+    {
+      "path": "gh search repos",
+      "flags": [
+        "--archived",
+        "--created date",
+        "--followers number",
+        "--forks number",
+        "--good-first-issues number",
+        "--help-wanted-issues number",
+        "--include-forks string",
+        "-q, --jq expression",
+        "--json fields",
+        "--language string",
+        "--license strings",
+        "-L, --limit int",
+        "--match strings",
+        "--number-topics number",
+        "--order string",
+        "--owner strings",
+        "--size string",
+        "--sort string",
+        "--stars number",
+        "-t, --template string",
+        "--topic strings",
+        "--updated date",
+        "--visibility strings",
+        "-w, --web"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh search repos cli shell"
+      ]
+    },
+    {
+      "path": "gh secret delete",
+      "flags": [
+        "-a, --app string",
+        "-e, --env string",
+        "-o, --org string",
+        "-u, --user"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh secret list",
+      "flags": [
+        "-a, --app string",
+        "-e, --env string",
+        "-q, --jq expression",
+        "--json fields",
+        "-o, --org string",
+        "-t, --template string",
+        "-u, --user"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh secret set",
+      "flags": [
+        "-a, --app string",
+        "-b, --body string",
+        "-e, --env environment",
+        "-f, --env-file file",
+        "--no-repos-selected",
+        "--no-store",
+        "-o, --org organization",
+        "-r, --repos repositories",
+        "-u, --user",
+        "-v, --visibility string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh secret set MYSECRET"
+      ]
+    },
+    {
+      "path": "gh ssh-key add",
+      "flags": [
+        "-t, --title string",
+        "--type string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh ssh-key delete",
+      "flags": [
+        "-y, --yes"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh ssh-key list",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh status",
+      "flags": [
+        "-e, --exclude strings",
+        "-o, --org string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh status -e cli/cli -e cli/go-gh # Exclude multiple repositories",
+        "gh status -o cli # Limit results to a single organization"
+      ]
+    },
+    {
+      "path": "gh variable delete",
+      "flags": [
+        "-e, --env string",
+        "-o, --org string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh variable get",
+      "flags": [
+        "-e, --env string",
+        "-q, --jq expression",
+        "--json fields",
+        "-o, --org string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh variable list",
+      "flags": [
+        "-e, --env string",
+        "-q, --jq expression",
+        "--json fields",
+        "-o, --org string",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh variable set",
+      "flags": [
+        "-b, --body string",
+        "-e, --env environment",
+        "-f, --env-file file",
+        "-o, --org organization",
+        "-r, --repos repositories",
+        "-v, --visibility string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh variable set MYVARIABLE"
+      ]
+    },
+    {
+      "path": "gh workflow disable",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh workflow enable",
+      "flags": [],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh workflow list",
+      "flags": [
+        "-a, --all",
+        "-q, --jq expression",
+        "--json fields",
+        "-L, --limit int",
+        "-t, --template string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": []
+    },
+    {
+      "path": "gh workflow run",
+      "flags": [
+        "--json",
+        "-r, --ref string"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh workflow run"
+      ]
+    },
+    {
+      "path": "gh workflow view",
+      "flags": [
+        "-r, --ref string",
+        "-w, --web",
+        "-y, --yaml"
+      ],
+      "inherited": [
+        "--help"
+      ],
+      "examples": [
+        "gh workflow view"
+      ]
+    }
+  ]
+}
