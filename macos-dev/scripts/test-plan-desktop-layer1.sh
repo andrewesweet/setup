@@ -271,6 +271,29 @@ for name in ICON_WIFI ICON_BATTERY ICON_VOLUME ICON_CLOCK ICON_ZSCALER ICON_FOCU
     grep -qE "^[[:space:]]*(export[[:space:]]+)?${name}=" sketchybar/icons.sh
 done
 
+# ── AC-14: sketchybarrc sources palette + configures the bar ─────────
+echo ""
+echo "AC-14: sketchybarrc sources palette and adds 9 items"
+# shellcheck disable=SC2016  # \$CONFIG_DIR is a literal regex pattern — not a shell expansion
+check "sketchybarrc sources colors.sh" \
+  grep -qE 'source[[:space:]]+"\$CONFIG_DIR/colors.sh"' sketchybar/sketchybarrc
+# shellcheck disable=SC2016  # \$CONFIG_DIR is a literal regex pattern — not a shell expansion
+check "sketchybarrc sources icons.sh" \
+  grep -qE 'source[[:space:]]+"\$CONFIG_DIR/icons.sh"' sketchybar/sketchybarrc
+check "sketchybarrc calls --bar height=30" \
+  grep -qE 'sketchybar[[:space:]]+--bar.*height=30' sketchybar/sketchybarrc
+check "sketchybarrc calls --bar position=top" \
+  grep -qE 'sketchybar[[:space:]]+--bar.*position=top' sketchybar/sketchybarrc
+check "sketchybarrc pins display to primary-external placeholder" \
+  grep -q '<primary-external-name>' sketchybar/sketchybarrc
+# Count --add item occurrences — expect at least 9 (9 items + optional event).
+add_item_count=$(grep -cE '^[[:space:]]*sketchybar[[:space:]]+--add[[:space:]]+item' sketchybar/sketchybarrc)
+if (( add_item_count >= 8 )); then
+  ok "sketchybarrc adds ≥ 8 items ($add_item_count)"
+else
+  nok "sketchybarrc adds ≥ 8 items ($add_item_count)"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

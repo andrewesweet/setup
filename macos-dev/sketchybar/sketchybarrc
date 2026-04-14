@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+# sketchybar/sketchybarrc — SketchyBar top-level config.
+#
+# Spec: docs/plans/2026-04-14-macos-desktop-env-design.md §3.2.
+# Pins the bar to the <primary-external-name> placeholder — the user
+# substitutes at install time per Next-steps item 7.f (same pattern
+# as aerospace.toml monitor placeholders).
+
+CONFIG_DIR="$HOME/.config/sketchybar"
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/colors.sh"
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/icons.sh"
+
+# ── Bar appearance ────────────────────────────────────────────────────
+sketchybar --bar height=30 position=top \
+  color="$COLOR_BG" \
+  padding_left=8 \
+  padding_right=8 \
+  corner_radius=9 \
+  y_offset=4 \
+  margin=8 \
+  blur_radius=0 \
+  topmost=window \
+  display='<primary-external-name>'
+
+# ── Defaults applied to every item ────────────────────────────────────
+sketchybar --default \
+  updates=when_shown \
+  drawing=on \
+  icon.font="JetBrainsMono Nerd Font:Bold:14.0" \
+  icon.color="$COLOR_FG" \
+  label.font="JetBrainsMono Nerd Font:Regular:12.0" \
+  label.color="$COLOR_FG" \
+  padding_left=6 \
+  padding_right=6
+
+# ── Left side ─────────────────────────────────────────────────────────
+# 1. workspaces — 4 pills, subscribes to aerospace_workspace_change.
+# Fallback update_freq=5 catches missed triggers within 5 s.
+for ws in 1 2 3 4; do
+  icon_var="ICON_WS_$ws"
+  # shellcheck disable=SC2005,SC2086
+  sketchybar --add item "workspace.$ws" left \
+    --set "workspace.$ws" \
+      icon="$(eval echo \$"$icon_var")" \
+      label="$ws" \
+      update_freq=5 \
+      script="$PLUGIN_DIR/workspaces.sh" \
+      click_script="aerospace workspace $ws" \
+    --subscribe "workspace.$ws" aerospace_workspace_change
+done
+
+# 2. focused_app — subscribes to front_app_switched.
+sketchybar --add item focused_app left \
+  --set focused_app \
+    label.font="JetBrainsMono Nerd Font:Bold:12.0" \
+    script="$PLUGIN_DIR/focused_app.sh" \
+  --subscribe focused_app front_app_switched
+
+# ── Right side (drawn right-to-left) ──────────────────────────────────
+# 3. zscaler — 10-second poll of pgrep -qx ZscalerTunnel.
+sketchybar --add item zscaler right \
+  --set zscaler \
+    icon="$ICON_ZSCALER" \
+    update_freq=10 \
+    script="$PLUGIN_DIR/zscaler.sh"
+
+# 4. focus_mode — reads ~/Library/DoNotDisturb/DB/Assertions.json (jq -e guard).
+sketchybar --add item focus_mode right \
+  --set focus_mode \
+    icon="$ICON_FOCUS" \
+    update_freq=30 \
+    script="$PLUGIN_DIR/focus_mode.sh"
+
+# 5. wifi — SSID or disconnect glyph, 30-second poll.
+sketchybar --add item wifi right \
+  --set wifi \
+    icon="$ICON_WIFI" \
+    update_freq=30 \
+    script="$PLUGIN_DIR/wifi.sh"
+
+# 6. volume — event-driven.
+sketchybar --add item volume right \
+  --set volume \
+    icon="$ICON_VOLUME" \
+    script="$PLUGIN_DIR/volume.sh" \
+  --subscribe volume volume_change
+
+# 7. battery — percent + charge state, 120-second poll.
+sketchybar --add item battery right \
+  --set battery \
+    icon="$ICON_BATTERY" \
+    update_freq=120 \
+    script="$PLUGIN_DIR/battery.sh"
+
+# 8. clock — date + time, 30-second poll.
+sketchybar --add item clock right \
+  --set clock \
+    icon="$ICON_CLOCK" \
+    update_freq=30 \
+    script="$PLUGIN_DIR/clock.sh"
+
+sketchybar --update
