@@ -169,7 +169,7 @@ cask "nikitabobko/tap/aerospace"
 
 # ── Desktop · status bar & focus indicator (Layer 1 desktop) ──────────
 tap "FelixKratz/formulae"
-brew "sketchybar"
+brew "FelixKratz/formulae/sketchybar"
 brew "FelixKratz/formulae/borders"
 
 # ── Desktop · keyboard (Layer 2 desktop) ──────────────────────────────
