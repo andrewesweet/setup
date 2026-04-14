@@ -344,6 +344,23 @@ else
   nok "focus_mode.sh falls back to drawing=off on failure"
 fi
 
+# ── AC-18: bordersrc sources colors.sh and uses Dracula vars ─────────
+echo ""
+echo "AC-18: jankyborders/bordersrc invokes borders with Dracula colours"
+# shellcheck disable=SC2016  # \$HOME is a literal regex pattern — not a shell expansion
+check "bordersrc sources colors.sh" \
+  grep -qE '\.\s+"\$HOME/\.config/sketchybar/colors\.sh"' jankyborders/bordersrc
+# shellcheck disable=SC2016  # \$COLOR_PURPLE is a literal regex pattern — not a shell expansion
+check "bordersrc uses active_color=\$COLOR_PURPLE" \
+  grep -qE 'active_color="\$COLOR_PURPLE"' jankyborders/bordersrc
+# shellcheck disable=SC2016  # \$COLOR_CURRENT_LINE is a literal regex pattern — not a shell expansion
+check "bordersrc uses inactive_color=\$COLOR_CURRENT_LINE" \
+  grep -qE 'inactive_color="\$COLOR_CURRENT_LINE"' jankyborders/bordersrc
+check "bordersrc declares style=round" \
+  grep -qE 'style=round' jankyborders/bordersrc
+check "bordersrc declares hidpi=on" \
+  grep -qE 'hidpi=on' jankyborders/bordersrc
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

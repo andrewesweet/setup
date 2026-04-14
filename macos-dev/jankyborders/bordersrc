@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+# shellcheck shell=sh
+# jankyborders/bordersrc — config for the borders daemon.
+#
+# Spec: docs/plans/2026-04-14-macos-desktop-env-design.md §3.3.
+# Sourced from sketchybar/colors.sh — the single Dracula source of
+# truth. No hex values hardcoded here.
+
+# shellcheck source=/dev/null
+. "$HOME/.config/sketchybar/colors.sh"
+
+exec borders \
+  active_color="$COLOR_PURPLE" \
+  inactive_color="$COLOR_CURRENT_LINE" \
+  width=4.0 \
+  hidpi=on \
+  style=round
