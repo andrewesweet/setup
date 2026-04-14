@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # check-tool-manifest.sh — verify Brewfile and tools.txt are consistent
 #
-# Exits 0 if every `brew "name"` or `brew "tap/name"` or `cask "name"` entry
-# in Brewfile has a matching `brew:name` or `brew:tap/name` entry in tools.txt.
+# Exits 0 if every `brew "name"` or `brew "tap/name"` entry in Brewfile has a
+# matching `brew:name` or `brew:tap/name` entry in tools.txt.
+# Cask lines are intentionally skipped (Brewfile-only, per design §5.3/§5.4).
 #
 # Does NOT check the reverse direction (tools.txt entries without Brewfile
 # matches) because some tools are installed by non-brew means (bun, uv, etc.)
@@ -25,11 +26,12 @@ if [[ ! -f "$TOOLS_TXT" ]]; then
 fi
 
 # Extract formula names from Brewfile.
-# Matches: brew "name", brew "tap/name", cask "name"
-# Strips surrounding quotes.
+# Casks are intentionally skipped — they are Brewfile-only per design
+# docs/plans/2026-04-14-macos-desktop-env-design.md §5.3 / §5.4.
+# tools.txt is the formula manifest, not the full Brewfile mirror.
 brewfile_formulas=$(
-  grep -E '^(brew|cask) "' "$BREWFILE" \
-    | sed -E 's/^(brew|cask) "([^"]+)".*/\2/'
+  grep -E '^brew "' "$BREWFILE" \
+    | sed -E 's/^brew "([^"]+)".*/\1/'
 )
 
 # Extract brew: fields from tools.txt.

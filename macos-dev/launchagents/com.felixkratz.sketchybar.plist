@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.felixkratz.sketchybar</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>@HOMEBREW_PREFIX@/bin/sketchybar</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>@HOME@/Library/Logs/com.felixkratz.sketchybar.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>@HOME@/Library/Logs/com.felixkratz.sketchybar.err.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>@HOMEBREW_PREFIX@/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+</dict>
+</plist>

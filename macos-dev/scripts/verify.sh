@@ -226,6 +226,31 @@ else
   echo "  (gh extensions not checked — gh not on PATH or not authenticated)"
 fi
 
+# ── Desktop Layer 1 (macOS only) ─────────────────────────────────────
+if [[ "$PLATFORM" == "macos" ]]; then
+  echo ""
+  echo "Desktop Layer 1:"
+  # shellcheck disable=SC2016  # $HOME expansion inside inner bash -c is intentional
+  check "aerospace config symlink resolves" \
+    bash -c 'test -L "$HOME/.config/aerospace/aerospace.toml" && test -e "$HOME/.config/aerospace/aerospace.toml"'
+  # shellcheck disable=SC2016
+  check "sketchybarrc symlink resolves" \
+    bash -c 'test -L "$HOME/.config/sketchybar/sketchybarrc" && test -e "$HOME/.config/sketchybar/sketchybarrc"'
+  # shellcheck disable=SC2016
+  check "sketchybar/colors.sh symlink resolves" \
+    bash -c 'test -L "$HOME/.config/sketchybar/colors.sh" && test -e "$HOME/.config/sketchybar/colors.sh"'
+  # shellcheck disable=SC2016
+  check "sketchybar/plugins symlink resolves as a directory" \
+    bash -c 'test -L "$HOME/.config/sketchybar/plugins" && test -d "$HOME/.config/sketchybar/plugins"'
+  # shellcheck disable=SC2016
+  check "bordersrc symlink resolves" \
+    bash -c 'test -L "$HOME/.config/borders/bordersrc" && test -e "$HOME/.config/borders/bordersrc"'
+  check "sketchybar LaunchAgent loaded" \
+    bash -c "launchctl print gui/\$(id -u)/com.felixkratz.sketchybar"
+  check "borders LaunchAgent loaded" \
+    bash -c "launchctl print gui/\$(id -u)/com.felixkratz.borders"
+fi
+
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
 echo ""
 echo "${YELLOW}── Remaining manual steps ──${RESET}"

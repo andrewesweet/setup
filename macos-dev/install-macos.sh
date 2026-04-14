@@ -169,6 +169,14 @@ fi
 HOMEBREW_PREFIX="$(brew --prefix)"
 log "HOMEBREW_PREFIX=$HOMEBREW_PREFIX"
 
+# ── Desktop: cask install directory (Layer 1 desktop) ────────────────────────
+# /Applications is commonly MDM-locked on managed Macs. Install all casks
+# into ~/Applications/ instead — benign on non-managed Macs (user-local is a
+# valid Homebrew cask target). Must be exported BEFORE `brew bundle` so every
+# cask (including pre-desktop ones like codeql, visual-studio-code) inherits.
+mkdir -p "$HOME/Applications"
+export HOMEBREW_CASK_OPTS="--appdir=$HOME/Applications"
+
 # ── Step 1: Brew bundle ──────────────────────────────────────────────────────
 # Note: install.md lists `brew install charmbracelet/tap/freeze` as a separate
 # step, but we include it in the Brewfile (under its tap declaration) instead.
@@ -361,6 +369,14 @@ link vscode/extensions.json  "Library/Application Support/Code/User/extensions.j
 mkdir -p "$HOME/.local/bin"
 link container/dev.sh  .local/bin/dev
 
+# ── Desktop Layer 1 configs (aerospace + sketchybar + jankyborders) ─────
+link aerospace/aerospace.toml  .config/aerospace/aerospace.toml
+link sketchybar/sketchybarrc   .config/sketchybar/sketchybarrc
+link sketchybar/colors.sh      .config/sketchybar/colors.sh
+link sketchybar/icons.sh       .config/sketchybar/icons.sh
+link sketchybar/plugins        .config/sketchybar/plugins
+link jankyborders/bordersrc    .config/borders/bordersrc
+
 # Podman Machine LaunchAgent (macOS only)
 if [[ "$(uname)" == "Darwin" ]]; then
   # Substitute markers in LaunchAgent wrapper
@@ -381,6 +397,23 @@ if [[ "$(uname)" == "Darwin" ]]; then
   launchctl bootout "gui/$(id -u)/io.podman.machine" 2>/dev/null || true
   launchctl bootstrap "gui/$(id -u)" "$plist_dst"
   log "Podman Machine LaunchAgent loaded"
+
+  # ── Desktop LaunchAgents (macOS only) ─────────────────────────────────
+  for plist in com.felixkratz.sketchybar.plist \
+               com.felixkratz.borders.plist; do
+    plist_src="$DOTFILES/launchagents/$plist"
+    plist_dst="$HOME/Library/LaunchAgents/$plist"
+    if [[ ! -f "$plist_src" ]]; then
+      warn "missing plist: $plist_src — skipping"
+      continue
+    fi
+    sed -e "s|@HOMEBREW_PREFIX@|$HOMEBREW_PREFIX|g" -e "s|@HOME@|$HOME|g" \
+        "$plist_src" > "$plist_dst"
+    launchctl bootout "gui/$(id -u)/${plist%.plist}" 2>/dev/null || true
+    launchctl bootstrap "gui/$(id -u)" "$plist_dst"
+    printf "  linked    %s\n" "$plist_dst"
+  done
+  log "Desktop LaunchAgents loaded"
 fi
 
 # ── Step 4: Next steps ───────────────────────────────────────────────────────
@@ -406,6 +439,29 @@ Next steps:
        gh auth login
        gcloud auth login     # only if gcloud is installed (see prerequisites)
   6. Restart terminal.
+  7. Desktop first-run (macOS only — Layers 1–3):
+     a) Launch AeroSpace from ~/Applications/AeroSpace.app (first launch
+        triggers the Accessibility prompt; click "Open System Settings").
+     b) Within a single JIT-admin window, grant Accessibility to each of:
+          - AeroSpace             (~/Applications/AeroSpace.app)
+          - skhd                  ($HOMEBREW_PREFIX/bin/skhd — Layer 2)
+          - Hammerspoon           (~/Applications/Hammerspoon.app — Layer 2)
+          - Raycast               (~/Applications/Raycast.app — Layer 3)
+     c) Hide the native menu bar (SketchyBar replaces it):
+          defaults write -g _HIHideMenuBar -bool true
+          killall SystemUIServer
+     d) Capture monitor names at EACH dock location and substitute the
+        placeholders in ~/.config/aerospace/aerospace.toml under
+        [workspace-to-monitor-force-assignment] (and the <primary-external-name>
+        in ~/.config/sketchybar/sketchybarrc):
+          aerospace list-monitors
+        Edit the TOML + sketchybarrc, replacing each
+        <office-central-monitor-name>, <home-centre-monitor-name>,
+        <home-left-monitor-name>, <primary-external-name> placeholder,
+        then reload:
+          aerospace reload-config
+          brew services restart sketchybar
+     e) Walk docs/manual-smoke/desktop-layer1.md at your cadence.
 
 Prerequisites NOT installed by this script:
   - Google Cloud SDK (gcloud) — see warnings above if missing. The
