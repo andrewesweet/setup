@@ -1,0 +1,28 @@
+# skhd/.skhdrc — Desktop Layer 2 Hyper bindings.
+#
+# Spec: docs/plans/2026-04-14-macos-desktop-env-design.md §3.5.
+# Hyper = Cmd + Alt + Ctrl + Shift (sourced from Caps Lock via
+# hammerspoon/init.lua). Binding scheme: Hyper + first-letter-of-app.
+# Collision rule: Excel exception → `x` (Microsoft's iconography uses
+# the X glyph); Edge wins `e`. See design §3.5 collision convention.
+#
+# The @HOMEBREW_PREFIX@ marker is substituted at install time by
+# install-macos.sh (same pattern as aerospace.toml).
+
+# ── App launch / focus — first-letter rule, Office on siblings ───────
+cmd + alt + ctrl + shift - e     : open -a "Microsoft Edge"
+cmd + alt + ctrl + shift - o     : open -a "Microsoft Outlook"
+cmd + alt + ctrl + shift - t     : open -a "Microsoft Teams"
+cmd + alt + ctrl + shift - k     : open -a kitty
+cmd + alt + ctrl + shift - n     : open -na kitty --args nvim
+cmd + alt + ctrl + shift - w     : open -a "Microsoft Word"
+cmd + alt + ctrl + shift - x     : open -a "Microsoft Excel"
+cmd + alt + ctrl + shift - p     : open -a "Microsoft PowerPoint"
+cmd + alt + ctrl + shift - f     : open -a Finder
+
+# ── Utility ──────────────────────────────────────────────────────────
+# Hyper+Space: fallback launcher (Raycast ships in Layer 3; falls back
+# to Spotlight semantics gracefully if Layer 3 not yet installed).
+cmd + alt + ctrl + shift - space : open -a Raycast
+# Hyper+R: reload AeroSpace config (for after monitor-name edits).
+cmd + alt + ctrl + shift - r     : @HOMEBREW_PREFIX@/bin/aerospace reload-config

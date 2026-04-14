@@ -1,0 +1,27 @@
+{
+  "title": "Desktop Layer 2 — Caps Lock → Escape on tap / Hyper on hold",
+  "description": "Dormant Karabiner-Elements complex modification. Not active by default — see Appendix B of docs/plans/2026-04-14-macos-desktop-env-design.md. Semantically identical to hammerspoon/init.lua; switch via scripts/desktop-layer2-switch-to-karabiner.sh once MDM allows pqrs.org team ID G43BCU2T37.",
+  "rules": [
+    {
+      "description": "Caps Lock → Escape on tap, Hyper (Cmd+Alt+Ctrl+Shift) on hold",
+      "manipulators": [
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "caps_lock",
+            "modifiers": { "optional": ["any"] }
+          },
+          "to": [
+            {
+              "key_code": "left_shift",
+              "modifiers": ["left_command", "left_control", "left_option"]
+            }
+          ],
+          "to_if_alone": [
+            { "key_code": "escape" }
+          ]
+        }
+      ]
+    }
+  ]
+}
