@@ -23,24 +23,257 @@
     "todowrite": "allow",
     "bash": {
       "*": "ask",
-      "git status *": "allow", "git status": "allow",
-      "git diff *": "allow", "git diff": "allow",
-      "git log *": "allow", "git log": "allow",
+
+      // ── Git: read-only verbs ──────────────────────────────────────────────
+      "git status": "allow", "git status *": "allow",
+      "git diff": "allow", "git diff *": "allow",
+      "git log": "allow", "git log *": "allow",
       "git show *": "allow",
-      "git branch *": "allow", "git branch": "allow",
+      "git branch": "allow", "git branch *": "allow",
       "git stash list": "allow",
-      "rg *": "allow", "fd *": "allow",
-      "bat /home/dev/workspace/*": "allow",
-      "bat /tmp/*": "allow",
-      "cat /home/dev/workspace/*": "allow",
-      "cat /tmp/*": "allow",
-      "ls *": "allow", "ls": "allow",
-      "which *": "allow", "type *": "allow",
-      "pwd": "allow", "date *": "allow", "date": "allow",
-      "npm list *": "allow", "brew list *": "allow",
-      "rm -rf /tmp/opencode-*": "allow", // Scoped exception for scratch cleanup (specificity-wins)
+      "git blame *": "allow",
+      "git reflog": "allow", "git reflog *": "allow",
+      "git remote": "allow", "git remote -v": "allow", "git remote show *": "allow",
+      "git config --get *": "allow", "git config --list": "allow", "git config -l": "allow",
+      "git tag": "allow", "git tag -l *": "allow", "git tag --list *": "allow",
+      "git describe": "allow", "git describe *": "allow",
+      "git rev-parse *": "allow",
+      "git ls-files": "allow", "git ls-files *": "allow",
+      "git ls-tree *": "allow",
+      "git for-each-ref": "allow", "git for-each-ref *": "allow",
+      "git shortlog *": "allow",
+      "git cat-file -p *": "allow", "git cat-file -t *": "allow",
+      "git grep *": "allow",
+      "git worktree list": "allow",
+      "git whatchanged *": "allow",
+      "git name-rev *": "allow",
+      "git merge-base *": "allow",
+      "git count-objects -v": "allow",
+
+      // ── GitHub CLI: read verbs ────────────────────────────────────────────
+      "gh auth status": "allow",
+      "gh repo view": "allow", "gh repo view *": "allow",
+      "gh pr list": "allow", "gh pr list *": "allow",
+      "gh pr view *": "allow", "gh pr diff *": "allow", "gh pr checks *": "allow",
+      "gh issue list": "allow", "gh issue list *": "allow", "gh issue view *": "allow",
+      "gh workflow list": "allow", "gh workflow view *": "allow",
+      "gh run list": "allow", "gh run list *": "allow", "gh run view *": "allow",
+      "gh release list": "allow", "gh release view *": "allow",
+      "gh label list *": "allow",
+
+      // ── gh api: GET only (implicit + explicit -X GET) ─────────────────────
+      // Rule resolution is last-match-wins (not specificity). Ordering below:
+      //   1. broad allow, 2. ask overrides for non-GET methods and body flags,
+      //   3. re-allow explicit GET forms so they win over the method asks.
+      // `-f`/`-F`/`--field`/`--raw-field`/`--input` silently flip the default
+      // method from GET to POST, so they MUST ask even without `-X`.
+      // A per-endpoint POST allowlist will be added in a follow-up.
+      "gh api": "allow", "gh api *": "allow",
+      "gh api *-X *": "ask", "gh api *--method *": "ask",
+      "gh api *-XPOST*": "ask", "gh api *-XPUT*": "ask",
+      "gh api *-XDELETE*": "ask", "gh api *-XPATCH*": "ask",
+      "gh api *-f *": "ask", "gh api *--field*": "ask",
+      "gh api *-F *": "ask", "gh api *--raw-field*": "ask",
+      "gh api *--input*": "ask",
+      "gh api -X GET*": "allow", "gh api --method GET*": "allow",
+      "gh api *-XGET*": "allow",
+
+      // ── curl: GET only (implicit + explicit -X GET) ───────────────────────
+      // Same last-match-wins pattern as gh api above. Body flags (`-d`, `-F`,
+      // `-T` and their long forms) silently flip curl's default method away
+      // from GET, so they MUST ask even without `-X`. Both space (`-X POST`)
+      // and no-space (`-XPOST`) method forms are covered.
+      // A per-endpoint POST allowlist will be added in a follow-up.
+      "curl": "allow", "curl *": "allow",
+      "curl *-X *": "ask", "curl *--request *": "ask",
+      "curl *-XPOST*": "ask", "curl *-XPUT*": "ask",
+      "curl *-XDELETE*": "ask", "curl *-XPATCH*": "ask",
+      "curl *-d *": "ask", "curl *--data*": "ask",
+      "curl *-F *": "ask", "curl *--form*": "ask",
+      "curl *-T *": "ask", "curl *--upload-file*": "ask",
+      "curl -X GET*": "allow", "curl --request GET*": "allow",
+      "curl *-XGET*": "allow",
+
+      // ── Filesystem inspection (stdlib) ────────────────────────────────────
+      "ls": "allow", "ls *": "allow",
+      "pwd": "allow",
+      "which *": "allow", "type *": "allow", "command -v *": "allow",
+      "whereis *": "allow", "apropos *": "allow",
+      "file *": "allow",
+      "stat *": "allow",
+      "readlink *": "allow", "realpath *": "allow",
+      "basename *": "allow", "dirname *": "allow",
+      "wc": "allow", "wc *": "allow",
+      "head *": "allow", "tail *": "allow",
+      // tail follow modes hang sessions — placed AFTER `tail *: allow` so
+      // findLast returns the ask rule for `tail -f`/`tail -F`.
+      "tail -f *": "ask", "tail -F *": "ask",
+      "du -sh *": "allow", "du -h *": "allow",
+      "df": "allow", "df -h": "allow",
+      "tree": "allow", "tree *": "allow",
+      "eza": "allow", "eza *": "allow",
+
+      // ── Text inspection / hashing / diff ──────────────────────────────────
+      "diff *": "allow",
+      "cmp *": "allow",
+      "md5sum *": "allow", "sha1sum *": "allow",
+      "sha256sum *": "allow", "sha512sum *": "allow",
+      "shasum *": "allow",
+      "hexdump *": "allow", "xxd *": "allow", "od *": "allow", "strings *": "allow",
+
+      // ── Pure text-transform pipes (no in-place writes) ────────────────────
+      // Intentionally excluded: sed, awk, tee, perl, python, ruby, node, bash
+      // — all can write to disk via flags/-e/stdin and glob matching can't
+      // reliably prevent it.
+      "sort": "allow", "sort *": "allow",
+      "uniq": "allow", "uniq *": "allow",
+      "cut *": "allow",
+      "tr *": "allow",
+      "tac *": "allow", "rev *": "allow", "nl *": "allow",
+      "column *": "allow",
+      "paste *": "allow", "join *": "allow", "comm *": "allow",
+      "fold *": "allow", "fmt *": "allow",
+      "expand *": "allow", "unexpand *": "allow",
+
+      // ── Search tools ──────────────────────────────────────────────────────
+      "rg *": "allow",
+      "fd *": "allow",
+
+      // ── Data wrangling (read-only defaults) ───────────────────────────────
+      "jq": "allow", "jq *": "allow",
+      "yq": "allow", "yq *": "allow",
+      "mlr *": "allow", "miller *": "allow",
+
+      // ── Viewers scoped to workspace/tmp ───────────────────────────────────
+      "bat ~/workspace/*": "allow", "bat ~/workspace/**": "allow",
+      "bat /home/dev/workspace/*": "allow", "bat /home/dev/workspace/**": "allow",
+      "bat /tmp/*": "allow", "bat /tmp/**": "allow",
+      "cat ~/workspace/*": "allow", "cat ~/workspace/**": "allow",
+      "cat /home/dev/workspace/*": "allow", "cat /home/dev/workspace/**": "allow",
+      "cat /tmp/*": "allow", "cat /tmp/**": "allow",
+      "glow ~/workspace/*": "allow", "glow /home/dev/workspace/*": "allow",
+      "glow /tmp/*": "allow",
+      "delta ~/workspace/*": "allow", "delta /home/dev/workspace/*": "allow",
+      "delta /tmp/*": "allow",
+      "difft *": "allow",
+
+      // ── Environment / system info ─────────────────────────────────────────
+      "env": "allow",
+      "printenv": "allow", "printenv *": "allow",
+      "uname": "allow", "uname *": "allow",
+      "hostname": "allow", "whoami": "allow", "id": "allow", "groups": "allow",
+      "uptime": "allow", "locale": "allow",
+      "date": "allow", "date *": "allow",
+
+      // ── Version / help probes (broad, per-tool) ───────────────────────────
+      "* --version": "allow",
+      "* -V": "allow",
+      "* --help": "allow",
+      "* -h": "allow",
+
+      // ── Package / runtime inventory (list-only) ───────────────────────────
+      "brew list": "allow", "brew list *": "allow",
+      "brew info *": "allow", "brew outdated": "allow", "brew doctor": "allow",
+      "npm list": "allow", "npm list *": "allow", "npm ls *": "allow",
+      "pnpm list *": "allow", "yarn list *": "allow",
+      "bun pm ls": "allow",
+      "pip list": "allow", "pip show *": "allow", "pip freeze": "allow",
+      "uv pip list": "allow", "uv tree": "allow",
+      "cargo tree": "allow", "cargo metadata *": "allow",
+      "go list *": "allow", "go env": "allow", "go env *": "allow", "go version": "allow",
+      "bundle list": "allow", "gem list": "allow",
+      "dpkg -l": "allow", "apt list --installed": "allow",
+      "mise list": "allow", "mise ls": "allow", "mise current": "allow",
+      "mise env": "allow", "mise doctor": "allow", "mise which *": "allow",
+
+      // ── Linters / analyzers (non-mutating invocations only) ───────────────
+      "shellcheck *": "allow",
+      "shfmt -d *": "allow", "shfmt -l *": "allow",
+      "actionlint": "allow", "actionlint *": "allow",
+      "zizmor *": "allow",
+      "pinact run --check *": "allow",
+      "markdownlint-cli2 *.md": "allow",
+      "tflint": "allow", "tflint *": "allow",
+      "golangci-lint run": "allow", "golangci-lint run *": "allow",
+      "golangci-lint config *": "allow",
+      "gofmt -l *": "allow", "gofmt -d *": "allow",
+      "goimports -l *": "allow", "goimports -d *": "allow",
+
+      // ── Containers: read verbs ────────────────────────────────────────────
+      "podman ps": "allow", "podman ps *": "allow",
+      "podman images": "allow", "podman images *": "allow",
+      "podman inspect *": "allow", "podman logs *": "allow",
+      "podman version": "allow", "podman info": "allow",
+      "docker ps": "allow", "docker ps *": "allow",
+      "docker images": "allow", "docker inspect *": "allow",
+      "docker logs *": "allow",
+      "docker version": "allow", "docker info": "allow",
+
+      // ── Kubernetes: read verbs ────────────────────────────────────────────
+      "kubectl get *": "allow",
+      "kubectl describe *": "allow",
+      "kubectl logs *": "allow",
+      "kubectl config view": "allow",
+      "kubectl config get-contexts": "allow",
+      "kubectl config current-context": "allow",
+      "kubectl version *": "allow",
+      "kubectl api-resources": "allow", "kubectl api-versions": "allow",
+      "kubectl cluster-info": "allow",
+      "kubectl explain *": "allow",
+      "kubectx": "allow", "kubens": "allow",
+
+      // ── Cloud: narrow read-only ───────────────────────────────────────────
+      "gcloud auth list": "allow",
+      "gcloud config list": "allow", "gcloud config get-value *": "allow",
+      "gcloud projects list": "allow",
+      "gcloud info": "allow", "gcloud version": "allow",
+
+      // ── Cocogitto / changelog (read-only) ─────────────────────────────────
+      "cog verify *": "allow",
+      "cog check": "allow",
+      "cog log": "allow", "cog log *": "allow",
+      "git-cliff --context *": "allow",
+
+      // ── Terraform: plan-style, no apply/destroy ───────────────────────────
+      "terraform fmt -check": "allow",
+      "terraform validate": "allow",
+      "terraform version": "allow",
+      "terraform show": "allow", "terraform state list": "allow",
+      "tf-summarize *": "allow",
+      "tenv list": "allow",
+
+      // ── Archives: list only ───────────────────────────────────────────────
+      "tar -tvf *": "allow", "tar --list *": "allow",
+      "unzip -l *": "allow", "unzip -v *": "allow",
+      "7z l *": "allow", "zipinfo *": "allow",
+
+      // ── History / session / misc (read-only) ──────────────────────────────
+      "atuin search *": "allow", "atuin stats *": "allow", "atuin status": "allow",
+      "zoxide query *": "allow",
+      "ghq list": "allow", "ghq list *": "allow",
+      "direnv status": "allow", "direnv version": "allow",
+      "starship --print-config": "allow", "starship config": "allow",
+      "starship module *": "allow",
+      "tmux list-sessions": "allow", "tmux list-windows": "allow",
+      "tmux list-panes": "allow",
+      "tmux show-options *": "allow", "tmux display-message -p *": "allow",
+
+      // ── Network: passive probing only ─────────────────────────────────────
+      // curl/wget/xh/httpie intentionally excluded from broad allow (curl is
+      // GET-only above; others fall through to *: ask).
+      "dig *": "allow", "host *": "allow", "nslookup *": "allow",
+      "ping -c * *": "allow",
+      "traceroute *": "allow", "tracepath *": "allow",
+
+      // ── Denies (rule resolution is last-match-wins; denies placed BEFORE
+      //    the scoped exception so the narrower allow wins for /tmp/opencode-*)
       "rm -rf *": "deny", "rm -fr *": "deny",
-      "sudo *": "deny", "chmod 777 *": "deny"
+      "sudo *": "deny", "chmod 777 *": "deny",
+
+      // ── Scoped cleanup exception ──────────────────────────────────────────
+      // Placed LAST so findLast returns this rule for `rm -rf /tmp/opencode-*`,
+      // overriding the broader `rm -rf *: deny` above.
+      "rm -rf /tmp/opencode-*": "allow"
     },
     "edit": {
       "*": "ask",
