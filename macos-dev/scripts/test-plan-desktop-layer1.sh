@@ -59,6 +59,30 @@ echo ""
 
 # ── AC-1..25 get appended by subsequent tasks ─────────────────────────
 
+# ── AC-4: check-tool-manifest.sh skips cask lines ──────────────────────
+echo ""
+echo "AC-4: check-tool-manifest.sh skips cask lines"
+# Build a fake Brewfile with a cask but no matching tools.txt entry;
+# require check-tool-manifest.sh exits 0. Uses a temp dir under /tmp
+# so we don't pollute the repo.
+tmp=$(mktemp -d)
+cat >"$tmp/Brewfile" <<'EOF'
+brew "ghq"
+cask "nonexistent-cask-for-test"
+EOF
+cp tools.txt "$tmp/tools.txt"
+# Run the manifest script with REPO_ROOT spoofed via working directory.
+# The script uses $(dirname "$0")/.. — so place a symlink to the real
+# script under a fake scripts/ dir whose parent is $tmp.
+mkdir -p "$tmp/scripts"
+ln -sf "$(cd "$MACOS_DEV/scripts" && pwd)/check-tool-manifest.sh" "$tmp/scripts/check-tool-manifest.sh"
+if bash "$tmp/scripts/check-tool-manifest.sh" >/dev/null 2>&1; then
+  ok "check-tool-manifest.sh skips cask lines (unmatched cask passes)"
+else
+  nok "check-tool-manifest.sh skips cask lines (unmatched cask passes)"
+fi
+rm -rf "$tmp"
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
