@@ -109,7 +109,33 @@ for ext in 'Brew' 'GitHub' 'Kill Process' 'System' 'Clipboard History' 'Color Pi
   fi
 done
 
-# ── AC-5..9 get appended by subsequent tasks ──────────────────────────
+# ── AC-5: Next-steps references raycast/extensions.md ────────────────
+echo ""
+echo "AC-5: install-macos.sh Next-steps references raycast/extensions.md"
+next="$(awk '/Next steps:/,/^EOF$/' install-macos.sh)"
+if printf '%s' "$next" | grep -qF 'raycast/extensions.md'; then
+  ok "Next-steps mentions raycast/extensions.md"
+else
+  nok "Next-steps mentions raycast/extensions.md"
+fi
+
+# ── AC-6: Next-steps /etc/hosts blackhole commands ──────────────────
+echo ""
+echo "AC-6: Next-steps includes /etc/hosts blackhole for Raycast sync"
+for domain in 'backend.raycast.com' 'api.raycast.com' 'sync.raycast.com'; do
+  if printf '%s' "$next" | grep -qF "$domain"; then
+    ok "Next-steps mentions $domain"
+  else
+    nok "Next-steps mentions $domain"
+  fi
+done
+if printf '%s' "$next" | grep -qE '0\.0\.0\.0'; then
+  ok "Next-steps uses 0.0.0.0 blackhole target"
+else
+  nok "Next-steps uses 0.0.0.0 blackhole target"
+fi
+
+# ── AC-7..9 get appended by subsequent tasks ──────────────────────────
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
