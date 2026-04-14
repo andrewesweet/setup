@@ -111,6 +111,23 @@ else
 fi
 rm -rf "$tmp"
 
+# ── AC-5: install-macos.sh configures ~/Applications cask path ────────
+echo ""
+echo "AC-5: install-macos.sh sets HOMEBREW_CASK_OPTS"
+check "install-macos.sh has mkdir -p \"\$HOME/Applications\"" \
+  grep -qE 'mkdir -p[[:space:]]+"[$]HOME/Applications"' install-macos.sh
+check "install-macos.sh exports HOMEBREW_CASK_OPTS with --appdir" \
+  grep -qE 'export[[:space:]]+HOMEBREW_CASK_OPTS=".*--appdir=[$]HOME/Applications"' install-macos.sh
+# Verify the mkdir line precedes the `brew bundle` invocation.
+# grep -n emits "<line>:<text>"; strip suffix and compare.
+mkdir_line="$(grep -nE 'mkdir -p[[:space:]]+"[$]HOME/Applications"' install-macos.sh | head -1 | cut -d: -f1)"
+brew_bundle_line="$(grep -nE '^if[[:space:]]+!.*brew bundle' install-macos.sh | head -1 | cut -d: -f1)"
+if [[ -n "$mkdir_line" && -n "$brew_bundle_line" && "$mkdir_line" -lt "$brew_bundle_line" ]]; then
+  ok "\$HOME/Applications mkdir precedes brew bundle"
+else
+  nok "\$HOME/Applications mkdir precedes brew bundle (mkdir=$mkdir_line brew=$brew_bundle_line)"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

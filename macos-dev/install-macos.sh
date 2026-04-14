@@ -169,6 +169,14 @@ fi
 HOMEBREW_PREFIX="$(brew --prefix)"
 log "HOMEBREW_PREFIX=$HOMEBREW_PREFIX"
 
+# ── Desktop: cask install directory (Layer 1 desktop) ────────────────────────
+# /Applications is commonly MDM-locked on managed Macs. Install all casks
+# into ~/Applications/ instead — benign on non-managed Macs (user-local is a
+# valid Homebrew cask target). Must be exported BEFORE `brew bundle` so every
+# cask (including pre-desktop ones like codeql, visual-studio-code) inherits.
+mkdir -p "$HOME/Applications"
+export HOMEBREW_CASK_OPTS="--appdir=$HOME/Applications"
+
 # ── Step 1: Brew bundle ──────────────────────────────────────────────────────
 # Note: install.md lists `brew install charmbracelet/tap/freeze` as a separate
 # step, but we include it in the Brewfile (under its tap declaration) instead.
