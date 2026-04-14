@@ -135,7 +135,32 @@ else
   nok "Next-steps uses 0.0.0.0 blackhole target"
 fi
 
-# ── AC-7..9 get appended by subsequent tasks ──────────────────────────
+# ── AC-7: manual-smoke/desktop-layer3.md populated ──────────────────
+echo ""
+echo "AC-7: manual-smoke/desktop-layer3.md populated"
+check "file exists" test -f docs/manual-smoke/desktop-layer3.md
+check "has 'When to run' section" \
+  grep -qE '^## When to run' docs/manual-smoke/desktop-layer3.md
+check "has 'Checklist' section" \
+  grep -qE '^## Checklist' docs/manual-smoke/desktop-layer3.md
+check "has 'Failure modes' section" \
+  grep -qE '^## Failure modes' docs/manual-smoke/desktop-layer3.md
+checklist_items=$(awk '/^## Checklist/,/^## Failure modes/' docs/manual-smoke/desktop-layer3.md \
+                  | grep -cE '^- \[ \]')
+failure_items=$(awk '/^## Failure modes/,0' docs/manual-smoke/desktop-layer3.md \
+               | grep -cE '^- \[ \]')
+if (( checklist_items >= 6 )); then
+  ok "checklist has ≥ 6 items ($checklist_items)"
+else
+  nok "checklist has ≥ 6 items ($checklist_items)"
+fi
+if (( failure_items >= 2 )); then
+  ok "failure modes has ≥ 2 drill items ($failure_items)"
+else
+  nok "failure modes has ≥ 2 drill items ($failure_items)"
+fi
+
+# ── AC-8..9 get appended by subsequent tasks ──────────────────────────
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
