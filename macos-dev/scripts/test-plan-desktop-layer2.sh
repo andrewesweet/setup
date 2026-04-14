@@ -255,6 +255,37 @@ else
   nok "Desktop LaunchAgent block iterates com.koekeishiya.skhd.plist"
 fi
 
+# ── AC-16: desktop-layer2-switch-to-karabiner.sh is shellcheck-clean ─
+echo ""
+echo "AC-16: desktop-layer2-switch-to-karabiner.sh structure"
+script=scripts/desktop-layer2-switch-to-karabiner.sh
+check "script exists and is executable" test -x "$script"
+if command -v shellcheck &>/dev/null; then
+  if shellcheck "$script" >/dev/null 2>&1; then
+    ok "shellcheck $script"
+  else
+    nok "shellcheck $script"
+  fi
+else
+  skp "shellcheck $script" "shellcheck not available"
+fi
+body="$(sed 's/#.*//' "$script")"
+if printf '%s' "$body" | grep -q 'killall Hammerspoon'; then
+  ok "script stops Hammerspoon"
+else
+  nok "script stops Hammerspoon"
+fi
+if printf '%s' "$body" | grep -qE 'rm -f[[:space:]]+"[$]HOME/[.]hammerspoon/init[.]lua"'; then
+  ok "script removes Hammerspoon symlink"
+else
+  nok "script removes Hammerspoon symlink"
+fi
+if printf '%s' "$body" | grep -q 'DESKTOP_LAYER2_USE_KARABINER=true'; then
+  ok "script invokes install-macos.sh with DESKTOP_LAYER2_USE_KARABINER=true"
+else
+  nok "script invokes install-macos.sh with DESKTOP_LAYER2_USE_KARABINER=true"
+fi
+
 # ── AC-17: install-macos.sh Next-steps covers Hammerspoon + skhd ─────
 echo ""
 echo "AC-17: install-macos.sh Next-steps covers Hammerspoon + skhd grants"
