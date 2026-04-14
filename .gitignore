@@ -1,2 +1,11 @@
 # Git worktrees (created at repo root by git worktree add)
 .worktrees/
+
+# Session-continuation scratch pads and superseded draft plans.
+# Committed plans live under docs/superpowers/plans/; anything under
+# macos-dev/docs/plans/continuation-*.md is per-session context for
+# resuming work and should not be version-controlled. The kitty plan
+# shipped via origin/plan4-kitty long ago and was superseded by the
+# Layer 1b-ii Dracula Pro refresh — the markdown is a stale draft.
+macos-dev/docs/plans/continuation-*.md
+macos-dev/docs/plans/2026-04-07-04-kitty.md
