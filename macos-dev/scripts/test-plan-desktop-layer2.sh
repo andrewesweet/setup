@@ -183,6 +183,33 @@ else
   nok "Hyper+r uses @HOMEBREW_PREFIX@/bin/aerospace reload-config"
 fi
 
+# ── AC-11: Karabiner JSON is valid JSON ──────────────────────────────
+echo ""
+echo "AC-11: karabiner/.../desktop-layer2.json parses via jq empty"
+if command -v jq &>/dev/null; then
+  if jq empty karabiner/complex_modifications/desktop-layer2.json >/dev/null 2>&1; then
+    ok "jq empty desktop-layer2.json"
+  else
+    nok "jq empty desktop-layer2.json"
+  fi
+else
+  skp "jq empty desktop-layer2.json" "jq not available"
+fi
+
+# ── AC-12: Karabiner JSON declares caps_lock → escape/Hyper ──────────
+echo ""
+echo "AC-12: Karabiner JSON declares Caps → Escape / Hyper semantics"
+if command -v jq &>/dev/null; then
+  check "title is non-empty" \
+    bash -c 'jq -e ".title | length > 0" karabiner/complex_modifications/desktop-layer2.json'
+  check ".rules is a non-empty array" \
+    bash -c 'jq -e ".rules | type == \"array\" and length > 0" karabiner/complex_modifications/desktop-layer2.json'
+  check "at least one rule references caps_lock" \
+    bash -c 'jq -e "[.. | .key_code? // empty] | any(. == \"caps_lock\")" karabiner/complex_modifications/desktop-layer2.json'
+else
+  skp "Karabiner JSON structural checks" "jq not available"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
