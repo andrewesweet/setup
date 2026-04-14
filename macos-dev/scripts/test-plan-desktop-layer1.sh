@@ -361,6 +361,33 @@ check "bordersrc declares style=round" \
 check "bordersrc declares hidpi=on" \
   grep -qE 'hidpi=on' jankyborders/bordersrc
 
+# ── AC-19: LaunchAgent plists are plutil-clean + use markers ─────────
+echo ""
+echo "AC-19: LaunchAgent plists plutil-lint clean + use markers"
+for plist in launchagents/com.felixkratz.sketchybar.plist \
+             launchagents/com.felixkratz.borders.plist; do
+  if [[ ! -f "$plist" ]]; then
+    nok "$plist exists"
+    continue
+  fi
+  ok "$plist exists"
+
+  if [[ "$(uname)" == "Darwin" ]] && command -v plutil &>/dev/null; then
+    if plutil -lint "$plist" >/dev/null 2>&1; then
+      ok "$plist passes plutil -lint"
+    else
+      nok "$plist passes plutil -lint"
+    fi
+  else
+    skp "$plist passes plutil -lint" "plutil not available"
+  fi
+
+  check "$plist uses @HOMEBREW_PREFIX@/bin marker" \
+    grep -q '@HOMEBREW_PREFIX@/bin' "$plist"
+  check "$plist uses @HOME@ marker in log paths" \
+    grep -q '@HOME@' "$plist"
+done
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
