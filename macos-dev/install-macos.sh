@@ -484,7 +484,21 @@ Next steps:
           DESKTOP_LAYER2_USE_KARABINER=true bash install-macos.sh
         or, for an already-installed machine:
           bash scripts/desktop-layer2-switch-to-karabiner.sh
-     g) Walk docs/manual-smoke/desktop-layer{1,2}.md at your cadence.
+     g) Launch Raycast from ~/Applications/Raycast.app. First launch
+        prompts for Accessibility — grant in the same JIT-admin window
+        as AeroSpace/skhd/Hammerspoon. Prefs: Start at login on,
+        Cmd+Space hotkey, Pop to root on, Auto-switch input source off.
+        Do NOT sign in. See raycast/extensions.md for the 8-step
+        post-install checklist and the 7-extension curated list.
+     h) (Corporate Mac — optional) Within the same JIT admin window,
+        null Raycast sync endpoints via /etc/hosts (defense in depth
+        on top of the no-sign-in rule):
+          sudo tee -a /etc/hosts >/dev/null <<EOF_HOSTS
+          0.0.0.0  backend.raycast.com
+          0.0.0.0  api.raycast.com
+          0.0.0.0  sync.raycast.com
+          EOF_HOSTS
+     i) Walk docs/manual-smoke/desktop-layer{1,2,3}.md at your cadence.
 
 Prerequisites NOT installed by this script:
   - Google Cloud SDK (gcloud) — see warnings above if missing. The

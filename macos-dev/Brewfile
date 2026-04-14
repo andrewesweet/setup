@@ -179,3 +179,9 @@ brew "koekeishiya/formulae/skhd"
 # Karabiner-Elements cask is deferred — see design Appendix B.
 # karabiner/complex_modifications/desktop-layer2.json ships dormant
 # and is only symlinked when DESKTOP_LAYER2_USE_KARABINER=true.
+
+# ── Desktop · launcher (Layer 3 desktop) ──────────────────────────────
+# Raycast replaces Spotlight on Cmd-Space. Cloud sync is forbidden on
+# corporate devices — see raycast/extensions.md + install-macos.sh
+# Next-steps for the /etc/hosts blackhole.
+cask "raycast"
