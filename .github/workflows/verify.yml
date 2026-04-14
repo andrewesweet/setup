@@ -204,8 +204,13 @@ jobs:
       - name: Desktop Layer 3 smoke tests
         run: bash macos-dev/scripts/test-plan-desktop-layer3.sh
 
-      - name: brew bundle check (validates formulas without installing)
-        run: brew bundle check --file=macos-dev/Brewfile --verbose || true
+      - name: Brewfile resolves (catches unqualified tap formulae)
+        # Taps every tap, then resolves every brew/cask via `brew info`.
+        # Unlike `brew bundle check` (installed-ness, non-blocking) this
+        # fails the build when a formula can't be looked up — the bug
+        # pattern that slipped past three desktop-layer PR gates in 2026-04
+        # (unqualified `brew "sketchybar"` vs `FelixKratz/formulae` tap).
+        run: bash macos-dev/scripts/check-brewfile-resolves.sh
 
       - name: DOTFILES self-resolution on real macOS
         run: |
