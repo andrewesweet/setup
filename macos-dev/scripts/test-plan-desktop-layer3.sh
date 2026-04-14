@@ -57,7 +57,15 @@ echo "Desktop Layer 3 acceptance tests (Raycast launcher)"
 echo "Platform: $PLATFORM    Mode: $([ "$FULL" = true ] && echo "full" || echo "safe")"
 echo ""
 
-# ── AC-1..9 get appended by subsequent tasks ──────────────────────────
+# ── AC-1: Brewfile declares Raycast cask ─────────────────────────────
+echo ""
+echo "AC-1: Brewfile declares Raycast cask"
+check "Brewfile has cask \"raycast\"" \
+  grep -qE '^cask "raycast"' Brewfile
+check "check-tool-manifest.sh still passes" \
+  bash scripts/check-tool-manifest.sh
+
+# ── AC-2..9 get appended by subsequent tasks ──────────────────────────
 
 echo ""
 echo "─────────────────────────────────────────────────────────────"
