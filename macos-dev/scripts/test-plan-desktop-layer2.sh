@@ -80,6 +80,73 @@ fi
 check "check-tool-manifest.sh still passes" \
   bash scripts/check-tool-manifest.sh
 
+# ── AC-3: init.lua parses via luac -p ────────────────────────────────
+echo ""
+echo "AC-3: hammerspoon/init.lua parses via luac -p"
+if command -v luac &>/dev/null; then
+  if luac -p hammerspoon/init.lua >/dev/null 2>&1; then
+    ok "luac -p hammerspoon/init.lua"
+  else
+    nok "luac -p hammerspoon/init.lua"
+  fi
+else
+  skp "luac -p hammerspoon/init.lua" "luac not available"
+fi
+
+# ── AC-4: init.lua registers eventtap on keycode 57 (Caps Lock) ──────
+echo ""
+echo "AC-4: init.lua handles Caps Lock keycode 57"
+lua_body="$(sed 's/--.*//' hammerspoon/init.lua)"
+if printf '%s' "$lua_body" | grep -q 'hs\.eventtap\.new'; then
+  ok "init.lua calls hs.eventtap.new"
+else
+  nok "init.lua calls hs.eventtap.new"
+fi
+if printf '%s' "$lua_body" | grep -qE 'keyCode\(\)[^=]*==[^0-9]*57|57\b'; then
+  ok "init.lua references keycode 57"
+else
+  nok "init.lua references keycode 57"
+fi
+for typ in 'keyDown' 'keyUp'; do
+  if printf '%s' "$lua_body" | grep -q "types\\.$typ"; then
+    ok "init.lua subscribes to hs.eventtap.event.types.$typ"
+  else
+    nok "init.lua subscribes to hs.eventtap.event.types.$typ"
+  fi
+done
+
+# ── AC-5: init.lua defines THRESHOLD_MS = 200 ────────────────────────
+echo ""
+echo "AC-5: init.lua defines THRESHOLD_MS = 200"
+if printf '%s' "$lua_body" | grep -qE 'THRESHOLD_MS[[:space:]]*=[[:space:]]*200'; then
+  ok "THRESHOLD_MS = 200"
+else
+  nok "THRESHOLD_MS = 200"
+fi
+
+# ── AC-6: init.lua emits the four-modifier Hyper chord ───────────────
+echo ""
+echo "AC-6: init.lua emits Cmd+Alt+Ctrl+Shift on hold"
+for mod in 'cmd[[:space:]]*=[[:space:]]*true' \
+           'alt[[:space:]]*=[[:space:]]*true' \
+           'ctrl[[:space:]]*=[[:space:]]*true' \
+           'shift[[:space:]]*=[[:space:]]*true'; do
+  if printf '%s' "$lua_body" | grep -qE "$mod"; then
+    ok "init.lua sets $mod"
+  else
+    nok "init.lua sets $mod"
+  fi
+done
+
+# ── AC-7: init.lua wraps eventtap setup in pcall() ───────────────────
+echo ""
+echo "AC-7: init.lua wraps setup in pcall()"
+if printf '%s' "$lua_body" | grep -q 'pcall('; then
+  ok "init.lua contains pcall("
+else
+  nok "init.lua contains pcall("
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
