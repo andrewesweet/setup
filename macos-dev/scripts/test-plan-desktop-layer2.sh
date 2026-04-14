@@ -210,6 +210,29 @@ else
   skp "Karabiner JSON structural checks" "jq not available"
 fi
 
+# ── AC-13: skhd LaunchAgent plist plutil-lint clean + markers ────────
+echo ""
+echo "AC-13: launchagents/com.koekeishiya.skhd.plist validity"
+plist=launchagents/com.koekeishiya.skhd.plist
+if [[ -f "$plist" ]]; then
+  ok "$plist exists"
+else
+  nok "$plist exists"
+fi
+if [[ "$(uname)" == "Darwin" ]] && command -v plutil &>/dev/null; then
+  if plutil -lint "$plist" >/dev/null 2>&1; then
+    ok "$plist passes plutil -lint"
+  else
+    nok "$plist passes plutil -lint"
+  fi
+else
+  skp "$plist passes plutil -lint" "plutil not available"
+fi
+check "$plist uses @HOMEBREW_PREFIX@/bin/skhd" \
+  grep -q '@HOMEBREW_PREFIX@/bin/skhd' "$plist"
+check "$plist uses @HOME@ marker" \
+  grep -q '@HOME@' "$plist"
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
