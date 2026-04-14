@@ -298,6 +298,31 @@ for needle in 'Hammerspoon' 'skhd' 'Launch Hammerspoon at login'; do
   fi
 done
 
+# ── AC-18: manual-smoke/desktop-layer2.md populated ──────────────────
+echo ""
+echo "AC-18: manual-smoke/desktop-layer2.md populated"
+check "file exists" test -f docs/manual-smoke/desktop-layer2.md
+check "has 'When to run' section" \
+  grep -qE '^## When to run' docs/manual-smoke/desktop-layer2.md
+check "has 'Checklist' section" \
+  grep -qE '^## Checklist' docs/manual-smoke/desktop-layer2.md
+check "has 'Failure modes' section" \
+  grep -qE '^## Failure modes' docs/manual-smoke/desktop-layer2.md
+checklist_items=$(awk '/^## Checklist/,/^## Failure modes/' docs/manual-smoke/desktop-layer2.md \
+                  | grep -cE '^- \[ \]')
+failure_items=$(awk '/^## Failure modes/,0' docs/manual-smoke/desktop-layer2.md \
+               | grep -cE '^- \[ \]')
+if (( checklist_items >= 12 )); then
+  ok "checklist has ≥ 12 items ($checklist_items)"
+else
+  nok "checklist has ≥ 12 items ($checklist_items)"
+fi
+if (( failure_items >= 3 )); then
+  ok "failure modes has ≥ 3 drill items ($failure_items)"
+else
+  nok "failure modes has ≥ 3 drill items ($failure_items)"
+fi
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
