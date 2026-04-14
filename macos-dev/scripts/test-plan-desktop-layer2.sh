@@ -233,6 +233,40 @@ check "$plist uses @HOMEBREW_PREFIX@/bin/skhd" \
 check "$plist uses @HOME@ marker" \
   grep -q '@HOME@' "$plist"
 
+# ── AC-14: install-macos.sh links Layer 2 configs ────────────────────
+echo ""
+echo "AC-14: install-macos.sh links Layer 2 configs"
+check "link hammerspoon/init.lua" \
+  grep -qE 'link[[:space:]]+hammerspoon/init\.lua[[:space:]]+\.hammerspoon/init\.lua' install-macos.sh
+check "link skhd/.skhdrc" \
+  grep -qE 'link[[:space:]]+skhd/\.skhdrc[[:space:]]+\.config/skhd/skhdrc' install-macos.sh
+check "Karabiner link guarded by DESKTOP_LAYER2_USE_KARABINER" \
+  grep -qE 'DESKTOP_LAYER2_USE_KARABINER.*true|"\$\{DESKTOP_LAYER2_USE_KARABINER:-false\}"' install-macos.sh
+check "Karabiner link target is assets/complex_modifications/desktop-layer2.json" \
+  grep -qE 'link[[:space:]]+karabiner/complex_modifications/desktop-layer2\.json[[:space:]]+\.config/karabiner/assets/complex_modifications/desktop-layer2\.json' install-macos.sh
+
+# ── AC-15: install-macos.sh bootstraps skhd LaunchAgent ──────────────
+echo ""
+echo "AC-15: install-macos.sh bootstraps skhd LaunchAgent"
+la_block="$(awk '/Desktop LaunchAgents \(macOS only\)/,/Desktop LaunchAgents loaded/' install-macos.sh)"
+if printf '%s' "$la_block" | grep -q 'com.koekeishiya.skhd.plist'; then
+  ok "Desktop LaunchAgent block iterates com.koekeishiya.skhd.plist"
+else
+  nok "Desktop LaunchAgent block iterates com.koekeishiya.skhd.plist"
+fi
+
+# ── AC-17: install-macos.sh Next-steps covers Hammerspoon + skhd ─────
+echo ""
+echo "AC-17: install-macos.sh Next-steps covers Hammerspoon + skhd grants"
+next="$(awk '/Next steps:/,/EOF/' install-macos.sh)"
+for needle in 'Hammerspoon' 'skhd' 'Launch Hammerspoon at login'; do
+  if printf '%s' "$next" | grep -q -F "$needle"; then
+    ok "Next-steps mentions: $needle"
+  else
+    nok "Next-steps mentions: $needle"
+  fi
+done
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

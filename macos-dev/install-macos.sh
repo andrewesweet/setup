@@ -377,6 +377,18 @@ link sketchybar/icons.sh       .config/sketchybar/icons.sh
 link sketchybar/plugins        .config/sketchybar/plugins
 link jankyborders/bordersrc    .config/borders/bordersrc
 
+# ── Desktop Layer 2 configs (Hammerspoon + skhd) ────────────────────
+link hammerspoon/init.lua  .hammerspoon/init.lua
+link skhd/.skhdrc          .config/skhd/skhdrc
+
+# Karabiner JSON — dormant by default. Only symlinked when the user
+# has opted into the Appendix-B upgrade path by exporting
+# DESKTOP_LAYER2_USE_KARABINER=true.
+if [[ "${DESKTOP_LAYER2_USE_KARABINER:-false}" == "true" ]]; then
+  link karabiner/complex_modifications/desktop-layer2.json .config/karabiner/assets/complex_modifications/desktop-layer2.json
+  log "Karabiner complex modification linked (DESKTOP_LAYER2_USE_KARABINER=true)"
+fi
+
 # Podman Machine LaunchAgent (macOS only)
 if [[ "$(uname)" == "Darwin" ]]; then
   # Substitute markers in LaunchAgent wrapper
@@ -400,7 +412,8 @@ if [[ "$(uname)" == "Darwin" ]]; then
 
   # ── Desktop LaunchAgents (macOS only) ─────────────────────────────────
   for plist in com.felixkratz.sketchybar.plist \
-               com.felixkratz.borders.plist; do
+               com.felixkratz.borders.plist \
+               com.koekeishiya.skhd.plist; do
     plist_src="$DOTFILES/launchagents/$plist"
     plist_dst="$HOME/Library/LaunchAgents/$plist"
     if [[ ! -f "$plist_src" ]]; then
@@ -461,7 +474,17 @@ Next steps:
         then reload:
           aerospace reload-config
           brew services restart sketchybar
-     e) Walk docs/manual-smoke/desktop-layer1.md at your cadence.
+     e) In Hammerspoon prefs (menu-bar icon → Preferences), toggle
+          "Launch Hammerspoon at login" → enabled
+        Then Reload Config (menu-bar icon → Reload Config).
+        Caps-Lock-tap should emit Escape; Caps-Lock-hold + key should
+        emit Hyper+key.
+     f) (Karabiner upgrade path — Appendix B) If IT adds pqrs.org team
+        ID G43BCU2T37 to the MDM System Extensions allow-list, run:
+          DESKTOP_LAYER2_USE_KARABINER=true bash install-macos.sh
+        or, for an already-installed machine:
+          bash scripts/desktop-layer2-switch-to-karabiner.sh
+     g) Walk docs/manual-smoke/desktop-layer{1,2}.md at your cadence.
 
 Prerequisites NOT installed by this script:
   - Google Cloud SDK (gcloud) — see warnings above if missing. The
