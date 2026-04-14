@@ -232,6 +232,45 @@ else
   nok "trigger name is aerospace_workspace_change"
 fi
 
+# ── AC-12: sketchybar/colors.sh exports 12 Dracula hex constants ─────
+echo ""
+echo "AC-12: sketchybar/colors.sh exports full Dracula palette"
+# Use case-insensitive match — hex case is unspecified in the parent
+# design and consumers are case-insensitive.
+for pair in 'COLOR_BG:0xff282a36' \
+            'COLOR_CURRENT_LINE:0xff44475a' \
+            'COLOR_SELECTION:0xff44475a' \
+            'COLOR_FG:0xfff8f8f2' \
+            'COLOR_COMMENT:0xff6272a4' \
+            'COLOR_RED:0xffff5555' \
+            'COLOR_ORANGE:0xffffb86c' \
+            'COLOR_YELLOW:0xfff1fa8c' \
+            'COLOR_GREEN:0xff50fa7b' \
+            'COLOR_CYAN:0xff8be9fd' \
+            'COLOR_PURPLE:0xffbd93f9' \
+            'COLOR_PINK:0xffff79c6'; do
+  name="${pair%%:*}"; val="${pair##*:}"
+  if grep -qiE "^(export[[:space:]]+)?${name}=${val}" sketchybar/colors.sh; then
+    ok "colors.sh exports ${name}=${val}"
+  else
+    nok "colors.sh exports ${name}=${val}"
+  fi
+done
+
+# ── AC-13: sketchybar/icons.sh declares ≥ 9 ICON_* constants ─────────
+echo ""
+echo "AC-13: sketchybar/icons.sh declares glyph constants"
+icon_count=$(grep -cE '^[[:space:]]*(export[[:space:]]+)?ICON_[A-Z_]+=' sketchybar/icons.sh)
+if (( icon_count >= 9 )); then
+  ok "icons.sh declares ≥ 9 ICON_* constants ($icon_count)"
+else
+  nok "icons.sh declares ≥ 9 ICON_* constants ($icon_count)"
+fi
+for name in ICON_WIFI ICON_BATTERY ICON_VOLUME ICON_CLOCK ICON_ZSCALER ICON_FOCUS; do
+  check "icons.sh declares $name" \
+    grep -qE "^[[:space:]]*(export[[:space:]]+)?${name}=" sketchybar/icons.sh
+done
+
 echo ""
 echo "─────────────────────────────────────────────────────────────"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
