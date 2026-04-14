@@ -72,16 +72,16 @@ echo ""
 echo "AC-2: Brewfile declares SketchyBar + JankyBorders"
 check "Brewfile has tap \"FelixKratz/formulae\"" \
   grep -qE '^tap "FelixKratz/formulae"' Brewfile
-check "Brewfile has brew \"sketchybar\"" \
-  grep -qE '^brew "sketchybar"' Brewfile
+check "Brewfile has brew \"FelixKratz/formulae/sketchybar\"" \
+  grep -qE '^brew "FelixKratz/formulae/sketchybar"' Brewfile
 check "Brewfile has brew \"FelixKratz/formulae/borders\"" \
   grep -qE '^brew "FelixKratz/formulae/borders"' Brewfile
 
 # ── AC-3: tools.txt declares the two new formulae ────────────────────
 echo ""
 echo "AC-3: tools.txt declares the two new formulae"
-check "tools.txt has brew:sketchybar row" \
-  grep -qE '^sketchybar[[:space:]]+brew:sketchybar' tools.txt
+check "tools.txt has brew:FelixKratz/formulae/sketchybar row" \
+  grep -qE '^sketchybar[[:space:]]+brew:FelixKratz/formulae/sketchybar' tools.txt
 check "tools.txt has brew:FelixKratz/formulae/borders row" \
   grep -qE '^borders[[:space:]]+brew:FelixKratz/formulae/borders' tools.txt
 check "check-tool-manifest.sh still passes" \
