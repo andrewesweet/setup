@@ -695,11 +695,76 @@
       "cog log": "allow", "cog log *": "allow",
       "git-cliff --context *": "allow",
 
-      // ── Terraform: plan-style, no apply/destroy ───────────────────────────
-      "terraform fmt -check": "allow",
-      "terraform validate": "allow",
-      "terraform version": "allow",
-      "terraform show": "allow", "terraform state list": "allow",
+      // ── Terraform: every side-effect-free subcommand ─────────────────────
+      // Enumerated from Terraform 1.14.x. Commands that read local configs,
+      // read provider metadata, or read state are allowed. Commands that
+      // write files, download modules/providers, mutate state, prompt for
+      // input, or provision infrastructure fall through to `*: ask`.
+      // Catalogued in docs/research/terraform-cli-policy.md.
+      //
+      // Each verb has two patterns: one for the standard invocation, and
+      // one `terraform -chdir=*` variant covering Terraform's global flag
+      // for selecting a working directory. Mutating verbs (init, apply,
+      // destroy, plan, refresh, import, get, taint, untaint, force-unlock,
+      // push, login, logout, workspace new|select|delete, state mv|rm|push|
+      // replace-provider, providers lock|mirror) and session-blocking verbs
+      // (console, test) fall through to `*: ask`.
+
+      // version / help
+      "terraform version": "allow", "terraform version *": "allow",
+      "terraform -version": "allow",
+      "terraform -help": "allow", "terraform -help *": "allow",
+      "terraform -chdir=* version*": "allow",
+
+      // fmt -check (read-only; without -check, fmt rewrites files in place)
+      "terraform fmt -check": "allow", "terraform fmt -check *": "allow",
+      "terraform -chdir=* fmt -check*": "allow",
+
+      // validate — reads configs + state, returns diagnostics only
+      "terraform validate": "allow", "terraform validate *": "allow",
+      "terraform -chdir=* validate*": "allow",
+
+      // show — prints current state, saved plan, or state file
+      "terraform show": "allow", "terraform show *": "allow",
+      "terraform -chdir=* show*": "allow",
+
+      // output — prints declared outputs from state
+      "terraform output": "allow", "terraform output *": "allow",
+      "terraform -chdir=* output*": "allow",
+
+      // graph — emits DOT-format dependency graph (stdout only)
+      "terraform graph": "allow", "terraform graph *": "allow",
+      "terraform -chdir=* graph*": "allow",
+
+      // providers — bare form lists provider requirements. `lock` and
+      // `mirror` subcommands mutate and fall through. `schema` is read-only.
+      "terraform providers": "allow",
+      "terraform providers schema": "allow", "terraform providers schema *": "allow",
+      "terraform -chdir=* providers": "allow",
+      "terraform -chdir=* providers schema*": "allow",
+
+      // state — read-only subcommands (list, show, pull). `mv`, `rm`,
+      // `push`, `replace-provider` mutate state and fall through.
+      "terraform state list": "allow", "terraform state list *": "allow",
+      "terraform state show": "allow", "terraform state show *": "allow",
+      "terraform state pull": "allow", "terraform state pull *": "allow",
+      "terraform -chdir=* state list*": "allow",
+      "terraform -chdir=* state show*": "allow",
+      "terraform -chdir=* state pull*": "allow",
+
+      // workspace — read-only subcommands (list, show). `new`, `select`,
+      // `delete` mutate backend-visible state and fall through.
+      "terraform workspace list": "allow", "terraform workspace list *": "allow",
+      "terraform workspace show": "allow",
+      "terraform -chdir=* workspace list*": "allow",
+      "terraform -chdir=* workspace show*": "allow",
+
+      // metadata functions — lists provider-declared functions (read-only)
+      "terraform metadata functions": "allow",
+      "terraform metadata functions *": "allow",
+      "terraform -chdir=* metadata functions*": "allow",
+
+      // Adjacent read-only tools (preserved from prior allowlist)
       "tf-summarize *": "allow",
       "tenv list": "allow",
 
