@@ -41,6 +41,7 @@ The one exception is `terraform fmt -check*`, which is allowed only with the `-c
 | `terraform workspace list` | lists backend-visible workspaces |
 | `terraform workspace show` | prints the currently selected workspace |
 | `terraform metadata functions` / `terraform metadata functions -json` | lists provider-declared functions |
+| `terraform get` / `terraform get -update` | downloads referenced modules into `.terraform/modules/`; writes only to Terraform's cache directory, not to user source files |
 
 ### `-chdir` variants
 
@@ -56,7 +57,6 @@ Nothing in this group gets an explicit rule; they rely on the top-level `"*": "a
 | `terraform plan` | by default refreshes remote state (mutates backend) and writes the lock file if missing |
 | `terraform apply` / `terraform destroy` | changes infrastructure |
 | `terraform refresh` | updates state from real infrastructure |
-| `terraform get` | downloads modules |
 | `terraform import` | writes a new resource into state |
 | `terraform taint` / `terraform untaint` | deprecated; mutates state |
 | `terraform force-unlock` | clears a state lock |
