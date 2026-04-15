@@ -764,6 +764,13 @@
       "terraform metadata functions *": "allow",
       "terraform -chdir=* metadata functions*": "allow",
 
+      // get — downloads referenced modules into .terraform/modules/. Writes
+      // only to Terraform's own working directory (a cache), not to user
+      // source files, so treated as allow per team policy. `-update` refreshes
+      // the cache; still no user-file mutation.
+      "terraform get": "allow", "terraform get *": "allow",
+      "terraform -chdir=* get*": "allow",
+
       // Adjacent read-only tools (preserved from prior allowlist)
       "tf-summarize *": "allow",
       "tenv list": "allow",
