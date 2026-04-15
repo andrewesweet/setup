@@ -238,6 +238,34 @@ CASES: list[tuple[str, str, str]] = [
     ("gh api repos/cli/cli --raw-field x=1","ask","gh api --raw-field"),
     ("gh api repos/cli/cli --input in.json","ask","gh api --input body"),
 
+    # ── gh api: narrow Copilot review request allow (POST re-allow) ──
+    # Exact-match patterns (no trailing wildcard) permit only the pinned
+    # endpoint + Copilot reviewer payload. Extra flags fall through to ask.
+    ("gh api repos/octo/widgets/pulls/1/requested_reviewers -X POST -f reviewers[]=copilot-pull-request-reviewer[bot]",
+                                        "allow", "copilot review -X POST unquoted"),
+    ("gh api repos/set8-zmmk/terraform-google-app-repo-creator/pulls/274/requested_reviewers -X POST -f 'reviewers[]=copilot-pull-request-reviewer[bot]'",
+                                        "allow", "copilot review -X POST quoted"),
+    ("gh api repos/octo/widgets/pulls/1/requested_reviewers -XPOST -f reviewers[]=copilot-pull-request-reviewer[bot]",
+                                        "allow", "copilot review -XPOST no-space unquoted"),
+    ("gh api repos/octo/widgets/pulls/1/requested_reviewers -XPOST -f 'reviewers[]=copilot-pull-request-reviewer[bot]'",
+                                        "allow", "copilot review -XPOST no-space quoted"),
+    # Piggyback defense: extra -f, -F, --input, --jq suffix breaks the exact
+    # match so the command falls through to the general POST ask.
+    ("gh api repos/octo/widgets/pulls/1/requested_reviewers -X POST -f reviewers[]=copilot-pull-request-reviewer[bot] -f reviewers[]=mallory",
+                                        "ask",   "copilot review + extra reviewer falls through"),
+    ("gh api repos/octo/widgets/pulls/1/requested_reviewers -X POST -f reviewers[]=copilot-pull-request-reviewer[bot] -F body=@/etc/passwd",
+                                        "ask",   "copilot review + -F file exfil attempt falls through"),
+    ("gh api repos/octo/widgets/pulls/1/requested_reviewers -X POST -f reviewers[]=copilot-pull-request-reviewer[bot] --jq '.id'",
+                                        "ask",   "copilot review + --jq falls through (safe-but-asked)"),
+    # Non-Copilot reviewer endpoint POSTs still ask.
+    ("gh api repos/octo/widgets/pulls/1/requested_reviewers -X POST -f reviewers[]=alice",
+                                        "ask",   "reviewer request for non-Copilot asks"),
+    # Non-reviewers endpoints still ask under general POST policy.
+    ("gh api repos/octo/widgets/pulls/1/comments -X POST -f body=hi",
+                                        "ask",   "pulls/N/comments still asks"),
+    ("gh api repos/octo/widgets/issues -X POST -f title=x",
+                                        "ask",   "issues POST still asks"),
+
     # ── Extension explicit asks (must win over help/version etc.) ──
     ("gh extension install owner/repo","ask",   "extension install asks"),
     ("gh extension install owner/repo --help","ask","install --help still asks"),
