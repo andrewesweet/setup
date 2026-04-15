@@ -175,6 +175,18 @@
       "gh api -X GET*": "allow", "gh api --method GET*": "allow",
       "gh api *-XGET*": "allow",
 
+      // ── gh api: narrow POST allow for Copilot review request ─────────────
+      // Endpoint (requested_reviewers on any org/repo/PR) and payload (the
+      // Copilot reviewer slug) are pinned. `-X*POST` covers both `-X POST`
+      // and `-XPOST`; both quoted and unquoted `-f` argument forms are
+      // covered. No trailing wildcard: extra flags (`-F`, `--input`, `--jq`,
+      // additional `-f reviewers[]=...`) fall through to the general POST
+      // ask, preventing exfil-via-body-flag or reviewer piggyback. Blast
+      // radius is limited to pinging Copilot to review the PR — no code
+      // mutation.
+      "gh api repos/*/*/pulls/*/requested_reviewers -X*POST -f reviewers[]=copilot-pull-request-reviewer[bot]": "allow",
+      "gh api repos/*/*/pulls/*/requested_reviewers -X*POST -f 'reviewers[]=copilot-pull-request-reviewer[bot]'": "allow",
+
       // ── curl: GET only (implicit + explicit -X GET) ───────────────────────
       // Same last-match-wins pattern as gh api above. Body flags (`-d`, `-F`,
       // `-T` and their long forms) silently flip curl's default method away
