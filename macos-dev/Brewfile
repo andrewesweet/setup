@@ -185,3 +185,7 @@ brew "koekeishiya/formulae/skhd"
 # corporate devices — see raycast/extensions.md + install-macos.sh
 # Next-steps for the /etc/hosts blackhole.
 cask "raycast"
+
+# ── Editor tooling ──────────────────────────────────────────────────────
+# yamlfmt — Google's K8s-friendly YAML formatter (used by nvim via conform)
+brew "yamlfmt"
