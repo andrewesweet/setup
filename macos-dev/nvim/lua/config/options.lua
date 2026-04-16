@@ -1,25 +1,8 @@
--- options.lua — editor options
--- See docs/design/editor-neovim.md for the specification.
+-- options.lua — non-default editor options.
+-- LazyVim provides sensible defaults (tabstop=2, shiftwidth=2, number,
+-- relativenumber, cursorline, ignorecase, smartcase, undofile,
+-- splitbelow, splitright, clipboard=unnamedplus, list, listchars, etc.)
+-- Only document DIVERGENCES here.
 
-local opt = vim.opt
-opt.tabstop     = 2
-opt.shiftwidth  = 2
-opt.expandtab   = true
-opt.smartindent = true
-opt.number         = true
-opt.relativenumber = true
-opt.cursorline     = true
-opt.colorcolumn    = "100"
-opt.wrap           = false
-opt.ignorecase = true
-opt.smartcase  = true
-opt.undofile   = true
-opt.undolevels = 10000
-opt.confirm     = true
-opt.splitbelow  = true
-opt.splitright  = true
-opt.scrolloff   = 8
-opt.updatetime  = 200
-opt.list      = true
-opt.listchars = { tab = "→ ", trail = "·", nbsp = "␣" }
-opt.clipboard = "unnamedplus"
+vim.opt.colorcolumn = "120"  -- visible right margin (was 100; user preference)
+vim.opt.scrolloff   = 8      -- keep 8 lines of context above/below cursor

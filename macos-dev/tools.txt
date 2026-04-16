@@ -136,3 +136,6 @@ borders              brew:FelixKratz/formulae/borders apt:-                   ap
 
 # ── Desktop keyboard (Layer 2 desktop) ───────────────────────────────
 skhd                 brew:koekeishiya/formulae/skhd              apt:-                   apk:-
+
+# ── Editor tooling ──────────────────────────────────────────────────────
+yamlfmt              brew:yamlfmt                   apt:-                   apk:-
