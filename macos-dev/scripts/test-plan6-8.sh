@@ -115,8 +115,9 @@ check "11 TOML sections"             test "$(grep -c '^\[' "$REPO_ROOT/starship/
 
 echo ""
 echo "Lazygit — theme:"
-check "activeBorderColor #BD93F9 (Dracula, 1b-ii)"    grep -qF "'#BD93F9'" "$REPO_ROOT/lazygit/config.yml"
-check "selectedLineBgColor #44475A (Dracula, 1b-ii)"  grep -qF "'#44475A'" "$REPO_ROOT/lazygit/config.yml"
+# Theming assertions moved to scripts/test-plan-theming.sh (docs/design/theming.md).
+# Classic Dracula hex (#BD93F9 purple, #44475A current_line) superseded by
+# Pro Base hex (#9580FF purple, #454158 selection) in Wave B.
 
 echo ""
 echo "Lazygit — GUI settings:"
@@ -178,11 +179,11 @@ check "wsl: mise mapping"             grep -q 'link mise/config.toml.*\.config/m
 # Regression: Plans 2–5 link() calls preserved
 check "macos: bash links preserved"   test "$(grep -c 'link bash/' "$REPO_ROOT/install-macos.sh")" -eq 4
 check "macos: git links preserved"    test "$(grep -c 'link git/' "$REPO_ROOT/install-macos.sh")" -eq 2
-check "macos: kitty links preserved (kitty.conf + dracula-pro.conf, 1b-ii)"  test "$(grep -c 'link kitty/' "$REPO_ROOT/install-macos.sh")" -eq 2
+check "macos: kitty link preserved (kitty.conf only — dracula-pro.conf removed by theming Wave A)"  test "$(grep -c 'link kitty/' "$REPO_ROOT/install-macos.sh")" -eq 1
 check "macos: tmux links preserved"   test "$(grep -c 'link tmux/' "$REPO_ROOT/install-macos.sh")" -eq 1
 check "wsl: bash links preserved"     test "$(grep -c 'link bash/' "$REPO_ROOT/install-wsl.sh")" -eq 4
 check "wsl: git links preserved"      test "$(grep -c 'link git/' "$REPO_ROOT/install-wsl.sh")" -eq 2
-check "wsl: kitty links preserved (kitty.conf + dracula-pro.conf, 1b-ii)"    test "$(grep -c 'link kitty/' "$REPO_ROOT/install-wsl.sh")" -eq 2
+check "wsl: kitty link preserved (kitty.conf only — dracula-pro.conf removed by theming Wave A)"    test "$(grep -c 'link kitty/' "$REPO_ROOT/install-wsl.sh")" -eq 1
 check "wsl: tmux links preserved"     test "$(grep -c 'link tmux/' "$REPO_ROOT/install-wsl.sh")" -eq 1
 
 # ── Summary ────────────────────────────────────────────────────────────────

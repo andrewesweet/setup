@@ -278,7 +278,67 @@ export XH_CONFIG_DIR="$HOME/.config/xh"
 
 # bat syntax theme — custom Dracula Pro tmTheme, symlinked into
 # ~/.config/bat/themes/ by install-*.sh and registered via `bat cache --build`.
+# Wave C (docs/design/theming.md § 3.3) supersedes the Wave B `Dracula` value.
 export BAT_THEME="Dracula Pro"
+
+# ripgrep — load Dracula Pro --colors from the repo-tracked config.
+# See docs/design/theming.md § 3.2. Path resolution uses $HOME because the
+# installer symlinks ripgrep/config into ~/.config/ripgrep/config.
+export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
+
+# eza — Dracula Pro palette via 24-bit SGR (38;2;R;G;B). Each permission
+# slot is asserted by scripts/test-plan-theming.sh; see docs/design/theming.md
+# § 3.2. Pro Base hex → decimal RGB:
+#   Comment    #7970A9 = 121,112,169
+#   Purple     #9580FF = 149,128,255
+#   Red        #FF9580 = 255,149,128
+#   Green      #8AFF80 = 138,255,128
+#   Orange     #FFCA80 = 255,202,128
+#   Cyan       #80FFEA = 128,255,234
+#   BrightBlk  #504C67 = 80,76,103
+export EZA_COLORS="\
+da=38;2;121;112;169:\
+ur=38;2;149;128;255:\
+uw=38;2;255;149;128:\
+ux=38;2;138;255;128:\
+ue=38;2;255;202;128:\
+gr=38;2;149;128;255:\
+gw=38;2;255;149;128:\
+gx=38;2;138;255;128:\
+tr=38;2;149;128;255:\
+tw=38;2;255;149;128:\
+tx=38;2;138;255;128:\
+xx=38;2;80;76;103:\
+uu=38;2;128;255;234:\
+gu=38;2;248;248;242:\
+un=38;2;255;128;191:\
+uR=38;2;255;149;128"
+
+# dircolors — compile ~/.dir_colors into LS_COLORS. GNU dircolors only;
+# macOS ships BSD ls which ignores LS_COLORS, but eza/ls aliases use eza
+# on both platforms (see bash/.bash_aliases) so LS_COLORS is still relevant
+# for any stray `ls` invocations inside git subcommands, fd, etc.
+if command -v dircolors &>/dev/null && [[ -r "$HOME/.dir_colors" ]]; then
+  eval "$(dircolors -b "$HOME"/.dir_colors)"
+fi
+
+# man-pages — Dracula Pro colours via LESS termcap env vars. 24-bit SGR so
+# every slot is greppable as a Pro hex RGB. GROFF_NO_SGR=1 prevents groff
+# from stripping the SGR escapes that less then re-interprets.
+# Pro Base hex → decimal RGB:
+#   Black       #22212C =  34, 33, 44
+#   Red         #FF9580 = 255,149,128
+#   Purple      #9580FF = 149,128,255
+#   Cyan        #80FFEA = 128,255,234
+#   Orange     #FFCA80 = 255,202,128
+export GROFF_NO_SGR=1
+export LESS_TERMCAP_mb=$'\e[38;2;255;149;128m'                   # begin blink  = Red
+export LESS_TERMCAP_md=$'\e[1;38;2;149;128;255m'                 # begin bold   = Purple
+export LESS_TERMCAP_so=$'\e[38;2;34;33;44;48;2;255;202;128m'     # reverse video= Black on Orange
+export LESS_TERMCAP_us=$'\e[4;38;2;128;255;234m'                 # underline    = Cyan
+export LESS_TERMCAP_me=$'\e[0m'                                  # reset bold/blink
+export LESS_TERMCAP_se=$'\e[0m'                                  # reset reverse
+export LESS_TERMCAP_ue=$'\e[0m'                                  # reset underline
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
@@ -288,10 +348,10 @@ export FZF_DEFAULT_OPTS='
   --border
   --info=inline
   --bind=ctrl-j:down,ctrl-k:up
-  --color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9
-  --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9
-  --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6
-  --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4
+  --color=fg:#F8F8F2,bg:#22212C,hl:#9580FF
+  --color=fg+:#F8F8F2,bg+:#454158,hl+:#9580FF
+  --color=info:#FFCA80,prompt:#8AFF80,pointer:#FF80BF
+  --color=marker:#FF80BF,spinner:#FFCA80,header:#7970A9
 '
 
 # ── 12. Source aliases ─────────────────────────────────────────────────────

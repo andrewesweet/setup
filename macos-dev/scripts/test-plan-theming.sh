@@ -640,6 +640,192 @@ check "aerospace.toml has no hex literals" \
 check "aerospace exec-on-workspace-change triggers sketchybar" \
   grep -qE 'sketchybar --trigger aerospace_workspace_change' aerospace/aerospace.toml
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ── Wave B: Tier 2 Pro-from-Classic ──────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# Each tool below reproduces § 3.2 of macos-dev/docs/design/theming.md.
+# Classic hex are substituted for Dracula PRO Base hex sourced from
+# scripts/lib/dracula-pro-palette.sh. Every AC asserts every slot in the
+# tool's coverage profile per § 5.1.
+echo ""
+echo "Wave B — Tier 2 Pro-from-Classic palette substitution"
+
+# ── AC-B-starship ────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-starship: starship palette is dracula-pro with Pro Base hex"
+check "palette = dracula-pro"               grep -qE '^palette\s*=\s*"dracula-pro"' starship/starship.toml
+check "Classic palette name removed"        bash -c '! grep -qE "^palette\s*=\s*\"dracula\"\s*$" starship/starship.toml'
+check "Classic [palettes.dracula] removed"  bash -c '! grep -qE "^\[palettes\.dracula\]\s*$" starship/starship.toml'
+check "[palettes.dracula-pro] table"        grep -qE '^\[palettes\.dracula-pro\]' starship/starship.toml
+check "background = #22212C"                grep -qE '^background\s*=\s*"#22212C"' starship/starship.toml
+check "current_line = #454158"              grep -qE '^current_line\s*=\s*"#454158"' starship/starship.toml
+check "foreground = #F8F8F2"                grep -qE '^foreground\s*=\s*"#F8F8F2"' starship/starship.toml
+check "comment = #7970A9"                   grep -qE '^comment\s*=\s*"#7970A9"' starship/starship.toml
+check "cyan = #80FFEA"                      grep -qE '^cyan\s*=\s*"#80FFEA"' starship/starship.toml
+check "green = #8AFF80"                     grep -qE '^green\s*=\s*"#8AFF80"' starship/starship.toml
+check "orange = #FFCA80"                    grep -qE '^orange\s*=\s*"#FFCA80"' starship/starship.toml
+check "pink = #FF80BF"                      grep -qE '^pink\s*=\s*"#FF80BF"' starship/starship.toml
+check "purple = #9580FF"                    grep -qE '^purple\s*=\s*"#9580FF"' starship/starship.toml
+check "red = #FF9580"                       grep -qE '^red\s*=\s*"#FF9580"' starship/starship.toml
+check "yellow = #FFFF80"                    grep -qE '^yellow\s*=\s*"#FFFF80"' starship/starship.toml
+
+# ── AC-B-tmux ────────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-tmux: tmux dracula plugin colours overridden with Pro Base hex"
+check "tmux has @dracula-colors block"    grep -qE '^set -g @dracula-colors "' tmux/.tmux.conf
+check "tmux white = Pro White"            grep -q "white='#F8F8F2'"        tmux/.tmux.conf
+check "tmux gray = Pro Selection"         grep -q "gray='#454158'"         tmux/.tmux.conf
+check "tmux dark_gray = Pro Background"   grep -q "dark_gray='#22212C'"    tmux/.tmux.conf
+check "tmux light_purple = Pro Blue"      grep -q "light_purple='#9580FF'" tmux/.tmux.conf
+check "tmux dark_purple = Pro Comment"    grep -q "dark_purple='#7970A9'"  tmux/.tmux.conf
+check "tmux cyan = Pro Cyan"              grep -q "cyan='#80FFEA'"         tmux/.tmux.conf
+check "tmux green = Pro Green"            grep -q "green='#8AFF80'"        tmux/.tmux.conf
+check "tmux orange = Pro Orange"          grep -q "orange='#FFCA80'"       tmux/.tmux.conf
+check "tmux red = Pro Red"                grep -q "red='#FF9580'"          tmux/.tmux.conf
+check "tmux pink = Pro Magenta"           grep -q "pink='#FF80BF'"         tmux/.tmux.conf
+check "tmux yellow = Pro Yellow"          grep -q "yellow='#FFFF80'"       tmux/.tmux.conf
+
+# ── AC-B-lazygit ─────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-lazygit: lazygit theme uses Pro Base hex only"
+check "activeBorder / cherry-pick = Purple"  grep -q "'#9580FF'" lazygit/config.yml
+check "inactiveBorder = Comment"             grep -q "'#7970A9'" lazygit/config.yml
+check "options / defaultFg = Foreground"     grep -q "'#F8F8F2'" lazygit/config.yml
+check "selected/cherry-pick bg = Selection"  grep -q "'#454158'" lazygit/config.yml
+check "unstaged = Red"                       grep -q "'#FF9580'" lazygit/config.yml
+check "searching = Yellow"                   grep -q "'#FFFF80'" lazygit/config.yml
+check "no Classic hex remain"                bash -c "! grep -qE \"#(BD93F9|6272A4|44475A|FF5555|F1FA8C)\" lazygit/config.yml"
+check "delta syntax-theme = Dracula Pro"     grep -qE "syntax-theme=.*Dracula Pro" lazygit/config.yml
+
+# ── AC-B-gh-dash ─────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-gh-dash: gh-dash theme block uses Pro Base hex only"
+check "text.primary = Foreground"           grep -q '"#F8F8F2"' gh-dash/config.yml
+check "text.secondary / border.secondary"   grep -q '"#7970A9"' gh-dash/config.yml
+check "text.inverted = Background"          grep -q '"#22212C"' gh-dash/config.yml
+check "faint + bg.selected = Selection"     grep -q '"#454158"' gh-dash/config.yml
+check "warning = Orange"                    grep -q '"#FFCA80"' gh-dash/config.yml
+check "success = Green"                     grep -q '"#8AFF80"' gh-dash/config.yml
+check "error = Red"                         grep -q '"#FF9580"' gh-dash/config.yml
+check "border.primary = Purple"             grep -q '"#9580FF"' gh-dash/config.yml
+check "no Classic hex remain"               bash -c "! grep -qE \"#(BD93F9|FF5555|50FA7B|FFB86C|6272A4|44475A|282A36|FF79C6|F1FA8C|8BE9FD)\" gh-dash/config.yml"
+
+# ── AC-B-yazi ────────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-yazi: yazi/theme.toml uses Pro Base hex only"
+check "background = #22212C"   grep -q '"#22212C"' yazi/theme.toml
+check "foreground = #F8F8F2"   grep -q '"#F8F8F2"' yazi/theme.toml
+check "comment = #7970A9"      grep -q '"#7970A9"' yazi/theme.toml
+check "selection = #454158"    grep -q '"#454158"' yazi/theme.toml
+check "purple = #9580FF"       grep -q '"#9580FF"' yazi/theme.toml
+check "cyan = #80FFEA"         grep -q '"#80FFEA"' yazi/theme.toml
+check "green = #8AFF80"        grep -q '"#8AFF80"' yazi/theme.toml
+check "yellow = #FFFF80"       grep -q '"#FFFF80"' yazi/theme.toml
+check "orange = #FFCA80"       grep -q '"#FFCA80"' yazi/theme.toml
+check "pink = #FF80BF"         grep -q '"#FF80BF"' yazi/theme.toml
+check "red = #FF9580"          grep -q '"#FF9580"' yazi/theme.toml
+check "no Classic hex remain"  bash -c "! grep -qE \"#(BD93F9|6272A4|44475A|282A36|FF5555|50FA7B|FFB86C|FF79C6|F1FA8C|8BE9FD)\" yazi/theme.toml"
+
+# ── AC-B-fzf ─────────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-fzf: FZF_DEFAULT_OPTS uses Pro Base hex only"
+check "fzf fg = Foreground"         grep -q 'fg:#F8F8F2'          bash/.bashrc
+check "fzf bg = Background"         grep -q 'bg:#22212C'          bash/.bashrc
+check "fzf hl = Purple"             grep -q 'hl:#9580FF'          bash/.bashrc
+check "fzf fg+ = Foreground"        grep -q 'fg+:#F8F8F2'         bash/.bashrc
+check "fzf bg+ = Selection"         grep -q 'bg+:#454158'         bash/.bashrc
+check "fzf hl+ = Purple"            grep -q 'hl+:#9580FF'         bash/.bashrc
+check "fzf info = Orange"           grep -q 'info:#FFCA80'        bash/.bashrc
+check "fzf prompt = Green"          grep -q 'prompt:#8AFF80'      bash/.bashrc
+check "fzf pointer = Pink"          grep -q 'pointer:#FF80BF'     bash/.bashrc
+check "fzf marker = Pink"           grep -q 'marker:#FF80BF'      bash/.bashrc
+check "fzf spinner = Orange"        grep -q 'spinner:#FFCA80'     bash/.bashrc
+check "fzf header = Comment"        grep -q 'header:#7970A9'      bash/.bashrc
+check "no lowercase Classic fzf hex" bash -c "! grep -qE '#(bd93f9|6272a4|44475a|282a36|ff5555|50fa7b|ffb86c|ff79c6|f1fa8c|8be9fd)' bash/.bashrc"
+
+# ── AC-B-ripgrep ─────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-ripgrep: ripgrep --colors config uses Pro Base hex"
+check "ripgrep/config exists"                 test -f ripgrep/config
+check "path = Purple (0x95,0x80,0xFF)"        grep -q 'colors=path:fg:0x95,0x80,0xFF'    ripgrep/config
+check "line = Green (0x8A,0xFF,0x80)"         grep -q 'colors=line:fg:0x8A,0xFF,0x80'    ripgrep/config
+check "column = Green (0x8A,0xFF,0x80)"       grep -q 'colors=column:fg:0x8A,0xFF,0x80'  ripgrep/config
+check "match = Red (0xFF,0x95,0x80)"          grep -q 'colors=match:fg:0xFF,0x95,0x80'   ripgrep/config
+check "RIPGREP_CONFIG_PATH exported"          grep -qE '^export RIPGREP_CONFIG_PATH=.*ripgrep/config' bash/.bashrc
+check "install-macos.sh links ripgrep/config" grep -qE 'link\s+ripgrep/config\s+\.config/ripgrep/config' install-macos.sh
+check "install-wsl.sh   links ripgrep/config" grep -qE 'link\s+ripgrep/config\s+\.config/ripgrep/config' install-wsl.sh
+
+# ── AC-B-eza ─────────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-eza: EZA_COLORS is exported with Pro Base hex RGB"
+check "EZA_COLORS is exported"          grep -qE '^export EZA_COLORS='  bash/.bashrc
+check "da (date) = Comment"             grep -q 'da=38;2;121;112;169' bash/.bashrc
+check "ur (user read)  = Purple"        grep -q 'ur=38;2;149;128;255' bash/.bashrc
+check "uw (user write) = Red"           grep -q 'uw=38;2;255;149;128' bash/.bashrc
+check "ux (user exec)  = Green"         grep -q 'ux=38;2;138;255;128' bash/.bashrc
+check "ue (user other) = Orange"        grep -q 'ue=38;2;255;202;128' bash/.bashrc
+check "xx (dash / empty) = BrightBlack" grep -q 'xx=38;2;80;76;103'   bash/.bashrc
+
+# ── AC-B-dircolors ───────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-dircolors: .dir_colors uses Pro Base hex (24-bit SGR)"
+check ".dir_colors exists"                 test -f dircolors/.dir_colors
+check "DIR = Purple (149,128,255)"         grep -qE 'DIR .*38;2;149;128;255'    dircolors/.dir_colors
+check "LINK = Cyan (128,255,234)"          grep -qE 'LINK .*38;2;128;255;234'   dircolors/.dir_colors
+check "FIFO fg = Yellow (255,255,128)"     grep -qE 'FIFO .*38;2;255;255;128'   dircolors/.dir_colors
+check "ORPHAN = Red (255,149,128)"         grep -qE 'ORPHAN .*38;2;255;149;128' dircolors/.dir_colors
+check "SETUID bg = Red (255,149,128)"      grep -qE 'SETUID .*48;2;255;149;128' dircolors/.dir_colors
+check "no Classic 24-bit triples remain"   bash -c "! grep -qE '38;2;(189;147;249|98;114;164|139;233;253|255;121;198|255;85;85|255;184;108|241;250;140|80;250;123)' dircolors/.dir_colors"
+# shellcheck disable=SC2016
+check "bashrc evals dircolors"             grep -q 'eval "\$(dircolors -b.*\.dir_colors)"' bash/.bashrc
+check "install-macos.sh links .dir_colors" grep -qE 'link\s+dircolors/\.dir_colors\s+\.dir_colors' install-macos.sh
+check "install-wsl.sh   links .dir_colors" grep -qE 'link\s+dircolors/\.dir_colors\s+\.dir_colors' install-wsl.sh
+
+# ── AC-B-opencode ────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-opencode: opencode tui.jsonc uses dracula-pro custom theme"
+check "tui.jsonc theme = dracula-pro"          grep -qE '"theme"\s*:\s*"dracula-pro"' opencode/tui.jsonc
+check "opencode/themes/dracula-pro.json"       test -f opencode/themes/dracula-pro.json
+check "theme bgPrimary = Background"           grep -q '"#22212C"' opencode/themes/dracula-pro.json
+check "theme bgSecondary = Selection"          grep -q '"#454158"' opencode/themes/dracula-pro.json
+check "theme foreground = Foreground"          grep -q '"#F8F8F2"' opencode/themes/dracula-pro.json
+check "theme comment = Comment"                grep -q '"#7970A9"' opencode/themes/dracula-pro.json
+check "theme red = Red"                        grep -q '"#FF9580"' opencode/themes/dracula-pro.json
+check "theme orange = Orange"                  grep -q '"#FFCA80"' opencode/themes/dracula-pro.json
+check "theme yellow = Yellow"                  grep -q '"#FFFF80"' opencode/themes/dracula-pro.json
+check "theme green = Green"                    grep -q '"#8AFF80"' opencode/themes/dracula-pro.json
+check "theme cyan = Cyan"                      grep -q '"#80FFEA"' opencode/themes/dracula-pro.json
+check "theme purple = Purple"                  grep -q '"#9580FF"' opencode/themes/dracula-pro.json
+check "theme pink = Pink"                      grep -q '"#FF80BF"' opencode/themes/dracula-pro.json
+check "install-macos.sh links theme file"      grep -qE 'link opencode/themes/dracula-pro\.json.*\.config/opencode/themes/dracula-pro\.json' install-macos.sh
+check "install-wsl.sh   links theme file"      grep -qE 'link opencode/themes/dracula-pro\.json.*\.config/opencode/themes/dracula-pro\.json' install-wsl.sh
+
+# ── AC-B-man-pages ───────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-man-pages: less/MANPAGER env uses Pro Base hex (24-bit SGR)"
+check "LESS_TERMCAP_md (bold) = Purple"           grep -qE 'LESS_TERMCAP_md=.*38;2;149;128;255' bash/.bashrc
+check "LESS_TERMCAP_us (underline) = Cyan"        grep -qE 'LESS_TERMCAP_us=.*38;2;128;255;234' bash/.bashrc
+check "LESS_TERMCAP_so (standout) = Black on Org" grep -qE 'LESS_TERMCAP_so=.*38;2;34;33;44.*48;2;255;202;128' bash/.bashrc
+check "LESS_TERMCAP_mb (blink) = Red"             grep -qE 'LESS_TERMCAP_mb=.*38;2;255;149;128' bash/.bashrc
+check "GROFF_NO_SGR=1 exported"                   grep -qE 'export GROFF_NO_SGR=1' bash/.bashrc
+
+# ── AC-B-pygments ────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-pygments: local Dracula Pro pygments style authored + installable"
+check "pygments/dracula_pro.py exists"        test -f pygments/dracula_pro.py
+check "pygments/pyproject.toml exists"        test -f pygments/pyproject.toml
+check "style has Pro Purple"                  grep -qE '"#9580FF"|PURPLE\s*=\s*"#9580FF"' pygments/dracula_pro.py
+check "entry point = pygments.styles"         grep -qE '"pygments\.styles"' pygments/pyproject.toml
+check "entry key = dracula-pro"               grep -qE '"dracula-pro"\s*=' pygments/pyproject.toml
+check "install-macos.sh installs local style" grep -qE 'uv tool install --from .*pygments.*pygments-dracula-pro-local' install-macos.sh
+check "install-wsl.sh   installs local style" grep -qE 'uv tool install --from .*pygments.*pygments-dracula-pro-local' install-wsl.sh
+# Runtime check gated on pygmentize being available — only asserted in --full
+if [[ "${FULL:-false}" == true ]] && command -v pygmentize &>/dev/null; then
+  check "pygmentize knows dracula-pro style"  bash -c "pygmentize -L styles | grep -q dracula-pro"
+else
+  skp "pygmentize runtime check" "pygmentize not installed or not --full mode"
+fi
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
