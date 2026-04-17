@@ -1,0 +1,10 @@
+# ghostty/config — terminal emulator configuration
+# See macos-dev/docs/design/theming.md § 3.1 Wave A.
+#
+# Tier 1 theming: Pro ready-made ghostty theme from ~/dracula-pro/themes/.
+# Ghostty supports the `theme = <path>` directive natively — no include-file
+# generation needed (cf. kitty in Task 10).
+
+font-family = JetBrainsMono Nerd Font
+font-size   = 13
+theme       = ~/dracula-pro/themes/ghostty/pro

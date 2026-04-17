@@ -243,6 +243,16 @@ check "install-macos.sh Next Steps mentions Raycast + Dracula Pro" \
 check "install-macos.sh Next Steps contains addToRaycast deep-link" \
   grep -qE 'https://themes\.ray\.so' install-macos.sh
 
+# ── AC-ghostty: ghostty config references Pro theme by path ───────────────
+echo ""
+echo "AC-ghostty: ghostty uses ~/dracula-pro/themes/ghostty/pro"
+check "ghostty/config exists"                                 \
+  test -f ghostty/config
+check "ghostty/config sets theme to Pro file"                 \
+  grep -qE '^theme\s*=\s*~?/.*dracula-pro/themes/ghostty/pro' ghostty/config
+check "install-macos.sh symlinks ghostty/config"              \
+  grep -qE 'link\s+ghostty/config\s+\.config/ghostty/config' install-macos.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

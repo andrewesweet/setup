@@ -327,6 +327,9 @@ link git/.gitignore_global  .gitignore_global
 link kitty/kitty.conf        .config/kitty/kitty.conf
 link kitty/dracula-pro.conf  .config/kitty/dracula-pro.conf
 
+# ghostty (Wave A Tier 1) — theme referenced directly via `theme = ~/dracula-pro/...`
+link ghostty/config  .config/ghostty/config
+
 # tmux (Plan 5)
 link tmux/.tmux.conf  .tmux.conf
 
