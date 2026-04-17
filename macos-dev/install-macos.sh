@@ -229,6 +229,11 @@ if command -v uv &>/dev/null; then
   log "installing uv tools (ty, prek)"
   uv tool install ty@latest || warn "ty install failed"
   uv tool install prek       || warn "prek install failed"
+  # pygments Dracula Pro style (Wave B — local style, PyPI package not yet
+  # published as of 2026-04-17; re-verify in follow-up and replace with
+  # `uv tool install pygments-dracula-pro` once available).
+  uv tool install --from "$DOTFILES/pygments" pygments-dracula-pro-local \
+    --with pygments || warn "pygments-dracula-pro-local install failed"
 else
   warn "uv not available, skipping uv tool installs"
 fi

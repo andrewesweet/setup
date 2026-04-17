@@ -459,6 +459,23 @@ check "LESS_TERMCAP_so (standout) = Black on Org" grep -qE 'LESS_TERMCAP_so=.*38
 check "LESS_TERMCAP_mb (blink) = Red"             grep -qE 'LESS_TERMCAP_mb=.*38;2;255;149;128' bash/.bashrc
 check "GROFF_NO_SGR=1 exported"                   grep -qE 'export GROFF_NO_SGR=1' bash/.bashrc
 
+# ── AC-B-pygments ────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-pygments: local Dracula Pro pygments style authored + installable"
+check "pygments/dracula_pro.py exists"        test -f pygments/dracula_pro.py
+check "pygments/pyproject.toml exists"        test -f pygments/pyproject.toml
+check "style has Pro Purple"                  grep -qE '"#9580FF"|PURPLE\s*=\s*"#9580FF"' pygments/dracula_pro.py
+check "entry point = pygments.styles"         grep -qE '"pygments\.styles"' pygments/pyproject.toml
+check "entry key = dracula-pro"               grep -qE '"dracula-pro"\s*=' pygments/pyproject.toml
+check "install-macos.sh installs local style" grep -qE 'uv tool install --from .*pygments.*pygments-dracula-pro-local' install-macos.sh
+check "install-wsl.sh   installs local style" grep -qE 'uv tool install --from .*pygments.*pygments-dracula-pro-local' install-wsl.sh
+# Runtime check gated on pygmentize being available — only asserted in --full
+if [[ "${FULL:-false}" == true ]] && command -v pygmentize &>/dev/null; then
+  check "pygmentize knows dracula-pro style"  bash -c "pygmentize -L styles | grep -q dracula-pro"
+else
+  skp "pygmentize runtime check" "pygmentize not installed or not --full mode"
+fi
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
