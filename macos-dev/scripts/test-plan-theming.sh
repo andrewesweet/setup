@@ -490,6 +490,22 @@ check "install-macos.sh links television/themes" \
 check "install-wsl.sh   links television/themes" \
   grep -qE 'link\s+television/themes\s+\.config/television/themes' install-wsl.sh
 
+# ── AC-jqp: jqp custom theme block with Pro hex ────────────────────────────
+echo ""
+echo "AC-jqp: jqp.yaml custom theme"
+# theme: dracula (Classic builtin) MUST be gone.
+check "jqp theme is NOT 'dracula' (classic)" \
+  bash -c "! grep -qE '^theme:\s*dracula\s*$' jqp/.jqp.yaml"
+check "jqp theme block is a mapping (not a string)" \
+  grep -qE '^theme:\s*$' jqp/.jqp.yaml
+# Pro hex — structural + accents
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "jqp.yaml references $hex" grep -qiF "$hex" jqp/.jqp.yaml
+done
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
