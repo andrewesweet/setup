@@ -139,21 +139,21 @@ check "wsl: prek mapping"             grep -q 'link prek/.pre-commit-config.yaml
 # Regression: Plans 2–10 link() calls preserved
 check "macos: bash links preserved"    test "$(grep -c 'link bash/' "$REPO_ROOT/install-macos.sh")" -eq 4
 check "macos: git links preserved"     test "$(grep -c 'link git/' "$REPO_ROOT/install-macos.sh")" -eq 2
-check "macos: kitty links preserved (kitty.conf + dracula-pro.conf, 1b-ii)"  test "$(grep -c 'link kitty/' "$REPO_ROOT/install-macos.sh")" -eq 2
+check "macos: kitty link preserved (kitty.conf only — dracula-pro.conf removed by theming Wave A)"  test "$(grep -c 'link kitty/' "$REPO_ROOT/install-macos.sh")" -eq 1
 check "macos: tmux links preserved"    test "$(grep -c 'link tmux/' "$REPO_ROOT/install-macos.sh")" -eq 1
 check "macos: starship links preserved" test "$(grep -c 'link starship/' "$REPO_ROOT/install-macos.sh")" -eq 1
 check "macos: lazygit links preserved" test "$(grep -c 'link lazygit/' "$REPO_ROOT/install-macos.sh")" -eq 1
 check "macos: mise links preserved"    test "$(grep -c 'link mise/' "$REPO_ROOT/install-macos.sh")" -eq 1
-check "macos: opencode links preserved" test "$(grep -c 'link opencode/' "$REPO_ROOT/install-macos.sh")" -eq 4
+check "macos: opencode links preserved" test "$(grep -c 'link opencode/' "$REPO_ROOT/install-macos.sh")" -eq 5
 check "macos: nvim links preserved"    test "$(grep -c 'link nvim' "$REPO_ROOT/install-macos.sh")" -eq 1
 check "wsl: bash links preserved"      test "$(grep -c 'link bash/' "$REPO_ROOT/install-wsl.sh")" -eq 4
 check "wsl: git links preserved"       test "$(grep -c 'link git/' "$REPO_ROOT/install-wsl.sh")" -eq 2
-check "wsl: kitty links preserved (kitty.conf + dracula-pro.conf, 1b-ii)"    test "$(grep -c 'link kitty/' "$REPO_ROOT/install-wsl.sh")" -eq 2
+check "wsl: kitty link preserved (kitty.conf only — dracula-pro.conf removed by theming Wave A)"    test "$(grep -c 'link kitty/' "$REPO_ROOT/install-wsl.sh")" -eq 1
 check "wsl: tmux links preserved"      test "$(grep -c 'link tmux/' "$REPO_ROOT/install-wsl.sh")" -eq 1
 check "wsl: starship links preserved"  test "$(grep -c 'link starship/' "$REPO_ROOT/install-wsl.sh")" -eq 1
 check "wsl: lazygit links preserved"   test "$(grep -c 'link lazygit/' "$REPO_ROOT/install-wsl.sh")" -eq 1
 check "wsl: mise links preserved"      test "$(grep -c 'link mise/' "$REPO_ROOT/install-wsl.sh")" -eq 1
-check "wsl: opencode links preserved"  test "$(grep -c 'link opencode/' "$REPO_ROOT/install-wsl.sh")" -eq 4
+check "wsl: opencode links preserved"  test "$(grep -c 'link opencode/' "$REPO_ROOT/install-wsl.sh")" -eq 5
 check "wsl: nvim links preserved"      test "$(grep -c 'link nvim' "$REPO_ROOT/install-wsl.sh")" -eq 1
 
 # ── Summary ────────────────────────────────────────────────────────────────

@@ -158,9 +158,9 @@ check "old Monokai theme removed" bash -c '! grep -q "Monokai Extended" bash/.ba
 # ── AC-13: FZF_DEFAULT_OPTS has Dracula colors ───────────────────────────
 echo ""
 echo "AC-13: FZF_DEFAULT_OPTS Dracula palette"
-check "FZF opts include fg:#f8f8f2"  grep -q 'fg:#f8f8f2' bash/.bashrc
-check "FZF opts include bg:#282a36"  grep -q 'bg:#282a36' bash/.bashrc
-check "FZF opts include hl:#bd93f9"  grep -q 'hl:#bd93f9' bash/.bashrc
+# Theming assertions moved to scripts/test-plan-theming.sh (docs/design/theming.md).
+# Classic Dracula hex (fg:#f8f8f2, bg:#282a36, hl:#bd93f9) superseded by
+# Pro Base hex (fg:#F8F8F2, bg:#22212C, hl:#9580FF) in Wave B.
 check "FZF opts retain ctrl-j:down,ctrl-k:up" grep -q 'ctrl-j:down,ctrl-k:up' bash/.bashrc
 check "FZF opts retain --height 40%"  grep -q 'height 40%' bash/.bashrc
 check "FZF opts retain --layout=reverse" grep -q 'layout=reverse' bash/.bashrc
@@ -179,16 +179,11 @@ check "git .gitconfig delta syntax-theme = Dracula" \
   bash -c "awk '/^\\[delta\\]\$/{in_s=1; next} /^\\[/{in_s=0} in_s' git/.gitconfig | grep -qE 'syntax-theme[[:space:]]*=[[:space:]]*Dracula'"
 
 # ── AC-15: lazygit Dracula theme ─────────────────────────────────────────
-# Uses -Pzo multiline matching to walk the YAML array: key: followed by
-# "- '#COLOR'" on the next line.
 echo ""
 echo "AC-15: lazygit Dracula theme colors"
-check "lazygit theme activeBorderColor uses purple" \
-  bash -c "grep -Pzo '(?s)activeBorderColor:.{0,40}#BD93F9' lazygit/config.yml >/dev/null 2>&1"
-check "lazygit theme inactiveBorderColor uses comment" \
-  bash -c "grep -Pzo '(?s)inactiveBorderColor:.{0,40}#6272A4' lazygit/config.yml >/dev/null 2>&1"
-check "lazygit theme selectedLineBgColor uses current_line" \
-  bash -c "grep -Pzo '(?s)selectedLineBgColor:.{0,40}#44475A' lazygit/config.yml >/dev/null 2>&1"
+# Theming assertions moved to scripts/test-plan-theming.sh (docs/design/theming.md).
+# Classic Dracula hex (#BD93F9 purple, #6272A4 comment, #44475A current_line)
+# superseded by Pro Base hex (#9580FF, #7970A9, #454158) in Wave B.
 
 # ── AC-16: kitty font + dracula-pro ──────────────────────────────────────
 echo ""
@@ -196,14 +191,18 @@ echo "AC-16: kitty font and Dracula Pro"
 check "kitty font_family = JetBrainsMono Nerd Font" \
   grep -qE '^font_family[[:space:]]+JetBrainsMono Nerd Font' kitty/kitty.conf
 check "kitty disable_ligatures never"  grep -qE '^disable_ligatures[[:space:]]+never' kitty/kitty.conf
-check "kitty includes dracula-pro.conf" grep -qE '^include[[:space:]]+dracula-pro\.conf' kitty/kitty.conf
-check "kitty/dracula-pro.conf exists"   test -f kitty/dracula-pro.conf
-check "dracula-pro.conf has foreground" grep -qE '^foreground[[:space:]]+#' kitty/dracula-pro.conf
-check "dracula-pro.conf has background" grep -qE '^background[[:space:]]+#' kitty/dracula-pro.conf
-check "install-macos.sh links dracula-pro.conf" \
-  grep -qE 'link\s+kitty/dracula-pro\.conf' install-macos.sh
-check "install-wsl.sh links dracula-pro.conf" \
-  grep -qE 'link\s+kitty/dracula-pro\.conf' install-wsl.sh
+# Theming Wave A (docs/design/theming.md § 4.4) replaced the in-repo
+# dracula-pro.conf reconstruction with an install-time generated include at
+# ~/.config/kitty/dracula-pro.generated.conf built from the palette facts.
+# Detailed kitty theming assertions live in scripts/test-plan-theming.sh.
+check "kitty includes generated dracula-pro conf" \
+  grep -qE '^include[[:space:]]+.*dracula-pro(\.generated)?\.conf' kitty/kitty.conf
+check "kitty/dracula-pro.conf reconstruction removed" \
+  [ ! -f kitty/dracula-pro.conf ]
+check "install-macos.sh does not link kitty/dracula-pro.conf" \
+  bash -c "! grep -qE 'link[[:space:]]+kitty/dracula-pro\\.conf' install-macos.sh"
+check "install-wsl.sh does not link kitty/dracula-pro.conf" \
+  bash -c "! grep -qE 'link[[:space:]]+kitty/dracula-pro\\.conf' install-wsl.sh"
 
 # ── AC-17: cheat tmux-plugins subcommand ─────────────────────────────────
 echo ""
