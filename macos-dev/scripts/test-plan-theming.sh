@@ -416,6 +416,21 @@ check "ux (user exec)  = Green"         grep -q 'ux=38;2;138;255;128' bash/.bash
 check "ue (user other) = Orange"        grep -q 'ue=38;2;255;202;128' bash/.bashrc
 check "xx (dash / empty) = BrightBlack" grep -q 'xx=38;2;80;76;103'   bash/.bashrc
 
+# ── AC-B-dircolors ───────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-dircolors: .dir_colors uses Pro Base hex (24-bit SGR)"
+check ".dir_colors exists"                 test -f dircolors/.dir_colors
+check "DIR = Purple (149,128,255)"         grep -qE 'DIR .*38;2;149;128;255'    dircolors/.dir_colors
+check "LINK = Cyan (128,255,234)"          grep -qE 'LINK .*38;2;128;255;234'   dircolors/.dir_colors
+check "FIFO fg = Yellow (255,255,128)"     grep -qE 'FIFO .*38;2;255;255;128'   dircolors/.dir_colors
+check "ORPHAN = Red (255,149,128)"         grep -qE 'ORPHAN .*38;2;255;149;128' dircolors/.dir_colors
+check "SETUID bg = Red (255,149,128)"      grep -qE 'SETUID .*48;2;255;149;128' dircolors/.dir_colors
+check "no Classic 24-bit triples remain"   bash -c "! grep -qE '38;2;(189;147;249|98;114;164|139;233;253|255;121;198|255;85;85|255;184;108|241;250;140|80;250;123)' dircolors/.dir_colors"
+# shellcheck disable=SC2016
+check "bashrc evals dircolors"             grep -q 'eval "\$(dircolors -b.*\.dir_colors)"' bash/.bashrc
+check "install-macos.sh links .dir_colors" grep -qE 'link\s+dircolors/\.dir_colors\s+\.dir_colors' install-macos.sh
+check "install-wsl.sh   links .dir_colors" grep -qE 'link\s+dircolors/\.dir_colors\s+\.dir_colors' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

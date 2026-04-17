@@ -397,6 +397,9 @@ link television/cable         .config/television/cable
 # ripgrep (Wave B — Dracula Pro via --colors config)
 link ripgrep/config  .config/ripgrep/config
 
+# dircolors (Wave B — ls/LS_COLORS Dracula Pro via dircolors -b)
+link dircolors/.dir_colors  .dir_colors
+
 # yazi (Plan Layer 1b-i)
 link yazi/yazi.toml    .config/yazi/yazi.toml
 link yazi/keymap.toml  .config/yazi/keymap.toml

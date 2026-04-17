@@ -278,6 +278,14 @@ uu=38;2;128;255;234:\
 gu=38;2;248;248;242:\
 un=38;2;255;128;191:\
 uR=38;2;255;149;128"
+
+# dircolors — compile ~/.dir_colors into LS_COLORS. GNU dircolors only;
+# macOS ships BSD ls which ignores LS_COLORS, but eza/ls aliases use eza
+# on both platforms (see bash/.bash_aliases) so LS_COLORS is still relevant
+# for any stray `ls` invocations inside git subcommands, fd, etc.
+if command -v dircolors &>/dev/null && [[ -r "$HOME/.dir_colors" ]]; then
+  eval "$(dircolors -b "$HOME"/.dir_colors)"
+fi
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
