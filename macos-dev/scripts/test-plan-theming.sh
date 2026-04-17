@@ -300,6 +300,25 @@ fi
 echo ""
 echo "Wave B — Tier 2 Pro-from-Classic palette substitution"
 
+# ── AC-B-starship ────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-starship: starship palette is dracula-pro with Pro Base hex"
+check "palette = dracula-pro"               grep -qE '^palette\s*=\s*"dracula-pro"' starship/starship.toml
+check "Classic palette name removed"        bash -c '! grep -qE "^palette\s*=\s*\"dracula\"\s*$" starship/starship.toml'
+check "Classic [palettes.dracula] removed"  bash -c '! grep -qE "^\[palettes\.dracula\]\s*$" starship/starship.toml'
+check "[palettes.dracula-pro] table"        grep -qE '^\[palettes\.dracula-pro\]' starship/starship.toml
+check "background = #22212C"                grep -qE '^background\s*=\s*"#22212C"' starship/starship.toml
+check "current_line = #454158"              grep -qE '^current_line\s*=\s*"#454158"' starship/starship.toml
+check "foreground = #F8F8F2"                grep -qE '^foreground\s*=\s*"#F8F8F2"' starship/starship.toml
+check "comment = #7970A9"                   grep -qE '^comment\s*=\s*"#7970A9"' starship/starship.toml
+check "cyan = #80FFEA"                      grep -qE '^cyan\s*=\s*"#80FFEA"' starship/starship.toml
+check "green = #8AFF80"                     grep -qE '^green\s*=\s*"#8AFF80"' starship/starship.toml
+check "orange = #FFCA80"                    grep -qE '^orange\s*=\s*"#FFCA80"' starship/starship.toml
+check "pink = #FF80BF"                      grep -qE '^pink\s*=\s*"#FF80BF"' starship/starship.toml
+check "purple = #9580FF"                    grep -qE '^purple\s*=\s*"#9580FF"' starship/starship.toml
+check "red = #FF9580"                       grep -qE '^red\s*=\s*"#FF9580"' starship/starship.toml
+check "yellow = #FFFF80"                    grep -qE '^yellow\s*=\s*"#FFFF80"' starship/starship.toml
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
