@@ -383,6 +383,24 @@ link prek/.pre-commit-config.yaml  .pre-commit-config.yaml
 link vscode/settings.json    "Library/Application Support/Code/User/settings.json"
 link vscode/extensions.json  "Library/Application Support/Code/User/extensions.json"
 
+# vscode — Dracula Pro .vsix (Wave A Tier 1). Only attempt if ~/dracula-pro/
+# is present (DRACULA_PRO_OK=1) and `code` CLI is available. `code
+# --install-extension` is idempotent: running with the same .vsix is a
+# no-op once installed.
+if [[ "${DRACULA_PRO_OK:-0}" == 1 ]] && command -v code &>/dev/null; then
+  VSIX_PATH="$HOME/dracula-pro/themes/visual-studio-code/dracula-pro.vsix"
+  if [[ -f "$VSIX_PATH" ]]; then
+    log "installing Dracula Pro vscode extension"
+    code --install-extension "$HOME/dracula-pro/themes/visual-studio-code/dracula-pro.vsix" || warn "vscode extension install failed (non-fatal)"
+  else
+    warn "Dracula Pro .vsix not found at $VSIX_PATH — skipping vscode theme install"
+  fi
+elif [[ "${DRACULA_PRO_OK:-0}" != 1 ]]; then
+  warn "DRACULA_PRO_OK=0 — skipping vscode Pro .vsix install"
+else
+  warn "code CLI not on PATH — install vscode or run 'Shell Command: Install code command in PATH' from the command palette"
+fi
+
 # container dev script (Plan 13)
 mkdir -p "$HOME/.local/bin"
 link container/dev.sh  .local/bin/dev

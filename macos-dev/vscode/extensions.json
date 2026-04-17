@@ -18,7 +18,7 @@
     "ms-vscode-remote.remote-wsl",
     "ms-vscode-remote.remote-containers",
     "esbenp.prettier-vscode",
-    "catppuccin.catppuccin-vsc",
+    "dracula-theme-pro.theme-dracula-pro",
     "EditorConfig.EditorConfig",
     "streetsidesoftware.code-spell-checker"
   ]

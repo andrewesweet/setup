@@ -186,6 +186,18 @@ check "colorscheme.lua sets colorscheme = dracula_pro"       \
 check "colorscheme.lua overrides LazyVim default colorscheme" \
   grep -qE 'LazyVim.*colorscheme|opts.*colorscheme' nvim/lua/plugins/colorscheme.lua
 
+# ── AC-vscode: Dracula Pro replaces Catppuccin in vscode ──────────────────
+echo ""
+echo "AC-vscode: vscode uses Dracula Pro (.vsix + colorTheme setting)"
+check "extensions.json does NOT include catppuccin.catppuccin-vsc" \
+  bash -c '! grep -q "catppuccin.catppuccin-vsc" vscode/extensions.json'
+check "extensions.json includes dracula-theme-pro.theme-dracula-pro" \
+  grep -q '"dracula-theme-pro.theme-dracula-pro"' vscode/extensions.json
+check "settings.json sets workbench.colorTheme = Dracula Pro"   \
+  grep -qE '"workbench\.colorTheme"\s*:\s*"Dracula Pro"' vscode/settings.json
+check "install-macos.sh installs the Pro .vsix via code CLI"    \
+  grep -qE 'code --install-extension\s+.*dracula-pro\.vsix' install-macos.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
