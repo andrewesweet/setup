@@ -250,6 +250,34 @@ export BAT_THEME="Dracula"
 # See docs/design/theming.md § 3.2. Path resolution uses $HOME because the
 # installer symlinks ripgrep/config into ~/.config/ripgrep/config.
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
+
+# eza — Dracula Pro palette via 24-bit SGR (38;2;R;G;B). Each permission
+# slot is asserted by scripts/test-plan-theming.sh; see docs/design/theming.md
+# § 3.2. Pro Base hex → decimal RGB:
+#   Comment    #7970A9 = 121,112,169
+#   Purple     #9580FF = 149,128,255
+#   Red        #FF9580 = 255,149,128
+#   Green      #8AFF80 = 138,255,128
+#   Orange     #FFCA80 = 255,202,128
+#   Cyan       #80FFEA = 128,255,234
+#   BrightBlk  #504C67 = 80,76,103
+export EZA_COLORS="\
+da=38;2;121;112;169:\
+ur=38;2;149;128;255:\
+uw=38;2;255;149;128:\
+ux=38;2;138;255;128:\
+ue=38;2;255;202;128:\
+gr=38;2;149;128;255:\
+gw=38;2;255;149;128:\
+gx=38;2;138;255;128:\
+tr=38;2;149;128;255:\
+tw=38;2;255;149;128:\
+tx=38;2;138;255;128:\
+xx=38;2;80;76;103:\
+uu=38;2;128;255;234:\
+gu=38;2;248;248;242:\
+un=38;2;255;128;191:\
+uR=38;2;255;149;128"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'

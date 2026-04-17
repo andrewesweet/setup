@@ -405,6 +405,17 @@ check "RIPGREP_CONFIG_PATH exported"          grep -qE '^export RIPGREP_CONFIG_P
 check "install-macos.sh links ripgrep/config" grep -qE 'link\s+ripgrep/config\s+\.config/ripgrep/config' install-macos.sh
 check "install-wsl.sh   links ripgrep/config" grep -qE 'link\s+ripgrep/config\s+\.config/ripgrep/config' install-wsl.sh
 
+# ── AC-B-eza ─────────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-eza: EZA_COLORS is exported with Pro Base hex RGB"
+check "EZA_COLORS is exported"          grep -qE '^export EZA_COLORS='  bash/.bashrc
+check "da (date) = Comment"             grep -q 'da=38;2;121;112;169' bash/.bashrc
+check "ur (user read)  = Purple"        grep -q 'ur=38;2;149;128;255' bash/.bashrc
+check "uw (user write) = Red"           grep -q 'uw=38;2;255;149;128' bash/.bashrc
+check "ux (user exec)  = Green"         grep -q 'ux=38;2;138;255;128' bash/.bashrc
+check "ue (user other) = Orange"        grep -q 'ue=38;2;255;202;128' bash/.bashrc
+check "xx (dash / empty) = BrightBlack" grep -q 'xx=38;2;80;76;103'   bash/.bashrc
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
