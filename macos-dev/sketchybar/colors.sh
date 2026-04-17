@@ -1,24 +1,53 @@
 #!/usr/bin/env sh
 # shellcheck shell=sh
-# sketchybar/colors.sh — Dracula Pro palette, single source of truth.
+# sketchybar/colors.sh — Dracula Pro palette alias layer.
 #
 # Sourced by sketchybarrc, every sketchybar/plugins/*.sh, and
-# jankyborders/bordersrc. Hex values match the parent shell design's
-# §3.9 (docs/plans/2026-04-12-shell-modernisation-design.md).
+# jankyborders/bordersrc. Hex values are DERIVED from
+# $DOTFILES/scripts/lib/dracula-pro-palette.sh — the single source of
+# truth per `docs/design/theming.md` § 6.3. Do NOT hardcode hex here.
 #
-# Format: 0xff<RRGGBB>  — SketchyBar/JankyBorders AARRGGBB notation
-# with ff = fully opaque alpha.
+# Format on export: 0xff<RRGGBB> — SketchyBar/JankyBorders AARRGGBB
+# notation with ff = fully opaque alpha. The helper `_sb_color` strips
+# the leading '#' from the palette variable and prefixes 0xff.
 
-export COLOR_BG=0xff282A36            # Background
-export COLOR_CURRENT_LINE=0xff44475A  # Current Line (also inactive border)
-export COLOR_SELECTION=0xff44475A     # Selection (same hex as Current Line)
-export COLOR_FG=0xffF8F8F2            # Foreground
-export COLOR_COMMENT=0xff6272A4       # Comment / muted
+# Resolve $DOTFILES at source time. Installers set $DOTFILES; when this
+# file is sourced standalone (e.g. bordersrc at login), fall back to
+# the canonical install location.
+: "${DOTFILES:=$HOME/andrewesweet/setup/macos-dev}"
+# shellcheck source=../scripts/lib/dracula-pro-palette.sh disable=SC1091
+. "$DOTFILES/scripts/lib/dracula-pro-palette.sh"
 
-export COLOR_RED=0xffFF5555           # Red    — Zscaler disconnect / errors
-export COLOR_ORANGE=0xffFFB86C        # Orange — warnings
-export COLOR_YELLOW=0xffF1FA8C        # Yellow — battery low
-export COLOR_GREEN=0xff50FA7B         # Green  — Zscaler connected / ok
-export COLOR_CYAN=0xff8BE9FD          # Cyan   — wifi connected
-export COLOR_PURPLE=0xffBD93F9        # Purple — active focus / accent
-export COLOR_PINK=0xffFF79C6          # Pink   — unused (kept for completeness)
+_sb_color() {
+  # $1 = #RRGGBB hex → 0xffRRGGBB
+  printf '0xff%s' "$(printf '%s' "$1" | sed -E 's/^#//')"
+}
+
+# Structural slots
+COLOR_BG="$(_sb_color "$DRACULA_PRO_BACKGROUND")"           # #22212C
+export COLOR_BG
+COLOR_FG="$(_sb_color "$DRACULA_PRO_FOREGROUND")"           # #F8F8F2
+export COLOR_FG
+COLOR_COMMENT="$(_sb_color "$DRACULA_PRO_COMMENT")"         # #7970A9
+export COLOR_COMMENT
+COLOR_SELECTION="$(_sb_color "$DRACULA_PRO_SELECTION")"     # #454158
+export COLOR_SELECTION
+# Legacy alias — pre-Pro code referred to "Current Line"; map to Selection.
+export COLOR_CURRENT_LINE="$COLOR_SELECTION"
+
+# Accents (Terminal Standard names + Pro non-terminal aliases)
+COLOR_RED="$(_sb_color "$DRACULA_PRO_RED")"                 # #FF9580
+export COLOR_RED
+COLOR_GREEN="$(_sb_color "$DRACULA_PRO_GREEN")"             # #8AFF80
+export COLOR_GREEN
+COLOR_YELLOW="$(_sb_color "$DRACULA_PRO_YELLOW")"           # #FFFF80
+export COLOR_YELLOW
+COLOR_CYAN="$(_sb_color "$DRACULA_PRO_CYAN")"               # #80FFEA
+export COLOR_CYAN
+COLOR_ORANGE="$(_sb_color "$DRACULA_PRO_ORANGE")"           # #FFCA80
+export COLOR_ORANGE
+# Non-terminal aliases — preserve existing sketchybarrc / plugin refs.
+COLOR_PURPLE="$(_sb_color "$DRACULA_PRO_BLUE")"             # #9580FF
+export COLOR_PURPLE
+COLOR_PINK="$(_sb_color "$DRACULA_PRO_MAGENTA")"            # #FF80BF
+export COLOR_PINK

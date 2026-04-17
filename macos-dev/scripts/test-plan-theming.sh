@@ -304,6 +304,51 @@ fi
 echo ""
 echo "═══ Wave C — Tier 3 ═════════════════════════════════════════════════════"
 
+# ── AC-sketchybar: colors.sh aligns with Dracula Pro palette ───────────────
+echo ""
+echo "AC-sketchybar: sketchybar/colors.sh uses Dracula Pro palette"
+
+# Structural sourcing of the palette file — colors.sh MUST NOT hardcode hex.
+check "colors.sh sources scripts/lib/dracula-pro-palette.sh" \
+  grep -qE '^\s*\.\s+.*/dracula-pro-palette\.sh' sketchybar/colors.sh
+
+# Source colors.sh in a subshell so its helper-derived COLOR_* values
+# resolve to their 0xff<RRGGBB> strings; then extract the 6-char hex.
+# DOTFILES override so colors.sh sources the palette from the checkout.
+sb_hex() {
+  DOTFILES="$MACOS_DEV" bash -c '. sketchybar/colors.sh 2>/dev/null; printf "%s" "${'"$1"':-}"' \
+    | sed -E 's/^0xff([0-9A-Fa-f]{6}).*/\1/' | tr 'a-f' 'A-F'
+}
+pal_hex() { printf '%s' "$1" | sed -E 's/^#([0-9A-Fa-f]{6})/\1/' | tr 'a-f' 'A-F'; }
+
+# Base structural slots
+check "COLOR_BG        == DRACULA_PRO_BACKGROUND"  test "$(sb_hex COLOR_BG)"        = "$(pal_hex "$DRACULA_PRO_BACKGROUND")"
+check "COLOR_FG        == DRACULA_PRO_FOREGROUND"  test "$(sb_hex COLOR_FG)"        = "$(pal_hex "$DRACULA_PRO_FOREGROUND")"
+check "COLOR_COMMENT   == DRACULA_PRO_COMMENT"     test "$(sb_hex COLOR_COMMENT)"   = "$(pal_hex "$DRACULA_PRO_COMMENT")"
+check "COLOR_SELECTION == DRACULA_PRO_SELECTION"   test "$(sb_hex COLOR_SELECTION)" = "$(pal_hex "$DRACULA_PRO_SELECTION")"
+# Accents
+check "COLOR_RED       == DRACULA_PRO_RED"         test "$(sb_hex COLOR_RED)"       = "$(pal_hex "$DRACULA_PRO_RED")"
+check "COLOR_GREEN     == DRACULA_PRO_GREEN"       test "$(sb_hex COLOR_GREEN)"     = "$(pal_hex "$DRACULA_PRO_GREEN")"
+check "COLOR_YELLOW    == DRACULA_PRO_YELLOW"      test "$(sb_hex COLOR_YELLOW)"    = "$(pal_hex "$DRACULA_PRO_YELLOW")"
+check "COLOR_CYAN      == DRACULA_PRO_CYAN"        test "$(sb_hex COLOR_CYAN)"      = "$(pal_hex "$DRACULA_PRO_CYAN")"
+check "COLOR_PURPLE    == DRACULA_PRO_BLUE"        test "$(sb_hex COLOR_PURPLE)"    = "$(pal_hex "$DRACULA_PRO_BLUE")"
+check "COLOR_PINK      == DRACULA_PRO_MAGENTA"     test "$(sb_hex COLOR_PINK)"      = "$(pal_hex "$DRACULA_PRO_MAGENTA")"
+check "COLOR_ORANGE    == DRACULA_PRO_ORANGE"      test "$(sb_hex COLOR_ORANGE)"    = "$(pal_hex "$DRACULA_PRO_ORANGE")"
+# COLOR_CURRENT_LINE retained for legacy callers; map to Selection per spec § 5.2
+check "COLOR_CURRENT_LINE == DRACULA_PRO_SELECTION" test "$(sb_hex COLOR_CURRENT_LINE)" = "$(pal_hex "$DRACULA_PRO_SELECTION")"
+
+# ── AC-jankyborders: bordersrc still sources colors.sh + references COLOR_* ─
+echo ""
+echo "AC-jankyborders: bordersrc inherits sketchybar/colors.sh"
+# shellcheck disable=SC2016
+check "bordersrc sources .config/sketchybar/colors.sh" \
+  grep -qE '^\s*\.\s+"?\$HOME/\.config/sketchybar/colors\.sh"?' jankyborders/bordersrc
+# shellcheck disable=SC2016
+check "bordersrc active_color references \$COLOR_PURPLE"   grep -qE 'active_color="\$COLOR_PURPLE"'          jankyborders/bordersrc
+# shellcheck disable=SC2016
+check "bordersrc inactive_color references selection slot" \
+  grep -qE 'inactive_color="\$COLOR_(CURRENT_LINE|SELECTION)"' jankyborders/bordersrc
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
