@@ -461,6 +461,12 @@ EOF
 # xh — modern httpie replacement. httpie stays installed for team compat.
 alias http='xh'
 
+# xh: default Pro-aligned pygments style. The pygments 'dracula' style
+# is the closest upstream-packaged equivalent; a custom 'dracula-pro'
+# pygments style is installed separately by Task 13 (httpie) and will
+# be adopted here if a future xh release supports external style files.
+alias xh='xh --style=dracula-pro'
+
 # rip2 (MilesCranmer/rip2) — safe rm with undo. Graveyard at
 # ~/.local/share/graveyard (per §7.3 of design). Two aliases:
 #   rrip     — undo last deletion

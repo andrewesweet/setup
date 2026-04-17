@@ -268,6 +268,14 @@ export DFT_BACKGROUND="dark"
 #   objkeys -> DRACULA_PRO_CYAN      (1;36 bold)
 export JQ_COLORS="2;37:0;31:0;32:0;33:0;33:0;34:0;35:1;36"
 
+# xh — use pygments 'dracula' style at the terminal; xh doesn't ship a
+# 'dracula-pro' pygments style, so we pin to pygments 'dracula' which is
+# the closest upstream and leave the httpie-generated pygments style
+# (see Task 13) for when xh gains config-path support for external styles.
+# XH_CONFIG_DIR kept for forward compatibility — xh will auto-create the
+# directory when any config-based styling is introduced.
+export XH_CONFIG_DIR="$HOME/.config/xh"
+
 # bat syntax theme — custom Dracula Pro tmTheme, symlinked into
 # ~/.config/bat/themes/ by install-*.sh and registered via `bat cache --build`.
 export BAT_THEME="Dracula Pro"

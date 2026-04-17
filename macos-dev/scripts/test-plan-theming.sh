@@ -451,6 +451,14 @@ check "JQ_COLORS has 8 tuples" bash -c "awk -F: '/^export JQ_COLORS=/{sub(/\"/,\
 check "JQ_COLORS comment cites DRACULA_PRO slots" \
   grep -qE '# JQ_COLORS .* DRACULA_PRO_' bash/.bashrc
 
+# ── AC-xh: xh default --style = dracula-pro ───────────────────────────────
+echo ""
+echo "AC-xh: xh styling env"
+check "bashrc exports XH_CONFIG_DIR" grep -qE '^export XH_CONFIG_DIR='         bash/.bashrc
+# xh reads --style from CLI or config.json. We use an alias with --style=dracula-pro.
+check "bash defines xh alias with --style=dracula-pro" \
+  grep -qE "alias xh=['\"]xh --style=dracula-pro" bash/.bash_aliases
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
