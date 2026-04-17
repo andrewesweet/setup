@@ -286,6 +286,24 @@ uR=38;2;255;149;128"
 if command -v dircolors &>/dev/null && [[ -r "$HOME/.dir_colors" ]]; then
   eval "$(dircolors -b "$HOME"/.dir_colors)"
 fi
+
+# man-pages — Dracula Pro colours via LESS termcap env vars. 24-bit SGR so
+# every slot is greppable as a Pro hex RGB. GROFF_NO_SGR=1 prevents groff
+# from stripping the SGR escapes that less then re-interprets.
+# Pro Base hex → decimal RGB:
+#   Black       #22212C =  34, 33, 44
+#   Red         #FF9580 = 255,149,128
+#   Purple      #9580FF = 149,128,255
+#   Cyan        #80FFEA = 128,255,234
+#   Orange      #FFCA80 = 255,202,128
+export GROFF_NO_SGR=1
+export LESS_TERMCAP_mb=$'\e[38;2;255;149;128m'                   # begin blink  = Red
+export LESS_TERMCAP_md=$'\e[1;38;2;149;128;255m'                 # begin bold   = Purple
+export LESS_TERMCAP_so=$'\e[38;2;34;33;44;48;2;255;202;128m'     # reverse video= Black on Orange
+export LESS_TERMCAP_us=$'\e[4;38;2;128;255;234m'                 # underline    = Cyan
+export LESS_TERMCAP_me=$'\e[0m'                                  # reset bold/blink
+export LESS_TERMCAP_se=$'\e[0m'                                  # reset reverse
+export LESS_TERMCAP_ue=$'\e[0m'                                  # reset underline
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'

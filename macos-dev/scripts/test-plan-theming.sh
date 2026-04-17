@@ -450,6 +450,15 @@ check "theme pink = Pink"                      grep -q '"#FF80BF"' opencode/them
 check "install-macos.sh links theme file"      grep -qE 'link opencode/themes/dracula-pro\.json.*\.config/opencode/themes/dracula-pro\.json' install-macos.sh
 check "install-wsl.sh   links theme file"      grep -qE 'link opencode/themes/dracula-pro\.json.*\.config/opencode/themes/dracula-pro\.json' install-wsl.sh
 
+# ── AC-B-man-pages ───────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-man-pages: less/MANPAGER env uses Pro Base hex (24-bit SGR)"
+check "LESS_TERMCAP_md (bold) = Purple"           grep -qE 'LESS_TERMCAP_md=.*38;2;149;128;255' bash/.bashrc
+check "LESS_TERMCAP_us (underline) = Cyan"        grep -qE 'LESS_TERMCAP_us=.*38;2;128;255;234' bash/.bashrc
+check "LESS_TERMCAP_so (standout) = Black on Org" grep -qE 'LESS_TERMCAP_so=.*38;2;34;33;44.*48;2;255;202;128' bash/.bashrc
+check "LESS_TERMCAP_mb (blink) = Red"             grep -qE 'LESS_TERMCAP_mb=.*38;2;255;149;128' bash/.bashrc
+check "GROFF_NO_SGR=1 exported"                   grep -qE 'export GROFF_NO_SGR=1' bash/.bashrc
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
