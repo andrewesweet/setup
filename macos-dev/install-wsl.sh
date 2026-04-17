@@ -33,7 +33,7 @@ export DOTFILES
 # Tier 1 theming requires ~/dracula-pro/ present. On CI or machines without a
 # Pro licence, set SKIP_DRACULA_PRO=1 to skip Tier 1 steps and continue.
 # See macos-dev/docs/design/theming.md § 4.3.
-# shellcheck source=scripts/lib/dracula-pro-palette.sh
+# shellcheck source=scripts/lib/dracula-pro-palette.sh disable=SC1091
 source "$DOTFILES/scripts/lib/dracula-pro-palette.sh"
 DRACULA_PRO_OK=0
 if [[ -d "$HOME/dracula-pro" ]]; then

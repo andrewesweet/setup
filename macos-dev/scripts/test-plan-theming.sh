@@ -117,6 +117,7 @@ echo ""
 echo "AC-skip-env: install scripts handle SKIP_DRACULA_PRO + loud-fail"
 check "install-macos.sh sources the palette file"             \
   grep -qE 'source .*scripts/lib/dracula-pro-palette\.sh' install-macos.sh
+# shellcheck disable=SC2016
 check "install-macos.sh checks for ~/dracula-pro/ presence"   \
   grep -qE 'test -d .*\$HOME/dracula-pro|\[\[ -d "\$HOME/dracula-pro" \]\]' install-macos.sh
 check "install-macos.sh references SKIP_DRACULA_PRO"          \
@@ -125,6 +126,7 @@ check "install-macos.sh has loud-fail error message"          \
   grep -qE 'error: ~/dracula-pro/ not found' install-macos.sh
 check "install-wsl.sh sources the palette file"               \
   grep -qE 'source .*scripts/lib/dracula-pro-palette\.sh' install-wsl.sh
+# shellcheck disable=SC2016
 check "install-wsl.sh checks for ~/dracula-pro/ presence"     \
   grep -qE 'test -d .*\$HOME/dracula-pro|\[\[ -d "\$HOME/dracula-pro" \]\]' install-wsl.sh
 check "install-wsl.sh references SKIP_DRACULA_PRO"            \
@@ -136,7 +138,7 @@ check "install-wsl.sh has loud-fail error message"            \
 if [[ "$FULL" == true ]]; then
   tmphome="$(mktemp -d)"
   # Absent + unset → must fail non-zero with the error message
-  out_absent_unset="$(HOME="$tmphome" SKIP_DRACULA_PRO= bash -c '
+  out_absent_unset="$(HOME="$tmphome" SKIP_DRACULA_PRO='' bash -c '
     set +e
     source scripts/lib/dracula-pro-palette.sh
     if [[ ! -d "$HOME/dracula-pro" ]] && [[ -z "${SKIP_DRACULA_PRO:-}" ]]; then

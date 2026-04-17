@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # scripts/lib/dracula-pro-palette.sh
 #
 # Dracula PRO Base / Terminal Standard — single source of truth.
