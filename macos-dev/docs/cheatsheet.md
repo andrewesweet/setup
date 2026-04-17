@@ -225,3 +225,26 @@ This cheatsheet is intentionally limited (two pages of A4) — it is a muscle-me
 | diffnav | Inside diffnav: `?` for help |
 | xh | `xh --help`; `cheat xh` for quickstart |
 | rip2 | `cheat rip2` |
+
+## Theming — Dracula Pro (Wave B, Tier 2)
+
+Tools below use the Pro-from-Classic palette substitution chain
+(see `docs/design/theming.md` § 3.2):
+
+| Tool       | Surface                                | Wired via                           |
+|------------|----------------------------------------|-------------------------------------|
+| starship   | `starship/starship.toml` `[palettes.dracula-pro]` | config                |
+| tmux       | `tmux/.tmux.conf` `@dracula-colors`    | TPM plugin override                  |
+| lazygit    | `lazygit/config.yml` `gui.theme`       | config                               |
+| gh-dash    | `gh-dash/config.yml` `theme.colors`    | config                               |
+| yazi       | `yazi/theme.toml`                      | config                               |
+| fzf        | `FZF_DEFAULT_OPTS`                     | `bash/.bashrc`                       |
+| ripgrep    | `ripgrep/config` `--colors=`           | `RIPGREP_CONFIG_PATH` in bashrc      |
+| eza        | `EZA_COLORS`                           | `bash/.bashrc`                       |
+| dircolors  | `dircolors/.dir_colors`                | `eval $(dircolors -b)` in bashrc     |
+| opencode   | `opencode/themes/dracula-pro.json`     | `theme` key in `tui.jsonc`           |
+| man-pages  | `LESS_TERMCAP_*` + `GROFF_NO_SGR`      | `bash/.bashrc`                       |
+| pygments   | `pygments/dracula_pro.py` (local)      | `uv tool install --from pygments/`   |
+
+The authoritative palette file is `scripts/lib/dracula-pro-palette.sh`
+(committed by Wave A). The aggregate check is `scripts/test-plan-theming.sh`.
