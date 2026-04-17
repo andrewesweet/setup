@@ -335,6 +335,18 @@ check "tmux red = Pro Red"                grep -q "red='#FF9580'"          tmux/
 check "tmux pink = Pro Magenta"           grep -q "pink='#FF80BF'"         tmux/.tmux.conf
 check "tmux yellow = Pro Yellow"          grep -q "yellow='#FFFF80'"       tmux/.tmux.conf
 
+# ── AC-B-lazygit ─────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-lazygit: lazygit theme uses Pro Base hex only"
+check "activeBorder / cherry-pick = Purple"  grep -q "'#9580FF'" lazygit/config.yml
+check "inactiveBorder = Comment"             grep -q "'#7970A9'" lazygit/config.yml
+check "options / defaultFg = Foreground"     grep -q "'#F8F8F2'" lazygit/config.yml
+check "selected/cherry-pick bg = Selection"  grep -q "'#454158'" lazygit/config.yml
+check "unstaged = Red"                       grep -q "'#FF9580'" lazygit/config.yml
+check "searching = Yellow"                   grep -q "'#FFFF80'" lazygit/config.yml
+check "no Classic hex remain"                bash -c "! grep -qE \"#(BD93F9|6272A4|44475A|FF5555|F1FA8C)\" lazygit/config.yml"
+check "delta syntax-theme = Dracula Pro"     grep -qE "syntax-theme=.*Dracula Pro" lazygit/config.yml
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

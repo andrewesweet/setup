@@ -4,26 +4,26 @@
 gui:
   theme:
     activeBorderColor:
-      - '#BD93F9'
+      - '#9580FF'
       - bold
     inactiveBorderColor:
-      - '#6272A4'
+      - '#7970A9'
     optionsTextColor:
       - '#F8F8F2'
     selectedLineBgColor:
-      - '#44475A'
+      - '#454158'
     selectedRangeBgColor:
-      - '#44475A'
+      - '#454158'
     cherryPickedCommitBgColor:
-      - '#44475A'
+      - '#454158'
     cherryPickedCommitFgColor:
-      - '#BD93F9'
+      - '#9580FF'
     unstagedChangesColor:
-      - '#FF5555'
+      - '#FF9580'
     defaultFgColor:
       - '#F8F8F2'
     searchingActiveBorderColor:
-      - '#F1FA8C'
+      - '#FFFF80'
   sidePanelWidth: 0.25
   expandFocusedSidePanel: true
   showFileTree: true
@@ -32,7 +32,7 @@ gui:
 git:
   paging:
     colorArg: always
-    pager: delta --paging=never --syntax-theme='Dracula'
+    pager: delta --paging=never --syntax-theme='Dracula Pro'
   commit:
     signOff: false
   fetching:
