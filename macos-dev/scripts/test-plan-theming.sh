@@ -349,6 +349,37 @@ check "bordersrc active_color references \$COLOR_PURPLE"   grep -qE 'active_colo
 check "bordersrc inactive_color references selection slot" \
   grep -qE 'inactive_color="\$COLOR_(CURRENT_LINE|SELECTION)"' jankyborders/bordersrc
 
+# ── AC-delta: git-delta syntax-theme is "Dracula Pro" ─────────────────────
+echo ""
+echo "AC-delta: git-delta syntax-theme"
+check 'delta syntax-theme = "Dracula Pro"' \
+  grep -qE '^\s*syntax-theme\s*=\s*"?Dracula Pro"?\s*$' git/.gitconfig
+
+# ── AC-git: git ui.color blocks use Dracula Pro hex ────────────────────────
+echo ""
+echo "AC-git: git .gitconfig [color.*] blocks"
+
+check "[color.branch] section present"  grep -qE '^\s*\[color "branch"\]' git/.gitconfig
+check "[color.diff] section present"    grep -qE '^\s*\[color "diff"\]'   git/.gitconfig
+check "[color.status] section present"  grep -qE '^\s*\[color "status"\]' git/.gitconfig
+
+# color.branch slots — current uses green, local uses blue, remote uses magenta.
+check "color.branch current  -> #8AFF80 (green)"    grep -qE '^\s*current\s*=\s*"?#8AFF80"? bold' git/.gitconfig
+check "color.branch local    -> #9580FF (blue)"     grep -qE '^\s*local\s*=\s*"?#9580FF"?'       git/.gitconfig
+check "color.branch remote   -> #FF80BF (magenta)"  grep -qE '^\s*remote\s*=\s*"?#FF80BF"?'      git/.gitconfig
+
+# color.diff slots — old=red, new=green, frag=magenta, meta=blue, whitespace=yellow
+check "color.diff old        -> #FF9580 (red)"      grep -qE '^\s*old\s*=\s*"?#FF9580"?'         git/.gitconfig
+check "color.diff new        -> #8AFF80 (green)"    grep -qE '^\s*new\s*=\s*"?#8AFF80"?'         git/.gitconfig
+check "color.diff frag       -> #FF80BF (magenta)"  grep -qE '^\s*frag\s*=\s*"?#FF80BF"?'        git/.gitconfig
+check "color.diff meta       -> #9580FF (blue)"     grep -qE '^\s*meta\s*=\s*"?#9580FF"?'        git/.gitconfig
+check "color.diff whitespace -> #FFFF80 (yellow)"   grep -qE '^\s*whitespace\s*=\s*"?#FFFF80"?'  git/.gitconfig
+
+# color.status slots — added=green, changed=yellow, untracked=red
+check "color.status added     -> #8AFF80 (green)"   grep -qE '^\s*added\s*=\s*"?#8AFF80"?'       git/.gitconfig
+check "color.status changed   -> #FFFF80 (yellow)"  grep -qE '^\s*changed\s*=\s*"?#FFFF80"?'     git/.gitconfig
+check "color.status untracked -> #FF9580 (red)"     grep -qE '^\s*untracked\s*=\s*"?#FF9580"?'   git/.gitconfig
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
