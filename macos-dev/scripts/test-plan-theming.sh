@@ -408,6 +408,38 @@ check "diffnav border_fg = #7970A9 (COMMENT)"        grep -qE 'border_fg:\s*"#79
 check "diffnav status_bar.fg = #F8F8F2 (FOREGROUND)" grep -qE 'fg:\s*"#F8F8F2"'            diffnav/config.yml
 check "diffnav status_bar.bg = #454158 (SELECTION)"  grep -qE 'bg:\s*"#454158"'            diffnav/config.yml
 
+# ── AC-bat: custom Dracula Pro tmTheme ships and BAT_THEME wired ───────────
+echo ""
+echo "AC-bat: Dracula Pro bat theme"
+TMTHEME="bash/bat-themes/Dracula Pro.tmTheme"
+check 'BAT_THEME="Dracula Pro" exported'   grep -qE '^export BAT_THEME="Dracula Pro"' bash/.bashrc
+check "$TMTHEME exists"                     test -f "$TMTHEME"
+check "tmTheme is valid plist XML (doctype)" grep -qE '<!DOCTYPE plist' "$TMTHEME"
+check "tmTheme name = Dracula Pro"          grep -qE '<string>Dracula Pro</string>' "$TMTHEME"
+
+# Assert every Pro slot the Full-ANSI+Dim profile requires appears verbatim
+# in the tmTheme XML (tmTheme hex is case-insensitive; tmTheme uses #RRGGBB).
+for hex in \
+  "$DRACULA_PRO_BACKGROUND"  "$DRACULA_PRO_FOREGROUND"  "$DRACULA_PRO_COMMENT"  "$DRACULA_PRO_SELECTION" \
+  "$DRACULA_PRO_RED"         "$DRACULA_PRO_GREEN"       "$DRACULA_PRO_YELLOW"    "$DRACULA_PRO_BLUE" \
+  "$DRACULA_PRO_MAGENTA"     "$DRACULA_PRO_CYAN"        "$DRACULA_PRO_ORANGE" \
+  "$DRACULA_PRO_BRIGHT_RED"  "$DRACULA_PRO_BRIGHT_GREEN"    "$DRACULA_PRO_BRIGHT_YELLOW" \
+  "$DRACULA_PRO_BRIGHT_BLUE" "$DRACULA_PRO_BRIGHT_MAGENTA"  "$DRACULA_PRO_BRIGHT_CYAN" \
+  "$DRACULA_PRO_DIM_RED"     "$DRACULA_PRO_DIM_GREEN"       "$DRACULA_PRO_DIM_YELLOW" \
+  "$DRACULA_PRO_DIM_BLUE"    "$DRACULA_PRO_DIM_MAGENTA"     "$DRACULA_PRO_DIM_CYAN" \
+; do
+  check "tmTheme references $hex" grep -qiF "$hex" "$TMTHEME"
+done
+
+# install scripts must rebuild bat's cache after linking the theme file.
+check "install-macos.sh runs bat cache --build" grep -qE 'bat cache --build' install-macos.sh
+check "install-wsl.sh   runs bat cache --build" grep -qE 'bat cache --build' install-wsl.sh
+# Symlink wiring for the theme directory
+check "install-macos.sh links bash/bat-themes → .config/bat/themes" \
+  grep -qE 'link\s+bash/bat-themes\s+\.config/bat/themes' install-macos.sh
+check "install-wsl.sh   links bash/bat-themes → .config/bat/themes" \
+  grep -qE 'link\s+bash/bat-themes\s+\.config/bat/themes' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

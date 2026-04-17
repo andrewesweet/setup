@@ -462,6 +462,21 @@ link jqp/.jqp.yaml  .jqp.yaml
 # diffnav (Plan Layer 1b-i)
 link diffnav/config.yml  .config/diffnav/config.yml
 
+# bat themes (Plan theming-wave-c)
+# Custom Dracula Pro tmTheme lives under bash/bat-themes/ and is
+# symlinked as a directory so adding themes later requires no rewire.
+mkdir -p "$HOME/.config/bat/themes"
+link bash/bat-themes  .config/bat/themes
+
+# Rebuild bat's theme cache so BAT_THEME="Dracula Pro" resolves.
+# Idempotent; bat prints "Writing theme set to ..." on each run.
+if command -v bat >/dev/null 2>&1; then
+  bat cache --build >/dev/null
+  printf "  bat cache --build (Dracula Pro theme registered)\n"
+else
+  warn "bat not installed — skipping 'bat cache --build'. Run it manually after installing bat."
+fi
+
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 

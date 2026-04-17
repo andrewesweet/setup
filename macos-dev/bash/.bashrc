@@ -250,7 +250,9 @@ fi
 # is required — DFT_BACKGROUND=dark ensures the contrast direction is
 # correct for the Pro dark background.
 export DFT_BACKGROUND="dark"
-export BAT_THEME="Dracula"
+# bat syntax theme — custom Dracula Pro tmTheme, symlinked into
+# ~/.config/bat/themes/ by install-*.sh and registered via `bat cache --build`.
+export BAT_THEME="Dracula Pro"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
