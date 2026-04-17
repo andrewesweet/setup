@@ -262,7 +262,7 @@ slots.
 | starship | Structural + accents | 2 | Module styles reference named colours |
 | lazygit, gh-dash, yazi, opencode, btop, k9s, jqp, lazydocker, atuin, television, glow, lnav | Structural + accents | 2 / 3 | UI chrome + text |
 | fzf, ripgrep, eza, dircolors, httpie, xh, jq, git ui.color, man-pages | Accents only | 2 / 3 | Rendered over terminal background |
-| sketchybar | Structural + accents | 3 | Exports every slot as `COLOR_*` — single source of truth |
+| sketchybar | Structural + accents | 3 | Exports Structural + accent slots as `COLOR_*` — single source of truth for desktop Tier 3 tools |
 | jankyborders | Single semantic (focus = Blue/Purple, unfocus = Selection) | 3 | Reads sketchybar colors.sh |
 | aerospace | Single semantic | — | Inherits borders |
 
