@@ -490,6 +490,11 @@ mkdir -p "$HOME/.config/k9s/skins"
 link k9s/config.yaml          .config/k9s/config.yaml
 link k9s/dracula-pro.yaml     .config/k9s/skins/dracula-pro.yaml
 
+# httpie (Wave C Tier 3)
+mkdir -p "$HOME/.config/httpie/styles"
+link httpie/config.json    .config/httpie/config.json
+link httpie/styles         .config/httpie/styles
+
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 

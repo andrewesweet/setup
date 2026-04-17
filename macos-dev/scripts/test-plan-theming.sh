@@ -544,6 +544,24 @@ check "install-macos.sh links k9s skin"          grep -qE 'link\s+k9s/dracula-pr
 check "install-wsl.sh   links k9s config"       grep -qE 'link\s+k9s/config\.yaml\s+\.config/k9s/config\.yaml'                install-wsl.sh
 check "install-wsl.sh   links k9s skin"          grep -qE 'link\s+k9s/dracula-pro\.yaml\s+\.config/k9s/skins/dracula-pro\.yaml' install-wsl.sh
 
+# ── AC-httpie: config.json + Pro pygments artefact ─────────────────────────
+echo ""
+echo "AC-httpie: httpie Dracula Pro style"
+check "httpie/config.json exists"                 test -f httpie/config.json
+check "httpie/styles/dracula-pro.json exists"     test -f httpie/styles/dracula-pro.json
+check "httpie config sets --style=dracula-pro"    \
+  grep -qE '"--style=dracula-pro"'                 httpie/config.json
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" "$DRACULA_PRO_YELLOW" \
+           "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" "$DRACULA_PRO_CYAN" \
+           "$DRACULA_PRO_ORANGE"; do
+  check "httpie dracula-pro.json references $hex" grep -qiF "$hex" httpie/styles/dracula-pro.json
+done
+check "install-macos.sh links httpie config"       grep -qE 'link\s+httpie/config\.json\s+\.config/httpie/config\.json'     install-macos.sh
+check "install-macos.sh links httpie styles dir"   grep -qE 'link\s+httpie/styles\s+\.config/httpie/styles'                 install-macos.sh
+check "install-wsl.sh   links httpie config"       grep -qE 'link\s+httpie/config\.json\s+\.config/httpie/config\.json'     install-wsl.sh
+check "install-wsl.sh   links httpie styles dir"   grep -qE 'link\s+httpie/styles\s+\.config/httpie/styles'                 install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

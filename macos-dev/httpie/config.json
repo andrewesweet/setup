@@ -1,0 +1,10 @@
+{
+  "__meta__": {
+    "about": "https://httpie.io/docs/cli/config-file",
+    "help": "Dracula Pro default style — pygments built-in 'dracula-pro' entry point registered by the pygments-dracula-pro package installed via Wave B. Until that package ships, httpie falls back to pygments 'dracula' (close Classic variant).",
+    "httpie": "3.2.0"
+  },
+  "default_options": [
+    "--style=dracula-pro"
+  ]
+}

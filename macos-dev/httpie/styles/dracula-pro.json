@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "name": "dracula-pro",
+    "source": "docs/design/theming.md § 3.3 — Tier 3 pygments-format style for httpie's --style flag once external styles ship. Values verbatim from scripts/lib/dracula-pro-palette.sh."
+  },
+  "background": "#22212C",
+  "foreground": "#F8F8F2",
+  "token_styles": {
+    "Comment":               { "color": "#7970A9", "italic": true },
+    "Comment.Single":        { "color": "#7970A9", "italic": true },
+    "Comment.Multiline":     { "color": "#7970A9", "italic": true },
+    "Keyword":               { "color": "#FF80BF" },
+    "Keyword.Constant":      { "color": "#80FFEA" },
+    "Keyword.Type":          { "color": "#9580FF", "italic": true },
+    "Name":                  { "color": "#F8F8F2" },
+    "Name.Function":         { "color": "#8AFF80" },
+    "Name.Class":            { "color": "#80FFEA", "italic": true },
+    "Name.Tag":              { "color": "#FF80BF" },
+    "Name.Attribute":        { "color": "#8AFF80", "italic": true },
+    "Literal.String":        { "color": "#FFFF80" },
+    "Literal.Number":        { "color": "#FFCA80" },
+    "Operator":              { "color": "#FF80BF" },
+    "Punctuation":           { "color": "#F8F8F2" },
+    "Generic.Heading":       { "color": "#FFCA80", "bold": true },
+    "Generic.Inserted":      { "color": "#8AFF80" },
+    "Generic.Deleted":       { "color": "#FF9580" },
+    "Generic.Emph":          { "color": "#FF80BF", "italic": true },
+    "Generic.Strong":        { "color": "#FFFF80", "bold": true },
+    "Error":                 { "color": "#22212C", "bgcolor": "#FFAA99" }
+  }
+}
