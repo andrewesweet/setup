@@ -479,6 +479,12 @@ else
   warn "bat not installed — skipping 'bat cache --build'. Run it manually after installing bat."
 fi
 
+# btop (Wave C Tier 3) — file-level links so `~/.config/btop/themes/`
+# remains a real directory btop can write transient state into.
+mkdir -p "$HOME/.config/btop/themes"
+link btop/btop.conf           .config/btop/btop.conf
+link btop/dracula-pro.theme   .config/btop/themes/dracula-pro.theme
+
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 

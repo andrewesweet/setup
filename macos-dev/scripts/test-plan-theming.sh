@@ -506,6 +506,26 @@ for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COM
   check "jqp.yaml references $hex" grep -qiF "$hex" jqp/.jqp.yaml
 done
 
+# ── AC-btop: dracula-pro.theme + btop.conf ─────────────────────────────────
+echo ""
+echo "AC-btop: btop theme ships and config references it"
+check "btop/dracula-pro.theme exists"            test -f btop/dracula-pro.theme
+check "btop/btop.conf exists"                    test -f btop/btop.conf
+check 'btop.conf color_theme = "dracula-pro"' \
+  grep -qE '^color_theme\s*=\s*"dracula-pro"'    btop/btop.conf
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "btop theme references $hex" grep -qiF "$hex" btop/dracula-pro.theme
+done
+check "install-macos.sh links btop.conf"            grep -qE 'link\s+btop/btop\.conf\s+\.config/btop/btop\.conf'             install-macos.sh
+check "install-macos.sh links btop dracula-pro.theme" \
+  grep -qE 'link\s+btop/dracula-pro\.theme\s+\.config/btop/themes/dracula-pro\.theme' install-macos.sh
+check "install-wsl.sh   links btop.conf"            grep -qE 'link\s+btop/btop\.conf\s+\.config/btop/btop\.conf'             install-wsl.sh
+check "install-wsl.sh   links btop dracula-pro.theme" \
+  grep -qE 'link\s+btop/dracula-pro\.theme\s+\.config/btop/themes/dracula-pro\.theme' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
