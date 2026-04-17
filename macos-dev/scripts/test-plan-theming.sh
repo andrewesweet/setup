@@ -411,7 +411,7 @@ check "diffnav status_bar.bg = #454158 (SELECTION)"  grep -qE 'bg:\s*"#454158"' 
 # ── AC-bat: custom Dracula Pro tmTheme ships and BAT_THEME wired ───────────
 echo ""
 echo "AC-bat: Dracula Pro bat theme"
-TMTHEME="bash/bat-themes/Dracula Pro.tmTheme"
+TMTHEME="bat/themes/Dracula Pro.tmTheme"
 check 'BAT_THEME="Dracula Pro" exported'   grep -qE '^export BAT_THEME="Dracula Pro"' bash/.bashrc
 check "$TMTHEME exists"                     test -f "$TMTHEME"
 check "tmTheme is valid plist XML (doctype)" grep -qE '<!DOCTYPE plist' "$TMTHEME"
@@ -435,10 +435,10 @@ done
 check "install-macos.sh runs bat cache --build" grep -qE 'bat cache --build' install-macos.sh
 check "install-wsl.sh   runs bat cache --build" grep -qE 'bat cache --build' install-wsl.sh
 # Symlink wiring for the theme directory
-check "install-macos.sh links bash/bat-themes → .config/bat/themes" \
-  grep -qE 'link\s+bash/bat-themes\s+\.config/bat/themes' install-macos.sh
-check "install-wsl.sh   links bash/bat-themes → .config/bat/themes" \
-  grep -qE 'link\s+bash/bat-themes\s+\.config/bat/themes' install-wsl.sh
+check "install-macos.sh links bat/themes → .config/bat/themes" \
+  grep -qE 'link\s+bat/themes\s+\.config/bat/themes' install-macos.sh
+check "install-wsl.sh   links bat/themes → .config/bat/themes" \
+  grep -qE 'link\s+bat/themes\s+\.config/bat/themes' install-wsl.sh
 
 # ── AC-jq: JQ_COLORS env with Pro-palette ANSI codes ───────────────────────
 echo ""

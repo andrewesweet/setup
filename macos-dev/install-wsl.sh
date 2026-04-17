@@ -476,10 +476,10 @@ link jqp/.jqp.yaml  .jqp.yaml
 link diffnav/config.yml  .config/diffnav/config.yml
 
 # bat themes (Plan theming-wave-c)
-# Custom Dracula Pro tmTheme lives under bash/bat-themes/ and is
+# Custom Dracula Pro tmTheme lives under bat/themes/ and is
 # symlinked as a directory so adding themes later requires no rewire.
 mkdir -p "$HOME/.config/bat/themes"
-link bash/bat-themes  .config/bat/themes
+link bat/themes  .config/bat/themes
 
 # Rebuild bat's theme cache so BAT_THEME="Dracula Pro" resolves.
 # Idempotent; bat prints "Writing theme set to ..." on each run.
