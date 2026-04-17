@@ -289,6 +289,17 @@ else
   skp "generated kitty file runtime checks" "safe mode or Pro absent"
 fi
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ── Wave B: Tier 2 Pro-from-Classic ──────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# Each tool below reproduces § 3.2 of macos-dev/docs/design/theming.md.
+# Classic hex are substituted for Dracula PRO Base hex sourced from
+# scripts/lib/dracula-pro-palette.sh. Every AC asserts every slot in the
+# tool's coverage profile per § 5.1.
+echo ""
+echo "Wave B — Tier 2 Pro-from-Classic palette substitution"
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
