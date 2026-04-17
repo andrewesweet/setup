@@ -244,6 +244,12 @@ else
   export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 fi
 
+# difftastic: DFT_BACKGROUND=dark → $DRACULA_PRO_BACKGROUND #22212C
+# difftastic renders added/removed with terminal ANSI red/green;
+# Pro terminal ANSI red=#FF9580 / green=#8AFF80 so no per-colour override
+# is required — DFT_BACKGROUND=dark ensures the contrast direction is
+# correct for the Pro dark background.
+export DFT_BACKGROUND="dark"
 export BAT_THEME="Dracula"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"

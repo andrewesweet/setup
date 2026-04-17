@@ -380,6 +380,18 @@ check "color.status added     -> #8AFF80 (green)"   grep -qE '^\s*added\s*=\s*"?
 check "color.status changed   -> #FFFF80 (yellow)"  grep -qE '^\s*changed\s*=\s*"?#FFFF80"?'     git/.gitconfig
 check "color.status untracked -> #FF9580 (red)"     grep -qE '^\s*untracked\s*=\s*"?#FF9580"?'   git/.gitconfig
 
+# ── AC-difftastic: DFT_* env overrides use Pro palette ─────────────────────
+echo ""
+echo "AC-difftastic: DFT_BACKGROUND / DFT_*_COLOR env"
+check 'DFT_BACKGROUND="dark" exported'            grep -qE '^export DFT_BACKGROUND="dark"'                 bash/.bashrc
+# difftastic exposes DFT_UNCHANGED_STYLE, DFT_STRONG_ADDED_STYLE etc. We
+# assert the Pro hex appears in the block comment header so a reader
+# lands on the palette variable instantly. The style vars themselves
+# only accept {regular,bold,dim,colour}; the comment documents the
+# palette-informed choice.
+# shellcheck disable=SC2016
+check 'bashrc difftastic block annotates Pro hex'  grep -qE '# difftastic: DFT_BACKGROUND=dark → \$DRACULA_PRO_BACKGROUND #22212C' bash/.bashrc
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
