@@ -99,6 +99,12 @@ jobs:
         run: bash macos-dev/scripts/test-plan-desktop-layer3.sh
 
       - name: DOTFILES self-resolution smoke test (macos installer)
+        env:
+          # CI has no ~/dracula-pro/. Wave A theming preflight
+          # (docs/design/theming.md § 4.3) requires this env var to skip
+          # Tier 1 install steps so the smoke test can reach the DOTFILES
+          # self-resolution line without tripping the loud-fail guard.
+          SKIP_DRACULA_PRO: "1"
         run: |
           # The inner bash install.sh exits non-zero on non-macOS hosts.
           # We wrap it in { ...; } || true so pipefail + set -e (active in
@@ -119,6 +125,8 @@ jobs:
           rm -rf /tmp/dotfiles-test
 
       - name: DOTFILES self-resolution smoke test (wsl installer)
+        env:
+          SKIP_DRACULA_PRO: "1"
         run: |
           mkdir -p /tmp/dotfiles-test-wsl
           ln -sf "$PWD/macos-dev/install-wsl.sh" /tmp/dotfiles-test-wsl/install.sh
@@ -213,6 +221,8 @@ jobs:
         run: bash macos-dev/scripts/check-brewfile-resolves.sh
 
       - name: DOTFILES self-resolution on real macOS
+        env:
+          SKIP_DRACULA_PRO: "1"
         run: |
           # On macOS, install-macos.sh will proceed past the Darwin check
           # and actually run brew bundle (slow). We only need the DOTFILES
@@ -261,6 +271,10 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: "1"
           HOMEBREW_NO_INSTALL_CLEANUP: "1"
           CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
+          # CI has no ~/dracula-pro/; Wave A preflight requires this env
+          # var to skip Tier 1 theming install steps (docs/design/theming.md
+          # § 4.3). Tier 2/3 theming is tested without Pro assets.
+          SKIP_DRACULA_PRO: "1"
         run: bash macos-dev/install-macos.sh
 
       - name: Verify tools installed (test-tool-installs.sh)
@@ -289,6 +303,11 @@ jobs:
 
       - name: Run install-wsl.sh inside WSL2
         shell: wsl-bash {0}
+        env:
+          # CI has no ~/dracula-pro/; Wave A preflight requires this env
+          # var to skip Tier 1 theming install steps (docs/design/theming.md
+          # § 4.3). Tier 2/3 theming is tested without Pro assets.
+          SKIP_DRACULA_PRO: "1"
         run: |
           set -e
           cd "$(pwd)"
