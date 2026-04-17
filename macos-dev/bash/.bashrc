@@ -245,6 +245,11 @@ else
 fi
 
 export BAT_THEME="Dracula"
+
+# ripgrep — load Dracula Pro --colors from the repo-tracked config.
+# See docs/design/theming.md § 3.2. Path resolution uses $HOME because the
+# installer symlinks ripgrep/config into ~/.config/ripgrep/config.
+export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .env --exclude .aws --exclude .ssh --exclude .gnupg --exclude .config/gh'

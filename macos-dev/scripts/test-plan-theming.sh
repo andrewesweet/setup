@@ -393,6 +393,18 @@ check "fzf spinner = Orange"        grep -q 'spinner:#FFCA80'     bash/.bashrc
 check "fzf header = Comment"        grep -q 'header:#7970A9'      bash/.bashrc
 check "no lowercase Classic fzf hex" bash -c "! grep -qE '#(bd93f9|6272a4|44475a|282a36|ff5555|50fa7b|ffb86c|ff79c6|f1fa8c|8be9fd)' bash/.bashrc"
 
+# ── AC-B-ripgrep ─────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-ripgrep: ripgrep --colors config uses Pro Base hex"
+check "ripgrep/config exists"                 test -f ripgrep/config
+check "path = Purple (0x95,0x80,0xFF)"        grep -q 'colors=path:fg:0x95,0x80,0xFF'    ripgrep/config
+check "line = Green (0x8A,0xFF,0x80)"         grep -q 'colors=line:fg:0x8A,0xFF,0x80'    ripgrep/config
+check "column = Green (0x8A,0xFF,0x80)"       grep -q 'colors=column:fg:0x8A,0xFF,0x80'  ripgrep/config
+check "match = Red (0xFF,0x95,0x80)"          grep -q 'colors=match:fg:0xFF,0x95,0x80'   ripgrep/config
+check "RIPGREP_CONFIG_PATH exported"          grep -qE '^export RIPGREP_CONFIG_PATH=.*ripgrep/config' bash/.bashrc
+check "install-macos.sh links ripgrep/config" grep -qE 'link\s+ripgrep/config\s+\.config/ripgrep/config' install-macos.sh
+check "install-wsl.sh   links ripgrep/config" grep -qE 'link\s+ripgrep/config\s+\.config/ripgrep/config' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

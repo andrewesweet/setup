@@ -1,0 +1,21 @@
+# Dracula Pro palette for ripgrep
+# Source: docs/design/theming.md § 3.2 (Tier 2 — Pro-from-Classic)
+# Palette hex facts from scripts/lib/dracula-pro-palette.sh:
+#   Purple = #9580FF    Green = #8AFF80    Red = #FF9580
+#
+# ripgrep's --colors flag takes RGB triples in hex, one component per byte
+# (path:fg:0xRR,0xGG,0xBB). See `rg --help | grep -A20 '^--colors'`.
+
+# path          = Purple
+--colors=path:fg:0x95,0x80,0xFF
+# line numbers  = Green
+--colors=line:fg:0x8A,0xFF,0x80
+# column numbers = Green
+--colors=column:fg:0x8A,0xFF,0x80
+# match         = Red
+--colors=match:fg:0xFF,0x95,0x80
+
+# Defaults worth keeping even outside theming:
+--smart-case
+--hidden
+--glob=!.git/

@@ -394,6 +394,9 @@ link television/config.toml   .config/television/config.toml
 # additional .toml files added later require no re-wire.
 link television/cable         .config/television/cable
 
+# ripgrep (Wave B — Dracula Pro via --colors config)
+link ripgrep/config  .config/ripgrep/config
+
 # yazi (Plan Layer 1b-i)
 link yazi/yazi.toml    .config/yazi/yazi.toml
 link yazi/keymap.toml  .config/yazi/keymap.toml
