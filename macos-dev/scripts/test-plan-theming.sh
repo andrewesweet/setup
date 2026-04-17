@@ -253,6 +253,40 @@ check "ghostty/config sets theme to Pro file"                 \
 check "install-macos.sh symlinks ghostty/config"              \
   grep -qE 'link\s+ghostty/config\s+\.config/ghostty/config' install-macos.sh
 
+# ── AC-kitty: kitty consumes Pro theme via generated include file ─────────
+echo ""
+echo "AC-kitty: kitty includes Dracula Pro (generated at install time)"
+check "kitty/kitty.conf includes dracula-pro.generated.conf"  \
+  grep -qE '^include\s+~?/.*dracula-pro\.generated\.conf' kitty/kitty.conf
+check "kitty/dracula-pro.conf (reconstruction) is removed"    \
+  bash -c '! test -f kitty/dracula-pro.conf'
+check "install-macos.sh generates the kitty include file"     \
+  grep -qE 'dracula-pro\.generated\.conf' install-macos.sh
+check "install-wsl.sh generates the kitty include file"       \
+  grep -qE 'dracula-pro\.generated\.conf' install-wsl.sh
+check "install-macos.sh no longer symlinks kitty/dracula-pro.conf" \
+  bash -c '! grep -qE "link\s+kitty/dracula-pro\.conf" install-macos.sh'
+check "install-wsl.sh no longer symlinks kitty/dracula-pro.conf"   \
+  bash -c '! grep -qE "link\s+kitty/dracula-pro\.conf" install-wsl.sh'
+
+# Runtime check: after install, the generated file must exist and contain
+# the canonical palette lines.
+if [[ "$FULL" == true ]] && [[ "${DRACULA_PRO_OK:-0}" == 1 ]]; then
+  gen="$HOME/.config/kitty/dracula-pro.generated.conf"
+  if [[ -f "$gen" ]]; then
+    check "generated kitty file: background #22212C" \
+      grep -qE '^background\s+#22212C' "$gen"
+    check "generated kitty file: foreground #F8F8F2" \
+      grep -qE '^foreground\s+#F8F8F2' "$gen"
+    check "generated kitty file has 16 color lines"  \
+      bash -c "[[ \"\$(grep -cE '^color(1?[0-9])\\s+#' \"$gen\")\" == 16 ]]"
+  else
+    skp "generated kitty file" "install-macos.sh has not been run"
+  fi
+else
+  skp "generated kitty file runtime checks" "safe mode or Pro absent"
+fi
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
