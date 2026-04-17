@@ -347,6 +347,19 @@ check "searching = Yellow"                   grep -q "'#FFFF80'" lazygit/config.
 check "no Classic hex remain"                bash -c "! grep -qE \"#(BD93F9|6272A4|44475A|FF5555|F1FA8C)\" lazygit/config.yml"
 check "delta syntax-theme = Dracula Pro"     grep -qE "syntax-theme=.*Dracula Pro" lazygit/config.yml
 
+# ── AC-B-gh-dash ─────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-gh-dash: gh-dash theme block uses Pro Base hex only"
+check "text.primary = Foreground"           grep -q '"#F8F8F2"' gh-dash/config.yml
+check "text.secondary / border.secondary"   grep -q '"#7970A9"' gh-dash/config.yml
+check "text.inverted = Background"          grep -q '"#22212C"' gh-dash/config.yml
+check "faint + bg.selected = Selection"     grep -q '"#454158"' gh-dash/config.yml
+check "warning = Orange"                    grep -q '"#FFCA80"' gh-dash/config.yml
+check "success = Green"                     grep -q '"#8AFF80"' gh-dash/config.yml
+check "error = Red"                         grep -q '"#FF9580"' gh-dash/config.yml
+check "border.primary = Purple"             grep -q '"#9580FF"' gh-dash/config.yml
+check "no Classic hex remain"               bash -c "! grep -qE \"#(BD93F9|FF5555|50FA7B|FFB86C|6272A4|44475A|282A36|FF79C6|F1FA8C|8BE9FD)\" gh-dash/config.yml"
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
