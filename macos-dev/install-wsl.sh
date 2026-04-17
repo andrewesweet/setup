@@ -495,6 +495,10 @@ mkdir -p "$HOME/.config/httpie/styles"
 link httpie/config.json    .config/httpie/config.json
 link httpie/styles         .config/httpie/styles
 
+# lnav (Wave C Tier 3)
+mkdir -p "$HOME/.lnav/formats/installed"
+link lnav/dracula-pro.json    .lnav/formats/installed/dracula-pro.json
+
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 

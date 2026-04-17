@@ -562,6 +562,21 @@ check "install-macos.sh links httpie styles dir"   grep -qE 'link\s+httpie/style
 check "install-wsl.sh   links httpie config"       grep -qE 'link\s+httpie/config\.json\s+\.config/httpie/config\.json'     install-wsl.sh
 check "install-wsl.sh   links httpie styles dir"   grep -qE 'link\s+httpie/styles\s+\.config/httpie/styles'                 install-wsl.sh
 
+# ── AC-lnav: dracula-pro.json ships ────────────────────────────────────────
+echo ""
+echo "AC-lnav: lnav theme"
+check "lnav/dracula-pro.json exists"              test -f lnav/dracula-pro.json
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "lnav theme references $hex" grep -qiF "$hex" lnav/dracula-pro.json
+done
+check "install-macos.sh links lnav theme into formats/installed" \
+  grep -qE 'link\s+lnav/dracula-pro\.json\s+\.lnav/formats/installed/dracula-pro\.json' install-macos.sh
+check "install-wsl.sh   links lnav theme into formats/installed" \
+  grep -qE 'link\s+lnav/dracula-pro\.json\s+\.lnav/formats/installed/dracula-pro\.json' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

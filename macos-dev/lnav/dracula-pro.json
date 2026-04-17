@@ -1,0 +1,77 @@
+{
+  "$schema": "https://lnav.org/schemas/config-v1.schema.json",
+  "ui": {
+    "theme-defs": {
+      "dracula-pro": {
+        "vars": {
+          "black":   "#22212C",
+          "red":     "#FF9580",
+          "green":   "#8AFF80",
+          "yellow":  "#FFFF80",
+          "blue":    "#9580FF",
+          "magenta": "#FF80BF",
+          "cyan":    "#80FFEA",
+          "white":   "#F8F8F2",
+          "orange":  "#FFCA80",
+          "selection": "#454158",
+          "comment": "#7970A9"
+        },
+        "styles": {
+          "identifier":     { "color": "#F8F8F2",  "background-color": "#22212C" },
+          "text":           { "color": "#F8F8F2",  "background-color": "#22212C" },
+          "alt-text":       { "color": "#F8F8F2",  "background-color": "#1B1A23" },
+          "ok":             { "color": "#8AFF80" },
+          "error":          { "color": "#FF9580" },
+          "warning":        { "color": "#FFFF80" },
+          "hidden":         { "color": "#7970A9" },
+          "cursor-line":    { "color": "#F8F8F2",  "background-color": "#454158",  "bold": true },
+          "adjusted-time":  { "color": "#FFCA80" },
+          "skewed-time":    { "color": "#FF80BF" },
+          "offset-time":    { "color": "#80FFEA" },
+          "popup":          { "color": "#F8F8F2",  "background-color": "#454158" },
+          "scrollbar":      { "color": "#F8F8F2",  "background-color": "#454158" },
+          "focused":        { "color": "#22212C",  "background-color": "#9580FF" }
+        },
+        "syntax-styles": {
+          "inline-code":    { "color": "#FFCA80" },
+          "quoted-code":    { "color": "#FFCA80" },
+          "code-border":    { "color": "#7970A9" },
+          "keyword":        { "color": "#FF80BF" },
+          "string":         { "color": "#FFFF80" },
+          "comment":        { "color": "#7970A9",  "italic": true },
+          "doc-directive":  { "color": "#80FFEA" },
+          "variable":       { "color": "#F8F8F2" },
+          "symbol":         { "color": "#80FFEA" },
+          "number":         { "color": "#FFCA80" },
+          "re-special":     { "color": "#FF80BF" },
+          "re-repeat":      { "color": "#FFFF80" },
+          "diff-delete":    { "color": "#FF9580" },
+          "diff-add":       { "color": "#8AFF80" },
+          "diff-section":   { "color": "#9580FF" },
+          "file":           { "color": "#F8F8F2" }
+        },
+        "status-styles": {
+          "text":         { "color": "#F8F8F2", "background-color": "#454158" },
+          "warn":         { "color": "#FFFF80", "background-color": "#454158" },
+          "alert":        { "color": "#FF9580", "background-color": "#454158" },
+          "active":       { "color": "#22212C", "background-color": "#9580FF" },
+          "inactive":     { "color": "#7970A9", "background-color": "#22212C" },
+          "title":        { "color": "#22212C", "background-color": "#FF80BF", "bold": true },
+          "disabled-title": { "color": "#7970A9", "background-color": "#22212C" },
+          "subtitle":     { "color": "#22212C", "background-color": "#FFCA80" }
+        },
+        "log-level-styles": {
+          "trace":    { "color": "#7970A9" },
+          "debug":    { "color": "#80FFEA" },
+          "info":     { "color": "#F8F8F2" },
+          "stats":    { "color": "#FFCA80" },
+          "notice":   { "color": "#9580FF" },
+          "warning":  { "color": "#FFFF80" },
+          "error":    { "color": "#FF9580" },
+          "critical": { "color": "#FF9580", "bold": true },
+          "fatal":    { "color": "#FF80BF", "bold": true }
+        }
+      }
+    }
+  }
+}
