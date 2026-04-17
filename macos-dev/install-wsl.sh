@@ -335,6 +335,11 @@ if command -v uv &>/dev/null; then
   log "installing uv tools (ty, prek)"
   uv tool install ty@latest || warn "ty install failed"
   uv tool install prek       || warn "prek install failed"
+  # pygments Dracula Pro style (Wave B — local style, PyPI package not yet
+  # published as of 2026-04-17; re-verify in follow-up and replace with
+  # `uv tool install pygments-dracula-pro` once available).
+  uv tool install --from "$DOTFILES/pygments" pygments-dracula-pro-local \
+    --with pygments || warn "pygments-dracula-pro-local install failed"
 else
   warn "uv not available, skipping uv tool installs (added in later plan)"
 fi
@@ -451,6 +456,12 @@ link television/config.toml   .config/television/config.toml
 # additional .toml files added later require no re-wire.
 link television/cable         .config/television/cable
 
+# ripgrep (Wave B — Dracula Pro via --colors config)
+link ripgrep/config  .config/ripgrep/config
+
+# dircolors (Wave B — ls/LS_COLORS Dracula Pro via dircolors -b)
+link dircolors/.dir_colors  .dir_colors
+
 # yazi (Plan Layer 1b-i)
 link yazi/yazi.toml    .config/yazi/yazi.toml
 link yazi/keymap.toml  .config/yazi/keymap.toml
@@ -465,9 +476,10 @@ link diffnav/config.yml  .config/diffnav/config.yml
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 
-# opencode (Plan 9)
+# opencode (Plan 9 + Wave B theme)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc
 link opencode/tui.jsonc                         .config/opencode/tui.jsonc
+link opencode/themes/dracula-pro.json           .config/opencode/themes/dracula-pro.json
 link opencode/instructions/git-conventions.md   .config/opencode/instructions/git-conventions.md
 link opencode/instructions/scratch-dirs.md      .config/opencode/instructions/scratch-dirs.md
 

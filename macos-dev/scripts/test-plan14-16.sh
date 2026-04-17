@@ -61,7 +61,7 @@ echo "cheatsheet.md existence and headers:"
 check "cheatsheet.md exists"              test -f "$REPO_ROOT/docs/cheatsheet.md"
 check "has ## Key bindings header"        grep -q '^## Key bindings' "$REPO_ROOT/docs/cheatsheet.md"
 check "has ## Tool reference header"      grep -q '^## Tool reference' "$REPO_ROOT/docs/cheatsheet.md"
-check "exactly 2 H2 headers"             test "$(grep -c '^## ' "$REPO_ROOT/docs/cheatsheet.md")" -eq 2
+check "exactly 3 H2 headers"             test "$(grep -c '^## ' "$REPO_ROOT/docs/cheatsheet.md")" -eq 3
 
 # Key bindings sub-headers
 check "has Navigation sub-header"         grep -q '^### Navigation' "$REPO_ROOT/docs/cheatsheet.md"
@@ -145,14 +145,14 @@ echo ""
 echo "Regression — macOS link() calls:"
 check "macos: bash links preserved"       test "$(grep -c 'link bash/' "$REPO_ROOT/install-macos.sh")" -eq 4
 check "macos: git links preserved"        test "$(grep -c 'link git/' "$REPO_ROOT/install-macos.sh")" -eq 2
-check "macos: opencode links preserved"   test "$(grep -c 'link opencode/' "$REPO_ROOT/install-macos.sh")" -eq 4
+check "macos: opencode links preserved"   test "$(grep -c 'link opencode/' "$REPO_ROOT/install-macos.sh")" -eq 5
 check "macos: vscode links preserved"     test "$(grep -c 'link vscode/' "$REPO_ROOT/install-macos.sh")" -eq 2
 
 echo ""
 echo "Regression — WSL link() calls:"
 check "wsl: bash links preserved"         test "$(grep -c 'link bash/' "$REPO_ROOT/install-wsl.sh")" -eq 4
 check "wsl: git links preserved"          test "$(grep -c 'link git/' "$REPO_ROOT/install-wsl.sh")" -eq 2
-check "wsl: opencode links preserved"     test "$(grep -c 'link opencode/' "$REPO_ROOT/install-wsl.sh")" -eq 4
+check "wsl: opencode links preserved"     test "$(grep -c 'link opencode/' "$REPO_ROOT/install-wsl.sh")" -eq 5
 check "wsl: vscode links preserved"       test "$(grep -c 'link vscode/' "$REPO_ROOT/install-wsl.sh")" -eq 2
 
 # ── Summary ─────────────────────────────────────────────────────────────────

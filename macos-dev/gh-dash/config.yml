@@ -46,7 +46,7 @@ pager:
 confirmQuit: false
 showAuthorIcons: true
 
-# Dracula theme (palette values from docs/plans § 3.9)
+# Dracula Pro theme (palette values from docs/design/theming.md § 1.3)
 theme:
   ui:
     table:
@@ -54,15 +54,15 @@ theme:
   colors:
     text:
       primary: "#F8F8F2"
-      secondary: "#6272A4"
-      inverted: "#282A36"
-      faint: "#44475A"
-      warning: "#FFB86C"
-      success: "#50FA7B"
-      error: "#FF5555"
+      secondary: "#7970A9"
+      inverted: "#22212C"
+      faint: "#454158"
+      warning: "#FFCA80"
+      success: "#8AFF80"
+      error: "#FF9580"
     background:
-      selected: "#44475A"
+      selected: "#454158"
     border:
-      primary: "#BD93F9"
-      secondary: "#6272A4"
-      faint: "#44475A"
+      primary: "#9580FF"
+      secondary: "#7970A9"
+      faint: "#454158"
