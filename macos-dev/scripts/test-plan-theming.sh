@@ -629,6 +629,17 @@ check "install-macos.sh links lazydocker config" \
 check "install-wsl.sh   links lazydocker config" \
   grep -qE 'link\s+lazydocker/config\.yml\s+\.config/lazydocker/config\.yml' install-wsl.sh
 
+# ── AC-aerospace: verification-only — no hex literals in aerospace.toml ───
+echo ""
+echo "AC-aerospace: aerospace.toml inherits (no hex literals)"
+# Assert: file contains zero `#RRGGBB` sequences. Treat lines beginning
+# with `#` as comments and strip them before matching.
+check "aerospace.toml has no hex literals" \
+  bash -c "! grep -v '^\s*#' aerospace/aerospace.toml | grep -qE '#[0-9A-Fa-f]{6}'"
+# And: the exec-on-workspace-change line still triggers sketchybar.
+check "aerospace exec-on-workspace-change triggers sketchybar" \
+  grep -qE 'sketchybar --trigger aerospace_workspace_change' aerospace/aerospace.toml
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
