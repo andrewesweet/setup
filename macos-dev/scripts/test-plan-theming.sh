@@ -431,6 +431,25 @@ check "bashrc evals dircolors"             grep -q 'eval "\$(dircolors -b.*\.dir
 check "install-macos.sh links .dir_colors" grep -qE 'link\s+dircolors/\.dir_colors\s+\.dir_colors' install-macos.sh
 check "install-wsl.sh   links .dir_colors" grep -qE 'link\s+dircolors/\.dir_colors\s+\.dir_colors' install-wsl.sh
 
+# ── AC-B-opencode ────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-opencode: opencode tui.jsonc uses dracula-pro custom theme"
+check "tui.jsonc theme = dracula-pro"          grep -qE '"theme"\s*:\s*"dracula-pro"' opencode/tui.jsonc
+check "opencode/themes/dracula-pro.json"       test -f opencode/themes/dracula-pro.json
+check "theme bgPrimary = Background"           grep -q '"#22212C"' opencode/themes/dracula-pro.json
+check "theme bgSecondary = Selection"          grep -q '"#454158"' opencode/themes/dracula-pro.json
+check "theme foreground = Foreground"          grep -q '"#F8F8F2"' opencode/themes/dracula-pro.json
+check "theme comment = Comment"                grep -q '"#7970A9"' opencode/themes/dracula-pro.json
+check "theme red = Red"                        grep -q '"#FF9580"' opencode/themes/dracula-pro.json
+check "theme orange = Orange"                  grep -q '"#FFCA80"' opencode/themes/dracula-pro.json
+check "theme yellow = Yellow"                  grep -q '"#FFFF80"' opencode/themes/dracula-pro.json
+check "theme green = Green"                    grep -q '"#8AFF80"' opencode/themes/dracula-pro.json
+check "theme cyan = Cyan"                      grep -q '"#80FFEA"' opencode/themes/dracula-pro.json
+check "theme purple = Purple"                  grep -q '"#9580FF"' opencode/themes/dracula-pro.json
+check "theme pink = Pink"                      grep -q '"#FF80BF"' opencode/themes/dracula-pro.json
+check "install-macos.sh links theme file"      grep -qE 'link opencode/themes/dracula-pro\.json.*\.config/opencode/themes/dracula-pro\.json' install-macos.sh
+check "install-wsl.sh   links theme file"      grep -qE 'link opencode/themes/dracula-pro\.json.*\.config/opencode/themes/dracula-pro\.json' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

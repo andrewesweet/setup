@@ -414,9 +414,10 @@ link diffnav/config.yml  .config/diffnav/config.yml
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 
-# opencode (Plan 9)
+# opencode (Plan 9 + Wave B theme)
 link opencode/opencode.jsonc                    .config/opencode/opencode.jsonc
 link opencode/tui.jsonc                         .config/opencode/tui.jsonc
+link opencode/themes/dracula-pro.json           .config/opencode/themes/dracula-pro.json
 link opencode/instructions/git-conventions.md   .config/opencode/instructions/git-conventions.md
 link opencode/instructions/scratch-dirs.md      .config/opencode/instructions/scratch-dirs.md
 
