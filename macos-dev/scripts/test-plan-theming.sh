@@ -392,6 +392,22 @@ check 'DFT_BACKGROUND="dark" exported'            grep -qE '^export DFT_BACKGROU
 # shellcheck disable=SC2016
 check 'bashrc difftastic block annotates Pro hex'  grep -qE '# difftastic: DFT_BACKGROUND=dark → \$DRACULA_PRO_BACKGROUND #22212C' bash/.bashrc
 
+# ── AC-diffnav: config.yml uses Dracula Pro hex ────────────────────────────
+echo ""
+echo "AC-diffnav: diffnav pane theme uses Pro palette"
+# Classic hex MUST NOT appear anywhere in the file.
+for classic in '#282A36' '#44475A' '#6272A4' '#BD93F9' '#FF79C6' '#8BE9FD' '#50FA7B' '#FFB86C' '#FF5555' '#F1FA8C'; do
+  check "no Classic hex $classic in diffnav/config.yml" \
+    bash -c "! grep -Fq '$classic' diffnav/config.yml"
+done
+# Required Pro slots
+check "diffnav selected_fg = #22212C (BACKGROUND)"   grep -qE 'selected_fg:\s*"#22212C"'   diffnav/config.yml
+check "diffnav selected_bg = #9580FF (BLUE/Purple)"  grep -qE 'selected_bg:\s*"#9580FF"'   diffnav/config.yml
+check "diffnav unselected_fg = #F8F8F2 (FOREGROUND)" grep -qE 'unselected_fg:\s*"#F8F8F2"' diffnav/config.yml
+check "diffnav border_fg = #7970A9 (COMMENT)"        grep -qE 'border_fg:\s*"#7970A9"'     diffnav/config.yml
+check "diffnav status_bar.fg = #F8F8F2 (FOREGROUND)" grep -qE 'fg:\s*"#F8F8F2"'            diffnav/config.yml
+check "diffnav status_bar.bg = #454158 (SELECTION)"  grep -qE 'bg:\s*"#454158"'            diffnav/config.yml
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

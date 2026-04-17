@@ -1,25 +1,22 @@
 # diffnav/config.yml — file-tree navigation pager for delta output.
 # Used as gh-dash's pager (set up in Layer 1b-iii).
-# See docs/plans/2026-04-12-shell-modernisation-design.md § 3.9
-
-# diffnav reads this file at $XDG_CONFIG_HOME/diffnav/config.yml.
-# Palette values are Dracula (see design § 3.9):
-#   background=#282A36  foreground=#F8F8F2  comment=#6272A4
-#   purple=#BD93F9  pink=#FF79C6  cyan=#8BE9FD  green=#50FA7B
-#   orange=#FFB86C  red=#FF5555  yellow=#F1FA8C
+# See docs/design/theming.md § 3.3 — Tier 3, Structural + accents profile.
+#
+# All hex values reference $DOTFILES/scripts/lib/dracula-pro-palette.sh:
+#   BACKGROUND=#22212C  FOREGROUND=#F8F8F2  COMMENT=#7970A9  SELECTION=#454158
+#   BLUE(Purple)=#9580FF  MAGENTA(Pink)=#FF80BF
 
 # Pane layout: tree on the left, diff view on the right.
 file_tree_width: 30
 
-# Dracula styling for the panes.
 theme:
   file_tree:
-    selected_fg: "#282A36"
-    selected_bg: "#BD93F9"
-    unselected_fg: "#F8F8F2"
-    border_fg: "#6272A4"
+    selected_fg:   "#22212C"   # DRACULA_PRO_BACKGROUND (contrast over selected_bg)
+    selected_bg:   "#9580FF"   # DRACULA_PRO_BLUE (Purple alias)
+    unselected_fg: "#F8F8F2"   # DRACULA_PRO_FOREGROUND
+    border_fg:     "#7970A9"   # DRACULA_PRO_COMMENT
   diff:
-    border_fg: "#6272A4"
+    border_fg:     "#7970A9"   # DRACULA_PRO_COMMENT
   status_bar:
-    fg: "#F8F8F2"
-    bg: "#44475A"
+    fg: "#F8F8F2"              # DRACULA_PRO_FOREGROUND
+    bg: "#454158"              # DRACULA_PRO_SELECTION
