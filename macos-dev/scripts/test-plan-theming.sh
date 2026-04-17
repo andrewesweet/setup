@@ -174,6 +174,18 @@ else
   skp "preflight runtime (absent + SKIP=1)" "safe mode"
 fi
 
+# ── AC-nvim: nvim adopts the Dracula Pro vim plugin via lazy.nvim ─────────
+echo ""
+echo "AC-nvim: nvim loads Dracula Pro via lazy.nvim local dir plugin"
+check "nvim/lua/plugins/colorscheme.lua exists"              \
+  test -f nvim/lua/plugins/colorscheme.lua
+check "colorscheme.lua uses local dir for dracula-pro/themes/vim" \
+  grep -qE 'dir\s*=\s*vim\.fn\.expand\("~/dracula-pro/themes/vim"\)' nvim/lua/plugins/colorscheme.lua
+check "colorscheme.lua sets colorscheme = dracula_pro"       \
+  grep -qE 'colorscheme\s*=\s*"dracula_pro"' nvim/lua/plugins/colorscheme.lua
+check "colorscheme.lua overrides LazyVim default colorscheme" \
+  grep -qE 'LazyVim.*colorscheme|opts.*colorscheme' nvim/lua/plugins/colorscheme.lua
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
