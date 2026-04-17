@@ -440,6 +440,17 @@ check "install-macos.sh links bash/bat-themes → .config/bat/themes" \
 check "install-wsl.sh   links bash/bat-themes → .config/bat/themes" \
   grep -qE 'link\s+bash/bat-themes\s+\.config/bat/themes' install-wsl.sh
 
+# ── AC-jq: JQ_COLORS env with Pro-palette ANSI codes ───────────────────────
+echo ""
+echo "AC-jq: JQ_COLORS env"
+# jq accepts "ansi[;ansi...]:ansi[;ansi...]:..." — fg;bg style, one tuple
+# per JSON type. We assert the env is exported, mapped to Pro slots in a
+# header comment, and that the string contains 8 colon-separated fields.
+check "JQ_COLORS exported"   grep -qE '^export JQ_COLORS='        bash/.bashrc
+check "JQ_COLORS has 8 tuples" bash -c "awk -F: '/^export JQ_COLORS=/{sub(/\"/,\"\"); sub(/\"$/,\"\"); if (NF==8) print}' bash/.bashrc | grep -q ."
+check "JQ_COLORS comment cites DRACULA_PRO slots" \
+  grep -qE '# JQ_COLORS .* DRACULA_PRO_' bash/.bashrc
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

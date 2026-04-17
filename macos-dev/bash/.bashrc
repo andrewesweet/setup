@@ -250,6 +250,24 @@ fi
 # is required — DFT_BACKGROUND=dark ensures the contrast direction is
 # correct for the Pro dark background.
 export DFT_BACKGROUND="dark"
+
+# JQ_COLORS — Pro-palette ANSI attributes — DRACULA_PRO_* slots per jq(1) manual. Format:
+#   null:false:true:numbers:strings:arrays:objects:objkeys
+# Each field is "<attrs>;<fg>" where attrs=1 bold, 2 dim, 4 underline and
+# fg is an 8-colour ANSI code (30-37) or 38;5;N for 256-colour. We use
+# Pro Terminal Standard ANSI codes:
+#   0=BLACK  1=RED    2=GREEN  3=YELLOW  4=BLUE  5=MAGENTA  6=CYAN  7=WHITE
+# Mapping:
+#   null    -> DRACULA_PRO_COMMENT   (dim white+italic — 2;37)
+#   false   -> DRACULA_PRO_RED       (0;31)
+#   true    -> DRACULA_PRO_GREEN     (0;32)
+#   numbers -> DRACULA_PRO_ORANGE    (0;33 yellow — Pro yellow/orange overlap at ANSI level)
+#   strings -> DRACULA_PRO_YELLOW    (0;33)
+#   arrays  -> DRACULA_PRO_BLUE      (0;34)
+#   objects -> DRACULA_PRO_MAGENTA   (0;35)
+#   objkeys -> DRACULA_PRO_CYAN      (1;36 bold)
+export JQ_COLORS="2;37:0;31:0;32:0;33:0;33:0;34:0;35:1;36"
+
 # bat syntax theme — custom Dracula Pro tmTheme, symlinked into
 # ~/.config/bat/themes/ by install-*.sh and registered via `bat cache --build`.
 export BAT_THEME="Dracula Pro"
