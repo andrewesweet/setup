@@ -33,6 +33,24 @@ done
 DOTFILES="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
 export DOTFILES
 
+# ── Dracula Pro preflight (Wave A) ───────────────────────────────────────────
+# Tier 1 theming requires ~/dracula-pro/ present. On CI or machines without a
+# Pro licence, set SKIP_DRACULA_PRO=1 to skip Tier 1 steps and continue.
+# See macos-dev/docs/design/theming.md § 4.3.
+# shellcheck source=scripts/lib/dracula-pro-palette.sh
+source "$DOTFILES/scripts/lib/dracula-pro-palette.sh"
+DRACULA_PRO_OK=0
+if [[ -d "$HOME/dracula-pro" ]]; then
+  DRACULA_PRO_OK=1
+elif [[ "${SKIP_DRACULA_PRO:-0}" == 1 ]]; then
+  printf "WARN: SKIP_DRACULA_PRO=1 — Tier 1 theming skipped\n" >&2
+else
+  printf "error: ~/dracula-pro/ not found. Install Dracula Pro from draculatheme.com/pro before running this script.\n" >&2
+  printf "       (To skip Tier 1 on CI, rerun with SKIP_DRACULA_PRO=1 in the environment.)\n" >&2
+  exit 1
+fi
+export DRACULA_PRO_OK
+
 BACKUP_TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 BACKUP_DIR="$HOME/.dotfiles-backup/$BACKUP_TIMESTAMP"
 

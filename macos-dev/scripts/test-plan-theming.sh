@@ -112,6 +112,68 @@ echo ""
 echo "AC-gitignore: /dracula-pro/ is listed in .gitignore"
 check ".gitignore contains '/dracula-pro/'"  grep -Fxq "/dracula-pro/" .gitignore
 
+# ── AC-skip-env: install scripts honour SKIP_DRACULA_PRO ──────────────────
+echo ""
+echo "AC-skip-env: install scripts handle SKIP_DRACULA_PRO + loud-fail"
+check "install-macos.sh sources the palette file"             \
+  grep -qE 'source .*scripts/lib/dracula-pro-palette\.sh' install-macos.sh
+check "install-macos.sh checks for ~/dracula-pro/ presence"   \
+  grep -qE 'test -d .*\$HOME/dracula-pro|\[\[ -d "\$HOME/dracula-pro" \]\]' install-macos.sh
+check "install-macos.sh references SKIP_DRACULA_PRO"          \
+  grep -q 'SKIP_DRACULA_PRO' install-macos.sh
+check "install-macos.sh has loud-fail error message"          \
+  grep -qE 'error: ~/dracula-pro/ not found' install-macos.sh
+check "install-wsl.sh sources the palette file"               \
+  grep -qE 'source .*scripts/lib/dracula-pro-palette\.sh' install-wsl.sh
+check "install-wsl.sh checks for ~/dracula-pro/ presence"     \
+  grep -qE 'test -d .*\$HOME/dracula-pro|\[\[ -d "\$HOME/dracula-pro" \]\]' install-wsl.sh
+check "install-wsl.sh references SKIP_DRACULA_PRO"            \
+  grep -q 'SKIP_DRACULA_PRO' install-wsl.sh
+check "install-wsl.sh has loud-fail error message"            \
+  grep -qE 'error: ~/dracula-pro/ not found' install-wsl.sh
+
+# Runtime: run the preflight in isolation with HOME redirected and confirm exit codes.
+if [[ "$FULL" == true ]]; then
+  tmphome="$(mktemp -d)"
+  # Absent + unset → must fail non-zero with the error message
+  out_absent_unset="$(HOME="$tmphome" SKIP_DRACULA_PRO= bash -c '
+    set +e
+    source scripts/lib/dracula-pro-palette.sh
+    if [[ ! -d "$HOME/dracula-pro" ]] && [[ -z "${SKIP_DRACULA_PRO:-}" ]]; then
+      echo "error: ~/dracula-pro/ not found. Install Dracula Pro from draculatheme.com/pro before running this script." >&2
+      exit 1
+    fi
+  ' 2>&1)"
+  if printf '%s' "$out_absent_unset" | grep -q 'error: ~/dracula-pro/ not found'; then
+    ok "preflight: absent + SKIP unset → error"
+  else
+    nok "preflight: absent + SKIP unset → error (got: $out_absent_unset)"
+  fi
+
+  # Absent + SKIP=1 → must warn and exit 0
+  out_absent_skip="$(HOME="$tmphome" SKIP_DRACULA_PRO=1 bash -c '
+    set -e
+    source scripts/lib/dracula-pro-palette.sh
+    if [[ ! -d "$HOME/dracula-pro" ]]; then
+      if [[ "${SKIP_DRACULA_PRO:-0}" == 1 ]]; then
+        echo "WARN: SKIP_DRACULA_PRO=1 — Tier 1 theming skipped" >&2
+      else
+        echo "error: ~/dracula-pro/ not found" >&2
+        exit 1
+      fi
+    fi
+  ' 2>&1)"
+  if printf '%s' "$out_absent_skip" | grep -q 'SKIP_DRACULA_PRO=1 — Tier 1 theming skipped'; then
+    ok "preflight: absent + SKIP=1 → warn + continue"
+  else
+    nok "preflight: absent + SKIP=1 → warn + continue (got: $out_absent_skip)"
+  fi
+  rm -rf "$tmphome"
+else
+  skp "preflight runtime (absent + unset)" "safe mode"
+  skp "preflight runtime (absent + SKIP=1)" "safe mode"
+fi
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
