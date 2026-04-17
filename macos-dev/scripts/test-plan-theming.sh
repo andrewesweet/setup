@@ -526,6 +526,24 @@ check "install-wsl.sh   links btop.conf"            grep -qE 'link\s+btop/btop\.
 check "install-wsl.sh   links btop dracula-pro.theme" \
   grep -qE 'link\s+btop/dracula-pro\.theme\s+\.config/btop/themes/dracula-pro\.theme' install-wsl.sh
 
+# ── AC-k9s: skin + config ──────────────────────────────────────────────────
+echo ""
+echo "AC-k9s: k9s dracula-pro skin"
+check "k9s/dracula-pro.yaml exists"              test -f k9s/dracula-pro.yaml
+check "k9s/config.yaml exists"                   test -f k9s/config.yaml
+check 'k9s config.yaml ui.skin = "dracula-pro"'  \
+  grep -qE 'skin:\s*"?dracula-pro"?'             k9s/config.yaml
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "k9s skin references $hex" grep -qiF "$hex" k9s/dracula-pro.yaml
+done
+check "install-macos.sh links k9s config"       grep -qE 'link\s+k9s/config\.yaml\s+\.config/k9s/config\.yaml'                install-macos.sh
+check "install-macos.sh links k9s skin"          grep -qE 'link\s+k9s/dracula-pro\.yaml\s+\.config/k9s/skins/dracula-pro\.yaml' install-macos.sh
+check "install-wsl.sh   links k9s config"       grep -qE 'link\s+k9s/config\.yaml\s+\.config/k9s/config\.yaml'                install-wsl.sh
+check "install-wsl.sh   links k9s skin"          grep -qE 'link\s+k9s/dracula-pro\.yaml\s+\.config/k9s/skins/dracula-pro\.yaml' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

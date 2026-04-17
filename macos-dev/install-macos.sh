@@ -428,6 +428,11 @@ mkdir -p "$HOME/.config/btop/themes"
 link btop/btop.conf           .config/btop/btop.conf
 link btop/dracula-pro.theme   .config/btop/themes/dracula-pro.theme
 
+# k9s (Wave C Tier 3)
+mkdir -p "$HOME/.config/k9s/skins"
+link k9s/config.yaml          .config/k9s/config.yaml
+link k9s/dracula-pro.yaml     .config/k9s/skins/dracula-pro.yaml
+
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 

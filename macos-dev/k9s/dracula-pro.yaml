@@ -1,0 +1,83 @@
+# k9s/dracula-pro.yaml — skin file, loaded from ~/.config/k9s/skins/
+# docs/design/theming.md § 3.3 — Tier 3, Structural + accents profile.
+k9s:
+  body:
+    fgColor:     "#F8F8F2"   # DRACULA_PRO_FOREGROUND
+    bgColor:     "#22212C"   # DRACULA_PRO_BACKGROUND
+    logoColor:   "#9580FF"   # DRACULA_PRO_BLUE
+  prompt:
+    fgColor:              "#F8F8F2"  # DRACULA_PRO_FOREGROUND
+    bgColor:              "#22212C"  # DRACULA_PRO_BACKGROUND
+    suggestColor:         "#7970A9"  # DRACULA_PRO_COMMENT
+  info:
+    fgColor:              "#FF80BF"  # DRACULA_PRO_MAGENTA
+    sectionColor:         "#F8F8F2"  # DRACULA_PRO_FOREGROUND
+  dialog:
+    fgColor:              "#F8F8F2"  # DRACULA_PRO_FOREGROUND
+    bgColor:              "#22212C"  # DRACULA_PRO_BACKGROUND
+    buttonFgColor:        "#22212C"  # DRACULA_PRO_BACKGROUND (inverted)
+    buttonBgColor:        "#9580FF"  # DRACULA_PRO_BLUE
+    buttonFocusFgColor:   "#22212C"  # DRACULA_PRO_BACKGROUND
+    buttonFocusBgColor:   "#FF80BF"  # DRACULA_PRO_MAGENTA
+    labelFgColor:         "#FFCA80"  # DRACULA_PRO_ORANGE
+    fieldFgColor:         "#F8F8F2"  # DRACULA_PRO_FOREGROUND
+  frame:
+    border:
+      fgColor:            "#7970A9"  # DRACULA_PRO_COMMENT
+      focusColor:         "#9580FF"  # DRACULA_PRO_BLUE
+    menu:
+      fgColor:            "#F8F8F2"  # DRACULA_PRO_FOREGROUND
+      keyColor:           "#80FFEA"  # DRACULA_PRO_CYAN
+      numKeyColor:        "#FFCA80"  # DRACULA_PRO_ORANGE
+    crumbs:
+      fgColor:            "#22212C"  # DRACULA_PRO_BACKGROUND (inverted)
+      bgColor:            "#454158"  # DRACULA_PRO_SELECTION
+      activeColor:        "#FF80BF"  # DRACULA_PRO_MAGENTA
+    status:
+      newColor:           "#80FFEA"  # DRACULA_PRO_CYAN
+      modifyColor:        "#9580FF"  # DRACULA_PRO_BLUE
+      addColor:           "#8AFF80"  # DRACULA_PRO_GREEN
+      errorColor:         "#FF9580"  # DRACULA_PRO_RED
+      highlightColor:     "#FFCA80"  # DRACULA_PRO_ORANGE
+      killColor:          "#FF80BF"  # DRACULA_PRO_MAGENTA
+      completedColor:     "#7970A9"  # DRACULA_PRO_COMMENT
+    title:
+      fgColor:            "#F8F8F2"  # DRACULA_PRO_FOREGROUND
+      bgColor:            "#22212C"  # DRACULA_PRO_BACKGROUND
+      highlightColor:     "#FFCA80"  # DRACULA_PRO_ORANGE
+      counterColor:       "#9580FF"  # DRACULA_PRO_BLUE
+      filterColor:        "#80FFEA"  # DRACULA_PRO_CYAN
+  views:
+    charts:
+      bgColor:             default
+      defaultDialColors:   ["#8AFF80", "#FF9580"]                      # GREEN, RED
+      defaultChartColors:  ["#8AFF80", "#FF9580"]                      # GREEN, RED
+      resourceColors:
+        cpu:    ["#FFFF80", "#FFCA80"]                                 # YELLOW, ORANGE
+        memory: ["#9580FF", "#FF80BF"]                                 # BLUE,   MAGENTA
+    table:
+      fgColor:              "#F8F8F2"  # DRACULA_PRO_FOREGROUND
+      bgColor:              "#22212C"  # DRACULA_PRO_BACKGROUND
+      cursorFgColor:        "#22212C"  # DRACULA_PRO_BACKGROUND
+      cursorBgColor:        "#454158"  # DRACULA_PRO_SELECTION
+      markColor:            "#FFCA80"  # DRACULA_PRO_ORANGE
+      header:
+        fgColor:            "#FF80BF"  # DRACULA_PRO_MAGENTA
+        bgColor:            "#22212C"  # DRACULA_PRO_BACKGROUND
+        sorterColor:        "#FFCA80"  # DRACULA_PRO_ORANGE
+    xray:
+      fgColor:        "#F8F8F2"        # DRACULA_PRO_FOREGROUND
+      bgColor:        "#22212C"        # DRACULA_PRO_BACKGROUND
+      cursorColor:    "#454158"        # DRACULA_PRO_SELECTION
+      graphicColor:   "#9580FF"        # DRACULA_PRO_BLUE
+      showIcons:      false
+    yaml:
+      keyColor:      "#FF80BF"         # DRACULA_PRO_MAGENTA
+      colonColor:    "#9580FF"         # DRACULA_PRO_BLUE
+      valueColor:    "#F8F8F2"         # DRACULA_PRO_FOREGROUND
+    logs:
+      fgColor:       "#F8F8F2"         # DRACULA_PRO_FOREGROUND
+      bgColor:       "#22212C"         # DRACULA_PRO_BACKGROUND
+      indicator:
+        fgColor:     "#FFCA80"         # DRACULA_PRO_ORANGE
+        bgColor:     "#22212C"         # DRACULA_PRO_BACKGROUND
