@@ -303,12 +303,12 @@ jobs:
 
       - name: Run install-wsl.sh inside WSL2
         shell: wsl-bash {0}
-        env:
+        run: |
           # CI has no ~/dracula-pro/; Wave A preflight requires this env
           # var to skip Tier 1 theming install steps (docs/design/theming.md
-          # § 4.3). Tier 2/3 theming is tested without Pro assets.
-          SKIP_DRACULA_PRO: "1"
-        run: |
+          # § 4.3). Step-level env: does not propagate into Vampire/setup-wsl's
+          # wsl-bash shell — must export inside the WSL2 subshell instead.
+          export SKIP_DRACULA_PRO=1
           set -e
           cd "$(pwd)"
           bash macos-dev/install-wsl.sh
