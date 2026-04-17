@@ -11,7 +11,7 @@ global_history = false
 [ui]
 ui_scale = 100
 orientation = "landscape"
-theme = "dracula"
+theme = "dracula-pro"
 
 [ui.input_bar]
 position = "top"

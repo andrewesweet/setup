@@ -472,6 +472,24 @@ for hex in "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_COM
   check "atuin config.toml references $hex" grep -qiF "$hex" atuin/config.toml
 done
 
+# ── AC-television: dracula-pro.toml ships + config.toml references it ─────
+echo ""
+echo "AC-television: Dracula Pro theme"
+TV_THEME="television/themes/dracula-pro.toml"
+check "$TV_THEME exists"                         test -f "$TV_THEME"
+check "television/config.toml theme = dracula-pro" \
+  grep -qE '^\s*theme\s*=\s*"dracula-pro"'       television/config.toml
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_SELECTION" \
+           "$DRACULA_PRO_COMMENT" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "television theme references $hex"       grep -qiF "$hex" "$TV_THEME"
+done
+check "install-macos.sh links television/themes" \
+  grep -qE 'link\s+television/themes\s+\.config/television/themes' install-macos.sh
+check "install-wsl.sh   links television/themes" \
+  grep -qE 'link\s+television/themes\s+\.config/television/themes' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

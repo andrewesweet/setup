@@ -450,6 +450,8 @@ link television/config.toml   .config/television/config.toml
 # television cable channels (Layer 1b-iii) — directory-level symlink so
 # additional .toml files added later require no re-wire.
 link television/cable         .config/television/cable
+# television themes (Wave C Tier 3 — directory symlink so added themes land without re-wire)
+link television/themes        .config/television/themes
 
 # yazi (Plan Layer 1b-i)
 link yazi/yazi.toml    .config/yazi/yazi.toml
