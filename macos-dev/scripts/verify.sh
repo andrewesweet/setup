@@ -198,9 +198,10 @@ check "TPM clone at ~/.tmux/plugins/tpm" \
 # shellcheck disable=SC2016
 check "kitty dracula-pro.conf symlink resolves" \
   bash -c 'test -L "$HOME/.config/kitty/dracula-pro.conf" && test -e "$HOME/.config/kitty/dracula-pro.conf"'
-# BAT_THEME env var check (indirect): .bashrc content
-check "BAT_THEME is Dracula in tracked .bashrc" \
-  grep -qE 'export BAT_THEME="Dracula"' "$REPO_ROOT/bash/.bashrc"
+# BAT_THEME env var check (indirect): .bashrc content.
+# Wave C (theming Tier 3) switched BAT_THEME from "Dracula" to "Dracula Pro".
+check "BAT_THEME is Dracula Pro in tracked .bashrc" \
+  grep -qE 'export BAT_THEME="Dracula Pro"' "$REPO_ROOT/bash/.bashrc"
 
 # ── Layer 1b-iii (cable channels + gh extensions + gh-dash) ──────────────
 echo ""
@@ -260,6 +261,17 @@ if [[ "$PLATFORM" == "macos" ]]; then
     bash -c 'test -L "$HOME/.config/skhd/skhdrc" && test -e "$HOME/.config/skhd/skhdrc"'
   check "skhd LaunchAgent loaded" \
     bash -c "launchctl print gui/\$(id -u)/com.koekeishiya.skhd"
+fi
+
+# ── Dracula Pro theming — Waves A, B, C ───────────────────────────────────
+if [[ -f "$REPO_ROOT/scripts/test-plan-theming.sh" ]]; then
+  echo ""
+  echo "─── Dracula Pro theming ─────────────────────────────────────"
+  if bash "$REPO_ROOT/scripts/test-plan-theming.sh"; then
+    ok "theming verify passed"
+  else
+    nok "theming verify failed"
+  fi
 fi
 
 # ── 5. Manual steps reminder ───────────────────────────────────────────────
