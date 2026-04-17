@@ -447,6 +447,39 @@ link vscode/extensions.json  .vscode-server/data/Machine/extensions.json
 mkdir -p "$HOME/.local/bin"
 link container/dev.sh  .local/bin/dev
 
+# ── Wave A Tier 1: Windows Terminal scheme splice ────────────────────────
+# Splices ~/dracula-pro/themes/windows-terminal/dracula-pro.json into
+# Windows Terminal's schemes[] array. Idempotent via .name == "Dracula Pro".
+# See macos-dev/docs/design/theming.md § 4.2.
+if [[ "${DRACULA_PRO_OK:-0}" == 1 ]]; then
+  wt_scheme_src="$HOME/dracula-pro/themes/windows-terminal/dracula-pro.json"
+  wt_settings_glob="/mnt/c/Users/*/AppData/Local/Packages/Microsoft.WindowsTerminal_*/LocalState/settings.json"
+  # shellcheck disable=SC2086
+  wt_settings="$(compgen -G $wt_settings_glob 2>/dev/null | head -n1 || true)"
+
+  if [[ -z "$wt_settings" ]]; then
+    warn "Windows Terminal settings.json not found — copy manually from $wt_scheme_src"
+  elif ! command -v jq &>/dev/null; then
+    warn "jq not on PATH — install jq (apt install -y jq) then rerun install-wsl.sh"
+    warn "Windows Terminal settings.json not found (skipped splice: no jq)"
+  elif [[ ! -f "$wt_scheme_src" ]]; then
+    warn "Dracula Pro WT scheme not found at $wt_scheme_src — skipping WT splice"
+  else
+    log "splicing Dracula Pro scheme into $wt_settings"
+    tmp="$(mktemp)"
+    # Remove any existing "Dracula Pro" scheme, then append the fresh one.
+    jq --slurpfile new "$wt_scheme_src" '.schemes = ((.schemes // []) | map(select(.name != "Dracula Pro"))) + $new' "$wt_settings" > "$tmp"
+    # Back up once per day; never overwrite an existing backup.
+    bak="${wt_settings}.bak.$(date +%Y%m%d)"
+    [[ -f "$bak" ]] || cp "$wt_settings" "$bak"
+    cp "$tmp" "$wt_settings"
+    rm -f "$tmp"
+    printf "  spliced   %s\n" "$wt_settings"
+  fi
+else
+  warn "DRACULA_PRO_OK=0 — skipping Windows Terminal scheme splice"
+fi
+
 # ── Step 5: Next steps ───────────────────────────────────────────────────────
 log "install complete"
 cat <<EOF

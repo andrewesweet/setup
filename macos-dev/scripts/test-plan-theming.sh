@@ -198,6 +198,39 @@ check "settings.json sets workbench.colorTheme = Dracula Pro"   \
 check "install-macos.sh installs the Pro .vsix via code CLI"    \
   grep -qE 'code --install-extension\s+.*dracula-pro\.vsix' install-macos.sh
 
+# ── AC-wt: install-wsl.sh splices Dracula Pro scheme into WT settings ─────
+echo ""
+echo "AC-wt: install-wsl.sh splices Dracula Pro scheme into Windows Terminal"
+check "install-wsl.sh references the Pro WT scheme JSON"      \
+  grep -qE 'dracula-pro/themes/windows-terminal/dracula-pro\.json' install-wsl.sh
+check "install-wsl.sh splices via jq (schemes array)"         \
+  grep -qE 'jq .*schemes' install-wsl.sh
+check "install-wsl.sh warns on absent WT settings.json"       \
+  grep -qE 'Windows Terminal settings\.json not found' install-wsl.sh
+check "install-wsl.sh WT splice is guarded by DRACULA_PRO_OK" \
+  grep -qE 'DRACULA_PRO_OK.*==.*1' install-wsl.sh
+
+# Runtime idempotency check — only runs on WSL with a real WT settings.json
+if [[ "$FULL" == true ]] && [[ "$PLATFORM" == "wsl" ]] && [[ "${DRACULA_PRO_OK:-0}" == 1 ]]; then
+  wt_glob="/mnt/c/Users/*/AppData/Local/Packages/Microsoft.WindowsTerminal_*/LocalState/settings.json"
+  # shellcheck disable=SC2086
+  wt_path="$(compgen -G $wt_glob 2>/dev/null | head -n1 || true)"
+  if [[ -n "$wt_path" ]] && command -v jq &>/dev/null; then
+    bash install-wsl.sh >/tmp/wt-install-1.log 2>&1 || true
+    bash install-wsl.sh >/tmp/wt-install-2.log 2>&1 || true
+    count="$(jq '[.schemes[] | select(.name=="Dracula Pro")] | length' "$wt_path" 2>/dev/null || echo 0)"
+    if [[ "$count" == "1" ]]; then
+      ok "WT splice is idempotent (exactly 1 Dracula Pro scheme)"
+    else
+      nok "WT splice is idempotent (expected 1, got $count)"
+    fi
+  else
+    skp "WT splice idempotency" "no WT settings.json or no jq"
+  fi
+else
+  skp "WT splice idempotency" "not WSL/full-mode or Pro absent"
+fi
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
