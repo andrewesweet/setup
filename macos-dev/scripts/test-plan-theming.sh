@@ -231,6 +231,18 @@ else
   skp "WT splice idempotency" "not WSL/full-mode or Pro absent"
 fi
 
+# ── AC-raycast: Raycast theme import is documented ────────────────────────
+echo ""
+echo "AC-raycast: install-macos.sh Next Steps documents Raycast import"
+check "raycast/dracula-pro.md exists"                         \
+  test -f raycast/dracula-pro.md
+check "raycast/dracula-pro.md records chosen variant (Pro)"   \
+  grep -qE 'Dracula PRO\s*-\s*Pro|variant.*Pro' raycast/dracula-pro.md
+check "install-macos.sh Next Steps mentions Raycast + Dracula Pro" \
+  bash -c "awk '/^Next steps:/,/^EOF$/' install-macos.sh | grep -qi 'Raycast.*Dracula Pro'"
+check "install-macos.sh Next Steps contains addToRaycast deep-link" \
+  grep -qE 'https://themes\.ray\.so' install-macos.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

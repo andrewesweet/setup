@@ -535,6 +535,11 @@ Next steps:
           0.0.0.0  sync.raycast.com
           EOF_HOSTS
      i) Walk docs/manual-smoke/desktop-layer{1,2,3}.md at your cadence.
+  8. Raycast — Dracula Pro theme (Wave A Tier 1):
+     Open this URL in a macOS browser to import the "Dracula PRO - Pro" theme
+     into Raycast, then set it in Raycast Preferences -> Appearance -> Theme:
+       https://themes.ray.so?version=1&name=Dracula%20PRO%20-%20Pro&author=Lucas%20de%20Fran%C3%A7a&authorUsername=luxonauta&colors=%2322212C,%2322212C,%23F8F8F2,%237970A9,%23454158,%23FFA680,%23FFCA80,%23FFFF80,%238AFF80,%2380FFEA,%239580FF,%23FF80BF&appearance=dark&addToRaycast
+     See raycast/dracula-pro.md for variant details and rationale.
 
 Prerequisites NOT installed by this script:
   - Google Cloud SDK (gcloud) — see warnings above if missing. The
