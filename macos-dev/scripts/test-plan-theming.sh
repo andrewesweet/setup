@@ -459,6 +459,19 @@ check "bashrc exports XH_CONFIG_DIR" grep -qE '^export XH_CONFIG_DIR='         b
 check "bash defines xh alias with --style=dracula-pro" \
   grep -qE "alias xh=['\"]xh --style=dracula-pro" bash/.bash_aliases
 
+# ── AC-atuin: atuin config.toml has [theme] with Pro hex ───────────────────
+echo ""
+echo "AC-atuin: atuin theme block"
+check "atuin [theme] section present"         grep -qE '^\[theme\]'                       atuin/config.toml
+check "atuin theme.name = dracula-pro"         grep -qE '^\s*name\s*=\s*"dracula-pro"'    atuin/config.toml
+# Pro hex slots — structural + accents
+for hex in "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "atuin config.toml references $hex" grep -qiF "$hex" atuin/config.toml
+done
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
