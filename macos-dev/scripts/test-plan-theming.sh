@@ -376,6 +376,23 @@ check "pink = #FF80BF"         grep -q '"#FF80BF"' yazi/theme.toml
 check "red = #FF9580"          grep -q '"#FF9580"' yazi/theme.toml
 check "no Classic hex remain"  bash -c "! grep -qE \"#(BD93F9|6272A4|44475A|282A36|FF5555|50FA7B|FFB86C|FF79C6|F1FA8C|8BE9FD)\" yazi/theme.toml"
 
+# ── AC-B-fzf ─────────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-fzf: FZF_DEFAULT_OPTS uses Pro Base hex only"
+check "fzf fg = Foreground"         grep -q 'fg:#F8F8F2'          bash/.bashrc
+check "fzf bg = Background"         grep -q 'bg:#22212C'          bash/.bashrc
+check "fzf hl = Purple"             grep -q 'hl:#9580FF'          bash/.bashrc
+check "fzf fg+ = Foreground"        grep -q 'fg+:#F8F8F2'         bash/.bashrc
+check "fzf bg+ = Selection"         grep -q 'bg+:#454158'         bash/.bashrc
+check "fzf hl+ = Purple"            grep -q 'hl+:#9580FF'         bash/.bashrc
+check "fzf info = Orange"           grep -q 'info:#FFCA80'        bash/.bashrc
+check "fzf prompt = Green"          grep -q 'prompt:#8AFF80'      bash/.bashrc
+check "fzf pointer = Pink"          grep -q 'pointer:#FF80BF'     bash/.bashrc
+check "fzf marker = Pink"           grep -q 'marker:#FF80BF'      bash/.bashrc
+check "fzf spinner = Orange"        grep -q 'spinner:#FFCA80'     bash/.bashrc
+check "fzf header = Comment"        grep -q 'header:#7970A9'      bash/.bashrc
+check "no lowercase Classic fzf hex" bash -c "! grep -qE '#(bd93f9|6272a4|44475a|282a36|ff5555|50fa7b|ffb86c|ff79c6|f1fa8c|8be9fd)' bash/.bashrc"
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

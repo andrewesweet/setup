@@ -254,10 +254,10 @@ export FZF_DEFAULT_OPTS='
   --border
   --info=inline
   --bind=ctrl-j:down,ctrl-k:up
-  --color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9
-  --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9
-  --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6
-  --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4
+  --color=fg:#F8F8F2,bg:#22212C,hl:#9580FF
+  --color=fg+:#F8F8F2,bg+:#454158,hl+:#9580FF
+  --color=info:#FFCA80,prompt:#8AFF80,pointer:#FF80BF
+  --color=marker:#FF80BF,spinner:#FFCA80,header:#7970A9
 '
 
 # ── 12. Source aliases ─────────────────────────────────────────────────────
