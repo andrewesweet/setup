@@ -289,6 +289,21 @@ else
   skp "generated kitty file runtime checks" "safe mode or Pro absent"
 fi
 
+# ═════════════════════════════════════════════════════════════════════════════
+# Wave C — Tier 3 custom reconstruction from Pro palette
+# Spec: macos-dev/docs/design/theming.md §§ 3.3, 5.2, 6.
+# Every AC below asserts every slot of the tool's profile; partial coverage
+# fails per § 6.1.
+# ═════════════════════════════════════════════════════════════════════════════
+
+# Source the authoritative palette so later ACs can assert
+# `committed-hex == $DRACULA_PRO_<SLOT>` instead of hardcoding hex twice.
+# shellcheck source=lib/dracula-pro-palette.sh disable=SC1091
+. "$MACOS_DEV/scripts/lib/dracula-pro-palette.sh"
+
+echo ""
+echo "═══ Wave C — Tier 3 ═════════════════════════════════════════════════════"
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
