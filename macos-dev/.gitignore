@@ -24,3 +24,10 @@ Thumbs.db
 *.swo
 *~
 .aider*
+
+# ── Dracula Pro (licensed — never committed) ─────────────────────────────────
+# Safety rail against accidentally committing symlinks, caches, or copies of
+# Pro theme content. Pro theme files live at ~/dracula-pro/ per
+# docs/design/theming.md § 4.1. Palette hex values (facts) are reproduced in
+# scripts/lib/dracula-pro-palette.sh per § 4.1 / § 6.3.
+/dracula-pro/
