@@ -613,6 +613,22 @@ check "install-macos.sh links freeze style" \
 check "install-wsl.sh   links freeze style" \
   grep -qE 'link\s+freeze/dracula-pro\.xml\s+\.config/freeze/styles/dracula-pro\.xml' install-wsl.sh
 
+# ── AC-lazydocker: config.yml gui.theme Pro hex ────────────────────────────
+echo ""
+echo "AC-lazydocker: Dracula Pro GUI theme"
+check "lazydocker/config.yml exists"  test -f lazydocker/config.yml
+check "lazydocker gui.theme: block"   grep -qE '^\s*theme:\s*$' lazydocker/config.yml
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "lazydocker/config.yml references $hex" grep -qiF "$hex" lazydocker/config.yml
+done
+check "install-macos.sh links lazydocker config" \
+  grep -qE 'link\s+lazydocker/config\.yml\s+\.config/lazydocker/config\.yml' install-macos.sh
+check "install-wsl.sh   links lazydocker config" \
+  grep -qE 'link\s+lazydocker/config\.yml\s+\.config/lazydocker/config\.yml' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

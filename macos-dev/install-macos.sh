@@ -450,6 +450,10 @@ link glow/dracula-pro.json    .config/glow/styles/dracula-pro.json
 mkdir -p "$HOME/.config/freeze/styles"
 link freeze/dracula-pro.xml    .config/freeze/styles/dracula-pro.xml
 
+# lazydocker (Wave C Tier 3)
+mkdir -p "$HOME/.config/lazydocker"
+link lazydocker/config.yml    .config/lazydocker/config.yml
+
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 
