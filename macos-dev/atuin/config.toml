@@ -60,3 +60,28 @@ common_subcommands = [
   "cargo", "docker", "git", "go", "gcloud",
   "kubectl", "npm", "podman", "terraform", "tmux",
 ]
+
+# ── Theme (Dracula Pro Tier 3 — docs/design/theming.md § 3.3) ──────────────
+# Structural + accents profile. Hex values mirror
+# $DOTFILES/scripts/lib/dracula-pro-palette.sh exactly.
+[theme]
+name = "dracula-pro"
+
+[theme.colors]
+# Structural
+Base          = "#F8F8F2"   # DRACULA_PRO_FOREGROUND
+Background    = "#22212C"   # DRACULA_PRO_BACKGROUND
+Guidance      = "#7970A9"   # DRACULA_PRO_COMMENT
+AlertInfo     = "#80FFEA"   # DRACULA_PRO_CYAN
+AlertWarn     = "#FFCA80"   # DRACULA_PRO_ORANGE
+AlertError    = "#FF9580"   # DRACULA_PRO_RED
+Annotation    = "#7970A9"   # DRACULA_PRO_COMMENT
+Title         = "#9580FF"   # DRACULA_PRO_BLUE (Purple alias)
+Important     = "#FF80BF"   # DRACULA_PRO_MAGENTA (Pink alias)
+# Accents on selected history row
+RowAlt        = "#454158"   # DRACULA_PRO_SELECTION
+# Semantic — success vs failure tag on history rows
+Success       = "#8AFF80"   # DRACULA_PRO_GREEN
+Failure       = "#FF9580"   # DRACULA_PRO_RED
+# Numeric statistics (counts, durations)
+Stats         = "#FFFF80"   # DRACULA_PRO_YELLOW

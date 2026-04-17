@@ -232,28 +232,26 @@ else
   nok "trigger name is aerospace_workspace_change"
 fi
 
-# ── AC-12: sketchybar/colors.sh exports 12 Dracula hex constants ─────
+# ── AC-12: sketchybar/colors.sh exports full Dracula Pro palette ─────
 echo ""
-echo "AC-12: sketchybar/colors.sh exports full Dracula palette"
-# Use case-insensitive match — hex case is unspecified in the parent
-# design and consumers are case-insensitive.
-for pair in 'COLOR_BG:0xff282a36' \
-            'COLOR_CURRENT_LINE:0xff44475a' \
-            'COLOR_SELECTION:0xff44475a' \
-            'COLOR_FG:0xfff8f8f2' \
-            'COLOR_COMMENT:0xff6272a4' \
-            'COLOR_RED:0xffff5555' \
-            'COLOR_ORANGE:0xffffb86c' \
-            'COLOR_YELLOW:0xfff1fa8c' \
-            'COLOR_GREEN:0xff50fa7b' \
-            'COLOR_CYAN:0xff8be9fd' \
-            'COLOR_PURPLE:0xffbd93f9' \
-            'COLOR_PINK:0xffff79c6'; do
-  name="${pair%%:*}"; val="${pair##*:}"
-  if grep -qiE "^(export[[:space:]]+)?${name}=${val}" sketchybar/colors.sh; then
+echo "AC-12: sketchybar/colors.sh exports full Dracula Pro palette"
+# Wave C (docs/design/theming.md § 3.3) reconciled sketchybar/colors.sh
+# against scripts/lib/dracula-pro-palette.sh. Expected values are Dracula
+# PRO Base (Terminal Standard). colors.sh now sources the palette file and
+# computes COLOR_* via `_sb_color "$DRACULA_PRO_<SLOT>"` at runtime, so we
+# resolve the values by sourcing the file in a subshell instead of grepping
+# literal hex. Authoritative colour-level assertions live in
+# scripts/test-plan-theming.sh (AC-sketchybar); this AC is a surface check
+# that each named constant is reachable and non-empty after sourcing.
+for name in COLOR_BG COLOR_CURRENT_LINE COLOR_SELECTION COLOR_FG \
+            COLOR_COMMENT COLOR_RED COLOR_ORANGE COLOR_YELLOW \
+            COLOR_GREEN COLOR_CYAN COLOR_PURPLE COLOR_PINK; do
+  # shellcheck disable=SC1091
+  val=$(DOTFILES="$PWD" bash -c 'set -e; . scripts/lib/dracula-pro-palette.sh; . sketchybar/colors.sh; printf "%s" "${'"$name"':-}"' 2>/dev/null)
+  if [[ -n "$val" && "$val" == 0x* ]]; then
     ok "colors.sh exports ${name}=${val}"
   else
-    nok "colors.sh exports ${name}=${val}"
+    nok "colors.sh exports ${name} (got: '${val}')"
   fi
 done
 

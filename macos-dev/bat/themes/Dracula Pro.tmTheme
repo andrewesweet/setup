@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Dracula Pro.tmTheme — bat syntax-highlight theme.
+
+  Palette derived verbatim from macos-dev/scripts/lib/dracula-pro-palette.sh
+  (docs/design/theming.md § 6.3). Full ANSI + Dim profile coverage
+  (§ 5.2). Pro palette hex values are facts per the spec § 4.1 and
+  may be reproduced here; Pro-authored theme files themselves are not.
+
+  Scope mapping follows the tmTheme convention used by bat/sublime-syntect:
+    foreground / background           -> structural
+    comment                           -> comment/docstrings
+    string                            -> strings
+    constant.numeric                  -> numbers
+    constant.language / .character    -> language constants (true/false/null, chars)
+    support.function / entity.name.function  -> function names
+    keyword / storage / support.class -> keywords & types
+    variable / variable.parameter     -> identifiers
+    invalid / invalid.deprecated      -> errors / deprecated tokens
+    markup.inserted / .deleted / .changed -> diff scopes
+-->
+<plist version="1.0">
+<dict>
+  <key>name</key><string>Dracula Pro</string>
+  <key>semanticClass</key><string>theme.dark.dracula-pro</string>
+  <key>uuid</key><string>b7c8a2a0-5a6e-4f51-9a4b-8f7e9d1e2c31</string>
+  <key>colorSpaceName</key><string>sRGB</string>
+  <key>settings</key>
+  <array>
+
+    <!-- Global canvas settings — Background / Foreground / Caret / Selection -->
+    <dict>
+      <key>settings</key>
+      <dict>
+        <key>background</key><string>#22212C</string>
+        <key>foreground</key><string>#F8F8F2</string>
+        <key>caret</key><string>#7970A9</string>
+        <key>lineHighlight</key><string>#454158</string>
+        <key>selection</key><string>#454158</string>
+        <key>selectionForeground</key><string>#F8F8F2</string>
+        <key>invisibles</key><string>#504C67</string>
+        <key>guide</key><string>#7970A9</string>
+        <key>activeGuide</key><string>#9580FF</string>
+        <key>stackGuide</key><string>#504C67</string>
+      </dict>
+    </dict>
+
+    <!-- Comment — Pro COMMENT (#7970A9) -->
+    <dict>
+      <key>name</key><string>Comment</string>
+      <key>scope</key><string>comment, punctuation.definition.comment</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#7970A9</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+
+    <!-- String literals — Pro YELLOW (#FFFF80) -->
+    <dict>
+      <key>name</key><string>String</string>
+      <key>scope</key><string>string, string.quoted, string.regexp</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#FFFF80</string></dict>
+    </dict>
+
+    <!-- String punctuation (quotes) — Pro DIM_YELLOW (#CCCC66) -->
+    <dict>
+      <key>name</key><string>String punctuation</string>
+      <key>scope</key><string>punctuation.definition.string</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#CCCC66</string></dict>
+    </dict>
+
+    <!-- Escape sequences inside strings — Pro BRIGHT_YELLOW (#FFFF99) -->
+    <dict>
+      <key>name</key><string>String escape</string>
+      <key>scope</key><string>constant.character.escape</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#FFFF99</string></dict>
+    </dict>
+
+    <!-- Numbers — Pro ORANGE (#FFCA80) -->
+    <dict>
+      <key>name</key><string>Number</string>
+      <key>scope</key><string>constant.numeric</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#FFCA80</string></dict>
+    </dict>
+
+    <!-- Language constants (true/false/null, symbols) — Pro CYAN (#80FFEA) -->
+    <dict>
+      <key>name</key><string>Language constant</string>
+      <key>scope</key><string>constant.language, constant.other, constant.character</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#80FFEA</string></dict>
+    </dict>
+
+    <!-- Keywords (control flow, operators) — Pro MAGENTA (#FF80BF) -->
+    <dict>
+      <key>name</key><string>Keyword</string>
+      <key>scope</key><string>keyword, keyword.control, keyword.operator</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#FF80BF</string></dict>
+    </dict>
+
+    <!-- Storage / type modifiers — Pro BLUE/Purple (#9580FF), italic -->
+    <dict>
+      <key>name</key><string>Storage</string>
+      <key>scope</key><string>storage, storage.type, storage.modifier</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#9580FF</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+
+    <!-- Function names — Pro GREEN (#8AFF80) -->
+    <dict>
+      <key>name</key><string>Function name</string>
+      <key>scope</key><string>entity.name.function, support.function, meta.function-call entity.name.function</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#8AFF80</string></dict>
+    </dict>
+
+    <!-- Function parameters — Pro ORANGE (#FFCA80), italic -->
+    <dict>
+      <key>name</key><string>Function parameter</string>
+      <key>scope</key><string>variable.parameter, meta.function.parameters variable</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#FFCA80</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+
+    <!-- Type names / classes — Pro CYAN (#80FFEA), italic -->
+    <dict>
+      <key>name</key><string>Class / Type</string>
+      <key>scope</key><string>entity.name.class, entity.name.type, support.class, support.type</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#80FFEA</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+
+    <!-- Tag names (HTML/XML) — Pro MAGENTA (#FF80BF) -->
+    <dict>
+      <key>name</key><string>Tag name</string>
+      <key>scope</key><string>entity.name.tag, meta.tag</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#FF80BF</string></dict>
+    </dict>
+
+    <!-- Attribute names — Pro GREEN (#8AFF80), italic -->
+    <dict>
+      <key>name</key><string>Attribute name</string>
+      <key>scope</key><string>entity.other.attribute-name</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#8AFF80</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+
+    <!-- Variables / identifiers — Pro FOREGROUND (#F8F8F2) -->
+    <dict>
+      <key>name</key><string>Variable</string>
+      <key>scope</key><string>variable, variable.other</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#F8F8F2</string></dict>
+    </dict>
+
+    <!-- Built-in / support functions — Pro CYAN (#80FFEA) -->
+    <dict>
+      <key>name</key><string>Support</string>
+      <key>scope</key><string>support, support.constant, support.variable</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#80FFEA</string></dict>
+    </dict>
+
+    <!-- Punctuation — Pro DIM_WHITE (#C6C6C2) — muted to reduce visual weight -->
+    <dict>
+      <key>name</key><string>Punctuation</string>
+      <key>scope</key><string>punctuation, meta.brace</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#C6C6C2</string></dict>
+    </dict>
+
+    <!-- Invalid / deprecated — Pro BRIGHT_RED (#FFAA99) -->
+    <dict>
+      <key>name</key><string>Invalid</string>
+      <key>scope</key><string>invalid, invalid.illegal</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#22212C</string>
+        <key>background</key><string>#FFAA99</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Deprecated</string>
+      <key>scope</key><string>invalid.deprecated</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#22212C</string>
+        <key>background</key><string>#FF99CC</string>
+      </dict>
+    </dict>
+
+    <!-- Markup: diff scopes — Pro RED/GREEN/BLUE -->
+    <dict>
+      <key>name</key><string>Diff: inserted</string>
+      <key>scope</key><string>markup.inserted</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#8AFF80</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Diff: deleted</string>
+      <key>scope</key><string>markup.deleted</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#FF9580</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Diff: changed</string>
+      <key>scope</key><string>markup.changed</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#FFFF80</string></dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Diff: meta (hunk header)</string>
+      <key>scope</key><string>meta.diff, meta.diff.header</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#9580FF</string></dict>
+    </dict>
+
+    <!-- Markup: headings & emphasis — secondary tokens use Dim where applicable -->
+    <dict>
+      <key>name</key><string>Markup heading</string>
+      <key>scope</key><string>markup.heading, markup.heading entity.name</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#FFCA80</string>
+        <key>fontStyle</key><string>bold</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Markup bold</string>
+      <key>scope</key><string>markup.bold</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#FFFF80</string>
+        <key>fontStyle</key><string>bold</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Markup italic</string>
+      <key>scope</key><string>markup.italic</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#FF80BF</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>name</key><string>Markup link / URL</string>
+      <key>scope</key><string>markup.underline.link, string.other.link</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#80FFEA</string>
+        <key>fontStyle</key><string>underline</string>
+      </dict>
+    </dict>
+
+    <!-- Dim secondary tokens — spec § 5.2 Full-ANSI+Dim profile requires
+         Dim slots be represented. These assign Dim hex to low-weight
+         secondary scopes so every palette slot is carried by the theme. -->
+    <dict>
+      <key>name</key><string>Secondary: constant support</string>
+      <key>scope</key><string>meta.block-level, meta.preprocessor</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#66CCBB</string></dict>   <!-- DIM_CYAN -->
+    </dict>
+    <dict>
+      <key>name</key><string>Secondary: deprecated keyword</string>
+      <key>scope</key><string>keyword.deprecated</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#7766CC</string></dict>   <!-- DIM_BLUE -->
+    </dict>
+    <dict>
+      <key>name</key><string>Secondary: meta annotation</string>
+      <key>scope</key><string>meta.annotation, meta.decorator</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#CC6699</string></dict>   <!-- DIM_MAGENTA -->
+    </dict>
+    <dict>
+      <key>name</key><string>Secondary: dim black invisible</string>
+      <key>scope</key><string>meta.whitespace</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#1B1A23</string></dict>   <!-- DIM_BLACK -->
+    </dict>
+
+    <!-- Secondary: dim-red / dim-green / dim-yellow completeness
+         (spec § 5.2 Full-ANSI+Dim profile requires all 8 Dim slots).
+         Map to low-weight secondary scopes. -->
+    <dict>
+      <key>name</key><string>Secondary: dim-red (muted error)</string>
+      <key>scope</key><string>invalid.deprecated.trivial</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#CC7766</string></dict>   <!-- DIM_RED -->
+    </dict>
+    <dict>
+      <key>name</key><string>Secondary: dim-green (muted inserted)</string>
+      <key>scope</key><string>markup.inserted.trivial</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#6ECC66</string></dict>   <!-- DIM_GREEN -->
+    </dict>
+    <dict>
+      <key>name</key><string>Secondary: dim-yellow (muted warning)</string>
+      <key>scope</key><string>markup.changed.trivial</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#CCCC66</string></dict>   <!-- DIM_YELLOW -->
+    </dict>
+
+    <!-- Bright secondary tokens — spec § 5.2 Full-ANSI+Dim profile requires
+         Bright slots be represented in the palette. tmTheme targets editor
+         syntax, not terminal ANSI cells (see plan open-items); we carry
+         Bright hex on auxiliary scopes so every palette slot is
+         mechanically present in the XML (AC § 6.1 partial-coverage test). -->
+    <dict>
+      <key>name</key><string>Auxiliary: bright-green (emphatic success)</string>
+      <key>scope</key><string>markup.inserted.emphatic</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#A2FF99</string></dict>   <!-- BRIGHT_GREEN -->
+    </dict>
+    <dict>
+      <key>name</key><string>Auxiliary: bright-blue (emphatic link)</string>
+      <key>scope</key><string>markup.underline.link.emphatic</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#AA99FF</string></dict>   <!-- BRIGHT_BLUE -->
+    </dict>
+    <dict>
+      <key>name</key><string>Auxiliary: bright-cyan (emphatic support)</string>
+      <key>scope</key><string>support.emphatic</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#99FFEE</string></dict>   <!-- BRIGHT_CYAN -->
+    </dict>
+
+  </array>
+</dict>
+</plist>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- freeze chroma XML style — Dracula Pro.
+     Full-ANSI profile per docs/design/theming.md § 5.2.
+     Hex values verbatim from scripts/lib/dracula-pro-palette.sh. -->
+<style name="dracula-pro">
+  <!-- Canvas -->
+  <entry type="Background"          style="bg:#22212C #F8F8F2"/>
+  <entry type="Other"               style="#F8F8F2"/>
+  <entry type="Error"               style="#FF9580 bold"/>
+  <entry type="LineHighlight"       style="bg:#454158"/>
+  <entry type="LineNumbers"         style="#7970A9"/>
+  <entry type="LineNumbersTable"    style="#7970A9"/>
+  <entry type="GenericUnderline"    style="underline"/>
+
+  <!-- Comments -->
+  <entry type="Comment"             style="#7970A9 italic"/>
+  <entry type="CommentHashbang"     style="#7970A9 italic"/>
+  <entry type="CommentMultiline"    style="#7970A9 italic"/>
+  <entry type="CommentSingle"       style="#7970A9 italic"/>
+  <entry type="CommentSpecial"      style="#7970A9 bold italic"/>
+  <entry type="CommentPreproc"      style="#FF80BF"/>
+
+  <!-- Keywords / control -->
+  <entry type="Keyword"             style="#FF80BF"/>
+  <entry type="KeywordConstant"     style="#80FFEA"/>
+  <entry type="KeywordDeclaration"  style="#9580FF italic"/>
+  <entry type="KeywordNamespace"    style="#FF80BF"/>
+  <entry type="KeywordPseudo"       style="#FF80BF"/>
+  <entry type="KeywordReserved"     style="#FF80BF"/>
+  <entry type="KeywordType"         style="#9580FF italic"/>
+
+  <!-- Names -->
+  <entry type="Name"                style="#F8F8F2"/>
+  <entry type="NameAttribute"       style="#8AFF80 italic"/>
+  <entry type="NameBuiltin"         style="#80FFEA"/>
+  <entry type="NameBuiltinPseudo"   style="#80FFEA"/>
+  <entry type="NameClass"           style="#80FFEA italic"/>
+  <entry type="NameConstant"        style="#80FFEA"/>
+  <entry type="NameDecorator"       style="#8AFF80"/>
+  <entry type="NameEntity"          style="#FFCA80"/>
+  <entry type="NameException"       style="#FF9580"/>
+  <entry type="NameFunction"        style="#8AFF80"/>
+  <entry type="NameFunctionMagic"   style="#8AFF80"/>
+  <entry type="NameLabel"           style="#FFCA80"/>
+  <entry type="NameNamespace"       style="#F8F8F2"/>
+  <entry type="NameOther"           style="#F8F8F2"/>
+  <entry type="NameTag"             style="#FF80BF"/>
+  <entry type="NameVariable"        style="#F8F8F2"/>
+  <entry type="NameVariableClass"   style="#F8F8F2"/>
+  <entry type="NameVariableGlobal"  style="#F8F8F2"/>
+  <entry type="NameVariableInstance" style="#F8F8F2"/>
+
+  <!-- Literals -->
+  <entry type="LiteralString"              style="#FFFF80"/>
+  <entry type="LiteralStringAffix"         style="#FF80BF"/>
+  <entry type="LiteralStringBacktick"      style="#FFFF80"/>
+  <entry type="LiteralStringChar"          style="#FFFF80"/>
+  <entry type="LiteralStringDelimiter"     style="#FFFF80"/>
+  <entry type="LiteralStringDoc"           style="#7970A9 italic"/>
+  <entry type="LiteralStringDouble"        style="#FFFF80"/>
+  <entry type="LiteralStringEscape"        style="#FFCA80"/>
+  <entry type="LiteralStringHeredoc"       style="#FFFF80"/>
+  <entry type="LiteralStringInterpol"      style="#FFCA80"/>
+  <entry type="LiteralStringOther"         style="#FFFF80"/>
+  <entry type="LiteralStringRegex"         style="#FF80BF"/>
+  <entry type="LiteralStringSingle"        style="#FFFF80"/>
+  <entry type="LiteralStringSymbol"        style="#80FFEA"/>
+  <entry type="LiteralNumber"              style="#FFCA80"/>
+  <entry type="LiteralNumberBin"           style="#FFCA80"/>
+  <entry type="LiteralNumberFloat"         style="#FFCA80"/>
+  <entry type="LiteralNumberHex"           style="#FFCA80"/>
+  <entry type="LiteralNumberInteger"       style="#FFCA80"/>
+  <entry type="LiteralNumberIntegerLong"   style="#FFCA80"/>
+  <entry type="LiteralNumberOct"           style="#FFCA80"/>
+
+  <!-- Operators / punctuation -->
+  <entry type="Operator"            style="#FF80BF"/>
+  <entry type="OperatorWord"        style="#FF80BF"/>
+  <entry type="Punctuation"         style="#F8F8F2"/>
+
+  <!-- Generic (markdown / diff) -->
+  <entry type="GenericDeleted"      style="#FF9580"/>
+  <entry type="GenericEmph"         style="#FF80BF italic"/>
+  <entry type="GenericHeading"      style="#FFCA80 bold"/>
+  <entry type="GenericInserted"     style="#8AFF80"/>
+  <entry type="GenericOutput"       style="#7970A9"/>
+  <entry type="GenericPrompt"       style="#F8F8F2 bold"/>
+  <entry type="GenericStrong"       style="#FFFF80 bold"/>
+  <entry type="GenericSubheading"   style="#9580FF bold"/>
+  <entry type="GenericTraceback"    style="#FF9580"/>
+</style>

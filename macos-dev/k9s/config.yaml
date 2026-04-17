@@ -1,0 +1,10 @@
+# k9s/config.yaml — global config.
+# Only the skin pin is set here; all other behavioural keys remain
+# at k9s defaults (which are written to this file on first run; our
+# symlinked version establishes the theme baseline).
+k9s:
+  ui:
+    skin: "dracula-pro"
+    logoless: false
+    crumbsless: false
+    noIcons: false

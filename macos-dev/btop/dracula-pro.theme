@@ -1,0 +1,63 @@
+# btop Dracula Pro theme
+# File format per btop-themes README: one key="#hex" per line, theme[key].
+# Structural + accents profile per docs/design/theming.md § 5.2.
+# Hex values mirror scripts/lib/dracula-pro-palette.sh exactly.
+
+# Main background / text
+theme[main_bg]="#22212C"            # DRACULA_PRO_BACKGROUND
+theme[main_fg]="#F8F8F2"            # DRACULA_PRO_FOREGROUND
+
+# Titles
+theme[title]="#F8F8F2"              # DRACULA_PRO_FOREGROUND
+theme[hi_fg]="#FF80BF"              # DRACULA_PRO_MAGENTA  (highlight)
+
+# Selection
+theme[selected_bg]="#454158"        # DRACULA_PRO_SELECTION
+theme[selected_fg]="#F8F8F2"        # DRACULA_PRO_FOREGROUND
+
+# Inactive / dim
+theme[inactive_fg]="#7970A9"        # DRACULA_PRO_COMMENT
+
+# Graphs & meters
+theme[graph_text]="#F8F8F2"         # DRACULA_PRO_FOREGROUND
+theme[meter_bg]="#454158"           # DRACULA_PRO_SELECTION
+theme[proc_misc]="#FFCA80"          # DRACULA_PRO_ORANGE
+
+# CPU box
+theme[cpu_box]="#7970A9"            # DRACULA_PRO_COMMENT
+theme[cpu_start]="#8AFF80"          # DRACULA_PRO_GREEN (gradient low)
+theme[cpu_mid]="#FFFF80"            # DRACULA_PRO_YELLOW (gradient mid)
+theme[cpu_end]="#FF9580"            # DRACULA_PRO_RED (gradient high)
+
+# Memory box
+theme[mem_box]="#7970A9"            # DRACULA_PRO_COMMENT
+theme[used_start]="#9580FF"         # DRACULA_PRO_BLUE
+theme[used_mid]="#FF80BF"           # DRACULA_PRO_MAGENTA
+theme[used_end]="#FF9580"           # DRACULA_PRO_RED
+theme[available_start]="#80FFEA"    # DRACULA_PRO_CYAN
+theme[available_mid]="#8AFF80"      # DRACULA_PRO_GREEN
+theme[available_end]="#FFFF80"      # DRACULA_PRO_YELLOW
+theme[cached_start]="#7970A9"       # DRACULA_PRO_COMMENT
+theme[cached_mid]="#9580FF"         # DRACULA_PRO_BLUE
+theme[cached_end]="#FF80BF"         # DRACULA_PRO_MAGENTA
+theme[free_start]="#8AFF80"         # DRACULA_PRO_GREEN
+theme[free_mid]="#80FFEA"           # DRACULA_PRO_CYAN
+theme[free_end]="#F8F8F2"           # DRACULA_PRO_FOREGROUND
+
+# Network box
+theme[net_box]="#7970A9"            # DRACULA_PRO_COMMENT
+theme[download_start]="#80FFEA"     # DRACULA_PRO_CYAN
+theme[download_mid]="#9580FF"       # DRACULA_PRO_BLUE
+theme[download_end]="#FF80BF"       # DRACULA_PRO_MAGENTA
+theme[upload_start]="#FFFF80"       # DRACULA_PRO_YELLOW
+theme[upload_mid]="#FFCA80"         # DRACULA_PRO_ORANGE
+theme[upload_end]="#FF9580"         # DRACULA_PRO_RED
+
+# Process box
+theme[proc_box]="#7970A9"           # DRACULA_PRO_COMMENT
+
+# Division lines / labels
+theme[div_line]="#504C67"           # DRACULA_PRO_BRIGHT_BLACK
+theme[temp_start]="#8AFF80"         # DRACULA_PRO_GREEN
+theme[temp_mid]="#FFFF80"           # DRACULA_PRO_YELLOW
+theme[temp_end]="#FF9580"           # DRACULA_PRO_RED

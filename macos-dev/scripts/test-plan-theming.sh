@@ -289,6 +289,356 @@ else
   skp "generated kitty file runtime checks" "safe mode or Pro absent"
 fi
 
+# ═════════════════════════════════════════════════════════════════════════════
+# Wave C — Tier 3 custom reconstruction from Pro palette
+# Spec: macos-dev/docs/design/theming.md §§ 3.3, 5.2, 6.
+# Every AC below asserts every slot of the tool's profile; partial coverage
+# fails per § 6.1.
+# ═════════════════════════════════════════════════════════════════════════════
+
+# Source the authoritative palette so later ACs can assert
+# `committed-hex == $DRACULA_PRO_<SLOT>` instead of hardcoding hex twice.
+# shellcheck source=lib/dracula-pro-palette.sh disable=SC1091
+. "$MACOS_DEV/scripts/lib/dracula-pro-palette.sh"
+
+echo ""
+echo "═══ Wave C — Tier 3 ═════════════════════════════════════════════════════"
+
+# ── AC-sketchybar: colors.sh aligns with Dracula Pro palette ───────────────
+echo ""
+echo "AC-sketchybar: sketchybar/colors.sh uses Dracula Pro palette"
+
+# Structural sourcing of the palette file — colors.sh MUST NOT hardcode hex.
+check "colors.sh sources scripts/lib/dracula-pro-palette.sh" \
+  grep -qE '^\s*\.\s+.*/dracula-pro-palette\.sh' sketchybar/colors.sh
+
+# Source colors.sh in a subshell so its helper-derived COLOR_* values
+# resolve to their 0xff<RRGGBB> strings; then extract the 6-char hex.
+# DOTFILES override so colors.sh sources the palette from the checkout.
+sb_hex() {
+  DOTFILES="$MACOS_DEV" bash -c '. sketchybar/colors.sh 2>/dev/null; printf "%s" "${'"$1"':-}"' \
+    | sed -E 's/^0xff([0-9A-Fa-f]{6}).*/\1/' | tr 'a-f' 'A-F'
+}
+pal_hex() { printf '%s' "$1" | sed -E 's/^#([0-9A-Fa-f]{6})/\1/' | tr 'a-f' 'A-F'; }
+
+# Base structural slots
+check "COLOR_BG        == DRACULA_PRO_BACKGROUND"  test "$(sb_hex COLOR_BG)"        = "$(pal_hex "$DRACULA_PRO_BACKGROUND")"
+check "COLOR_FG        == DRACULA_PRO_FOREGROUND"  test "$(sb_hex COLOR_FG)"        = "$(pal_hex "$DRACULA_PRO_FOREGROUND")"
+check "COLOR_COMMENT   == DRACULA_PRO_COMMENT"     test "$(sb_hex COLOR_COMMENT)"   = "$(pal_hex "$DRACULA_PRO_COMMENT")"
+check "COLOR_SELECTION == DRACULA_PRO_SELECTION"   test "$(sb_hex COLOR_SELECTION)" = "$(pal_hex "$DRACULA_PRO_SELECTION")"
+# Accents
+check "COLOR_RED       == DRACULA_PRO_RED"         test "$(sb_hex COLOR_RED)"       = "$(pal_hex "$DRACULA_PRO_RED")"
+check "COLOR_GREEN     == DRACULA_PRO_GREEN"       test "$(sb_hex COLOR_GREEN)"     = "$(pal_hex "$DRACULA_PRO_GREEN")"
+check "COLOR_YELLOW    == DRACULA_PRO_YELLOW"      test "$(sb_hex COLOR_YELLOW)"    = "$(pal_hex "$DRACULA_PRO_YELLOW")"
+check "COLOR_CYAN      == DRACULA_PRO_CYAN"        test "$(sb_hex COLOR_CYAN)"      = "$(pal_hex "$DRACULA_PRO_CYAN")"
+check "COLOR_PURPLE    == DRACULA_PRO_BLUE"        test "$(sb_hex COLOR_PURPLE)"    = "$(pal_hex "$DRACULA_PRO_BLUE")"
+check "COLOR_PINK      == DRACULA_PRO_MAGENTA"     test "$(sb_hex COLOR_PINK)"      = "$(pal_hex "$DRACULA_PRO_MAGENTA")"
+check "COLOR_ORANGE    == DRACULA_PRO_ORANGE"      test "$(sb_hex COLOR_ORANGE)"    = "$(pal_hex "$DRACULA_PRO_ORANGE")"
+# COLOR_CURRENT_LINE retained for legacy callers; map to Selection per spec § 5.2
+check "COLOR_CURRENT_LINE == DRACULA_PRO_SELECTION" test "$(sb_hex COLOR_CURRENT_LINE)" = "$(pal_hex "$DRACULA_PRO_SELECTION")"
+
+# ── AC-jankyborders: bordersrc still sources colors.sh + references COLOR_* ─
+echo ""
+echo "AC-jankyborders: bordersrc inherits sketchybar/colors.sh"
+# shellcheck disable=SC2016
+check "bordersrc sources .config/sketchybar/colors.sh" \
+  grep -qE '^\s*\.\s+"?\$HOME/\.config/sketchybar/colors\.sh"?' jankyborders/bordersrc
+# shellcheck disable=SC2016
+check "bordersrc active_color references \$COLOR_PURPLE"   grep -qE 'active_color="\$COLOR_PURPLE"'          jankyborders/bordersrc
+# shellcheck disable=SC2016
+check "bordersrc inactive_color references selection slot" \
+  grep -qE 'inactive_color="\$COLOR_(CURRENT_LINE|SELECTION)"' jankyborders/bordersrc
+
+# ── AC-delta: git-delta syntax-theme is "Dracula Pro" ─────────────────────
+echo ""
+echo "AC-delta: git-delta syntax-theme"
+check 'delta syntax-theme = "Dracula Pro"' \
+  grep -qE '^\s*syntax-theme\s*=\s*"?Dracula Pro"?\s*$' git/.gitconfig
+
+# ── AC-git: git ui.color blocks use Dracula Pro hex ────────────────────────
+echo ""
+echo "AC-git: git .gitconfig [color.*] blocks"
+
+check "[color.branch] section present"  grep -qE '^\s*\[color "branch"\]' git/.gitconfig
+check "[color.diff] section present"    grep -qE '^\s*\[color "diff"\]'   git/.gitconfig
+check "[color.status] section present"  grep -qE '^\s*\[color "status"\]' git/.gitconfig
+
+# color.branch slots — current uses green, local uses blue, remote uses magenta.
+check "color.branch current  -> #8AFF80 (green)"    grep -qE '^\s*current\s*=\s*"?#8AFF80"? bold' git/.gitconfig
+check "color.branch local    -> #9580FF (blue)"     grep -qE '^\s*local\s*=\s*"?#9580FF"?'       git/.gitconfig
+check "color.branch remote   -> #FF80BF (magenta)"  grep -qE '^\s*remote\s*=\s*"?#FF80BF"?'      git/.gitconfig
+
+# color.diff slots — old=red, new=green, frag=magenta, meta=blue, whitespace=yellow
+check "color.diff old        -> #FF9580 (red)"      grep -qE '^\s*old\s*=\s*"?#FF9580"?'         git/.gitconfig
+check "color.diff new        -> #8AFF80 (green)"    grep -qE '^\s*new\s*=\s*"?#8AFF80"?'         git/.gitconfig
+check "color.diff frag       -> #FF80BF (magenta)"  grep -qE '^\s*frag\s*=\s*"?#FF80BF"?'        git/.gitconfig
+check "color.diff meta       -> #9580FF (blue)"     grep -qE '^\s*meta\s*=\s*"?#9580FF"?'        git/.gitconfig
+check "color.diff whitespace -> #FFFF80 (yellow)"   grep -qE '^\s*whitespace\s*=\s*"?#FFFF80"?'  git/.gitconfig
+
+# color.status slots — added=green, changed=yellow, untracked=red
+check "color.status added     -> #8AFF80 (green)"   grep -qE '^\s*added\s*=\s*"?#8AFF80"?'       git/.gitconfig
+check "color.status changed   -> #FFFF80 (yellow)"  grep -qE '^\s*changed\s*=\s*"?#FFFF80"?'     git/.gitconfig
+check "color.status untracked -> #FF9580 (red)"     grep -qE '^\s*untracked\s*=\s*"?#FF9580"?'   git/.gitconfig
+
+# ── AC-difftastic: DFT_* env overrides use Pro palette ─────────────────────
+echo ""
+echo "AC-difftastic: DFT_BACKGROUND / DFT_*_COLOR env"
+check 'DFT_BACKGROUND="dark" exported'            grep -qE '^export DFT_BACKGROUND="dark"'                 bash/.bashrc
+# difftastic exposes DFT_UNCHANGED_STYLE, DFT_STRONG_ADDED_STYLE etc. We
+# assert the Pro hex appears in the block comment header so a reader
+# lands on the palette variable instantly. The style vars themselves
+# only accept {regular,bold,dim,colour}; the comment documents the
+# palette-informed choice.
+# shellcheck disable=SC2016
+check 'bashrc difftastic block annotates Pro hex'  grep -qE '# difftastic: DFT_BACKGROUND=dark → \$DRACULA_PRO_BACKGROUND #22212C' bash/.bashrc
+
+# ── AC-diffnav: config.yml uses Dracula Pro hex ────────────────────────────
+echo ""
+echo "AC-diffnav: diffnav pane theme uses Pro palette"
+# Classic hex MUST NOT appear anywhere in the file.
+for classic in '#282A36' '#44475A' '#6272A4' '#BD93F9' '#FF79C6' '#8BE9FD' '#50FA7B' '#FFB86C' '#FF5555' '#F1FA8C'; do
+  check "no Classic hex $classic in diffnav/config.yml" \
+    bash -c "! grep -Fq '$classic' diffnav/config.yml"
+done
+# Required Pro slots
+check "diffnav selected_fg = #22212C (BACKGROUND)"   grep -qE 'selected_fg:\s*"#22212C"'   diffnav/config.yml
+check "diffnav selected_bg = #9580FF (BLUE/Purple)"  grep -qE 'selected_bg:\s*"#9580FF"'   diffnav/config.yml
+check "diffnav unselected_fg = #F8F8F2 (FOREGROUND)" grep -qE 'unselected_fg:\s*"#F8F8F2"' diffnav/config.yml
+check "diffnav border_fg = #7970A9 (COMMENT)"        grep -qE 'border_fg:\s*"#7970A9"'     diffnav/config.yml
+check "diffnav status_bar.fg = #F8F8F2 (FOREGROUND)" grep -qE 'fg:\s*"#F8F8F2"'            diffnav/config.yml
+check "diffnav status_bar.bg = #454158 (SELECTION)"  grep -qE 'bg:\s*"#454158"'            diffnav/config.yml
+
+# ── AC-bat: custom Dracula Pro tmTheme ships and BAT_THEME wired ───────────
+echo ""
+echo "AC-bat: Dracula Pro bat theme"
+TMTHEME="bat/themes/Dracula Pro.tmTheme"
+check 'BAT_THEME="Dracula Pro" exported'   grep -qE '^export BAT_THEME="Dracula Pro"' bash/.bashrc
+check "$TMTHEME exists"                     test -f "$TMTHEME"
+check "tmTheme is valid plist XML (doctype)" grep -qE '<!DOCTYPE plist' "$TMTHEME"
+check "tmTheme name = Dracula Pro"          grep -qE '<string>Dracula Pro</string>' "$TMTHEME"
+
+# Assert every Pro slot the Full-ANSI+Dim profile requires appears verbatim
+# in the tmTheme XML (tmTheme hex is case-insensitive; tmTheme uses #RRGGBB).
+for hex in \
+  "$DRACULA_PRO_BACKGROUND"  "$DRACULA_PRO_FOREGROUND"  "$DRACULA_PRO_COMMENT"  "$DRACULA_PRO_SELECTION" \
+  "$DRACULA_PRO_RED"         "$DRACULA_PRO_GREEN"       "$DRACULA_PRO_YELLOW"    "$DRACULA_PRO_BLUE" \
+  "$DRACULA_PRO_MAGENTA"     "$DRACULA_PRO_CYAN"        "$DRACULA_PRO_ORANGE" \
+  "$DRACULA_PRO_BRIGHT_RED"  "$DRACULA_PRO_BRIGHT_GREEN"    "$DRACULA_PRO_BRIGHT_YELLOW" \
+  "$DRACULA_PRO_BRIGHT_BLUE" "$DRACULA_PRO_BRIGHT_MAGENTA"  "$DRACULA_PRO_BRIGHT_CYAN" \
+  "$DRACULA_PRO_DIM_RED"     "$DRACULA_PRO_DIM_GREEN"       "$DRACULA_PRO_DIM_YELLOW" \
+  "$DRACULA_PRO_DIM_BLUE"    "$DRACULA_PRO_DIM_MAGENTA"     "$DRACULA_PRO_DIM_CYAN" \
+; do
+  check "tmTheme references $hex" grep -qiF "$hex" "$TMTHEME"
+done
+
+# install scripts must rebuild bat's cache after linking the theme file.
+check "install-macos.sh runs bat cache --build" grep -qE 'bat cache --build' install-macos.sh
+check "install-wsl.sh   runs bat cache --build" grep -qE 'bat cache --build' install-wsl.sh
+# Symlink wiring for the theme directory
+check "install-macos.sh links bat/themes → .config/bat/themes" \
+  grep -qE 'link\s+bat/themes\s+\.config/bat/themes' install-macos.sh
+check "install-wsl.sh   links bat/themes → .config/bat/themes" \
+  grep -qE 'link\s+bat/themes\s+\.config/bat/themes' install-wsl.sh
+
+# ── AC-jq: JQ_COLORS env with Pro-palette ANSI codes ───────────────────────
+echo ""
+echo "AC-jq: JQ_COLORS env"
+# jq accepts "ansi[;ansi...]:ansi[;ansi...]:..." — fg;bg style, one tuple
+# per JSON type. We assert the env is exported, mapped to Pro slots in a
+# header comment, and that the string contains 8 colon-separated fields.
+check "JQ_COLORS exported"   grep -qE '^export JQ_COLORS='        bash/.bashrc
+check "JQ_COLORS has 8 tuples" bash -c "awk -F: '/^export JQ_COLORS=/{sub(/\"/,\"\"); sub(/\"$/,\"\"); if (NF==8) print}' bash/.bashrc | grep -q ."
+check "JQ_COLORS comment cites DRACULA_PRO slots" \
+  grep -qE '# JQ_COLORS .* DRACULA_PRO_' bash/.bashrc
+
+# ── AC-xh: xh default --style = dracula-pro ───────────────────────────────
+echo ""
+echo "AC-xh: xh styling env"
+check "bashrc exports XH_CONFIG_DIR" grep -qE '^export XH_CONFIG_DIR='         bash/.bashrc
+# xh reads --style from CLI or config.json. We use an alias with --style=dracula-pro.
+check "bash defines xh alias with --style=dracula-pro" \
+  grep -qE "alias xh=['\"]xh --style=dracula-pro" bash/.bash_aliases
+
+# ── AC-atuin: atuin config.toml has [theme] with Pro hex ───────────────────
+echo ""
+echo "AC-atuin: atuin theme block"
+check "atuin [theme] section present"         grep -qE '^\[theme\]'                       atuin/config.toml
+check "atuin theme.name = dracula-pro"         grep -qE '^\s*name\s*=\s*"dracula-pro"'    atuin/config.toml
+# Pro hex slots — structural + accents
+for hex in "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "atuin config.toml references $hex" grep -qiF "$hex" atuin/config.toml
+done
+
+# ── AC-television: dracula-pro.toml ships + config.toml references it ─────
+echo ""
+echo "AC-television: Dracula Pro theme"
+TV_THEME="television/themes/dracula-pro.toml"
+check "$TV_THEME exists"                         test -f "$TV_THEME"
+check "television/config.toml theme = dracula-pro" \
+  grep -qE '^\s*theme\s*=\s*"dracula-pro"'       television/config.toml
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_SELECTION" \
+           "$DRACULA_PRO_COMMENT" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "television theme references $hex"       grep -qiF "$hex" "$TV_THEME"
+done
+check "install-macos.sh links television/themes" \
+  grep -qE 'link\s+television/themes\s+\.config/television/themes' install-macos.sh
+check "install-wsl.sh   links television/themes" \
+  grep -qE 'link\s+television/themes\s+\.config/television/themes' install-wsl.sh
+
+# ── AC-jqp: jqp custom theme block with Pro hex ────────────────────────────
+echo ""
+echo "AC-jqp: jqp.yaml custom theme"
+# theme: dracula (Classic builtin) MUST be gone.
+check "jqp theme is NOT 'dracula' (classic)" \
+  bash -c "! grep -qE '^theme:\s*dracula\s*$' jqp/.jqp.yaml"
+check "jqp theme block is a mapping (not a string)" \
+  grep -qE '^theme:\s*$' jqp/.jqp.yaml
+# Pro hex — structural + accents
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "jqp.yaml references $hex" grep -qiF "$hex" jqp/.jqp.yaml
+done
+
+# ── AC-btop: dracula-pro.theme + btop.conf ─────────────────────────────────
+echo ""
+echo "AC-btop: btop theme ships and config references it"
+check "btop/dracula-pro.theme exists"            test -f btop/dracula-pro.theme
+check "btop/btop.conf exists"                    test -f btop/btop.conf
+check 'btop.conf color_theme = "dracula-pro"' \
+  grep -qE '^color_theme\s*=\s*"dracula-pro"'    btop/btop.conf
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "btop theme references $hex" grep -qiF "$hex" btop/dracula-pro.theme
+done
+check "install-macos.sh links btop.conf"            grep -qE 'link\s+btop/btop\.conf\s+\.config/btop/btop\.conf'             install-macos.sh
+check "install-macos.sh links btop dracula-pro.theme" \
+  grep -qE 'link\s+btop/dracula-pro\.theme\s+\.config/btop/themes/dracula-pro\.theme' install-macos.sh
+check "install-wsl.sh   links btop.conf"            grep -qE 'link\s+btop/btop\.conf\s+\.config/btop/btop\.conf'             install-wsl.sh
+check "install-wsl.sh   links btop dracula-pro.theme" \
+  grep -qE 'link\s+btop/dracula-pro\.theme\s+\.config/btop/themes/dracula-pro\.theme' install-wsl.sh
+
+# ── AC-k9s: skin + config ──────────────────────────────────────────────────
+echo ""
+echo "AC-k9s: k9s dracula-pro skin"
+check "k9s/dracula-pro.yaml exists"              test -f k9s/dracula-pro.yaml
+check "k9s/config.yaml exists"                   test -f k9s/config.yaml
+check 'k9s config.yaml ui.skin = "dracula-pro"'  \
+  grep -qE 'skin:\s*"?dracula-pro"?'             k9s/config.yaml
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "k9s skin references $hex" grep -qiF "$hex" k9s/dracula-pro.yaml
+done
+check "install-macos.sh links k9s config"       grep -qE 'link\s+k9s/config\.yaml\s+\.config/k9s/config\.yaml'                install-macos.sh
+check "install-macos.sh links k9s skin"          grep -qE 'link\s+k9s/dracula-pro\.yaml\s+\.config/k9s/skins/dracula-pro\.yaml' install-macos.sh
+check "install-wsl.sh   links k9s config"       grep -qE 'link\s+k9s/config\.yaml\s+\.config/k9s/config\.yaml'                install-wsl.sh
+check "install-wsl.sh   links k9s skin"          grep -qE 'link\s+k9s/dracula-pro\.yaml\s+\.config/k9s/skins/dracula-pro\.yaml' install-wsl.sh
+
+# ── AC-httpie: config.json + Pro pygments artefact ─────────────────────────
+echo ""
+echo "AC-httpie: httpie Dracula Pro style"
+check "httpie/config.json exists"                 test -f httpie/config.json
+check "httpie/styles/dracula-pro.json exists"     test -f httpie/styles/dracula-pro.json
+check "httpie config sets --style=dracula-pro"    \
+  grep -qE '"--style=dracula-pro"'                 httpie/config.json
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" "$DRACULA_PRO_YELLOW" \
+           "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" "$DRACULA_PRO_CYAN" \
+           "$DRACULA_PRO_ORANGE"; do
+  check "httpie dracula-pro.json references $hex" grep -qiF "$hex" httpie/styles/dracula-pro.json
+done
+check "install-macos.sh links httpie config"       grep -qE 'link\s+httpie/config\.json\s+\.config/httpie/config\.json'     install-macos.sh
+check "install-macos.sh links httpie styles dir"   grep -qE 'link\s+httpie/styles\s+\.config/httpie/styles'                 install-macos.sh
+check "install-wsl.sh   links httpie config"       grep -qE 'link\s+httpie/config\.json\s+\.config/httpie/config\.json'     install-wsl.sh
+check "install-wsl.sh   links httpie styles dir"   grep -qE 'link\s+httpie/styles\s+\.config/httpie/styles'                 install-wsl.sh
+
+# ── AC-lnav: dracula-pro.json ships ────────────────────────────────────────
+echo ""
+echo "AC-lnav: lnav theme"
+check "lnav/dracula-pro.json exists"              test -f lnav/dracula-pro.json
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "lnav theme references $hex" grep -qiF "$hex" lnav/dracula-pro.json
+done
+check "install-macos.sh links lnav theme into formats/installed" \
+  grep -qE 'link\s+lnav/dracula-pro\.json\s+\.lnav/formats/installed/dracula-pro\.json' install-macos.sh
+check "install-wsl.sh   links lnav theme into formats/installed" \
+  grep -qE 'link\s+lnav/dracula-pro\.json\s+\.lnav/formats/installed/dracula-pro\.json' install-wsl.sh
+
+# ── AC-glow: dracula-pro.json ships + alias pins it ───────────────────────
+echo ""
+echo "AC-glow: glow Dracula Pro style"
+check "glow/dracula-pro.json exists"              test -f glow/dracula-pro.json
+check "bash alias pins glow --style to Pro style" \
+  grep -qE "alias glow=['\"]glow --style=.*glow/styles/dracula-pro\.json" bash/.bash_aliases
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" "$DRACULA_PRO_YELLOW" \
+           "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" "$DRACULA_PRO_CYAN" \
+           "$DRACULA_PRO_ORANGE"; do
+  check "glow style references $hex" grep -qiF "$hex" glow/dracula-pro.json
+done
+check "install-macos.sh links glow style" \
+  grep -qE 'link\s+glow/dracula-pro\.json\s+\.config/glow/styles/dracula-pro\.json' install-macos.sh
+check "install-wsl.sh   links glow style" \
+  grep -qE 'link\s+glow/dracula-pro\.json\s+\.config/glow/styles/dracula-pro\.json' install-wsl.sh
+
+# ── AC-freeze: chroma XML style ships + alias pins it ──────────────────────
+echo ""
+echo "AC-freeze: freeze chroma Dracula Pro style"
+check "freeze/dracula-pro.xml exists"             test -f freeze/dracula-pro.xml
+check 'freeze XML declares chroma <style name="dracula-pro">' \
+  grep -qE '<style name="dracula-pro">' freeze/dracula-pro.xml
+check "bash alias pins freeze --theme to Pro style" \
+  grep -qE "alias freeze=['\"]freeze --theme=.*freeze/styles/dracula-pro\.xml" bash/.bash_aliases
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" "$DRACULA_PRO_YELLOW" \
+           "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" "$DRACULA_PRO_CYAN" \
+           "$DRACULA_PRO_ORANGE"; do
+  check "freeze xml references $hex" grep -qiF "$hex" freeze/dracula-pro.xml
+done
+check "install-macos.sh links freeze style" \
+  grep -qE 'link\s+freeze/dracula-pro\.xml\s+\.config/freeze/styles/dracula-pro\.xml' install-macos.sh
+check "install-wsl.sh   links freeze style" \
+  grep -qE 'link\s+freeze/dracula-pro\.xml\s+\.config/freeze/styles/dracula-pro\.xml' install-wsl.sh
+
+# ── AC-lazydocker: config.yml gui.theme Pro hex ────────────────────────────
+echo ""
+echo "AC-lazydocker: Dracula Pro GUI theme"
+check "lazydocker/config.yml exists"  test -f lazydocker/config.yml
+check "lazydocker gui.theme: block"   grep -qE '^\s*theme:\s*$' lazydocker/config.yml
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_SELECTION" "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" \
+           "$DRACULA_PRO_YELLOW" "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" \
+           "$DRACULA_PRO_CYAN" "$DRACULA_PRO_ORANGE"; do
+  check "lazydocker/config.yml references $hex" grep -qiF "$hex" lazydocker/config.yml
+done
+check "install-macos.sh links lazydocker config" \
+  grep -qE 'link\s+lazydocker/config\.yml\s+\.config/lazydocker/config\.yml' install-macos.sh
+check "install-wsl.sh   links lazydocker config" \
+  grep -qE 'link\s+lazydocker/config\.yml\s+\.config/lazydocker/config\.yml' install-wsl.sh
+
+# ── AC-aerospace: verification-only — no hex literals in aerospace.toml ───
+echo ""
+echo "AC-aerospace: aerospace.toml inherits (no hex literals)"
+# Assert: file contains zero `#RRGGBB` sequences. Treat lines beginning
+# with `#` as comments and strip them before matching.
+check "aerospace.toml has no hex literals" \
+  bash -c "! grep -v '^\s*#' aerospace/aerospace.toml | grep -qE '#[0-9A-Fa-f]{6}'"
+# And: the exec-on-workspace-change line still triggers sketchybar.
+check "aerospace exec-on-workspace-change triggers sketchybar" \
+  grep -qE 'sketchybar --trigger aerospace_workspace_change' aerospace/aerospace.toml
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ── Wave B: Tier 2 Pro-from-Classic ──────────────────────────────────────────

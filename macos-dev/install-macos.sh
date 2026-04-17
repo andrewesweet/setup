@@ -398,6 +398,8 @@ link television/config.toml   .config/television/config.toml
 # television cable channels (Layer 1b-iii) — directory-level symlink so
 # additional .toml files added later require no re-wire.
 link television/cable         .config/television/cable
+# television themes (Wave C Tier 3 — directory symlink so added themes land without re-wire)
+link television/themes        .config/television/themes
 
 # ripgrep (Wave B — Dracula Pro via --colors config)
 link ripgrep/config  .config/ripgrep/config
@@ -415,6 +417,53 @@ link jqp/.jqp.yaml  .jqp.yaml
 
 # diffnav (Plan Layer 1b-i)
 link diffnav/config.yml  .config/diffnav/config.yml
+
+# bat themes (Plan theming-wave-c)
+# Custom Dracula Pro tmTheme lives under bat/themes/ and is
+# symlinked as a directory so adding themes later requires no rewire.
+mkdir -p "$HOME/.config/bat/themes"
+link bat/themes  .config/bat/themes
+
+# Rebuild bat's theme cache so BAT_THEME="Dracula Pro" resolves.
+# Idempotent; bat prints "Writing theme set to ..." on each run.
+if command -v bat >/dev/null 2>&1; then
+  bat cache --build >/dev/null
+  printf "  bat cache --build (Dracula Pro theme registered)\n"
+else
+  warn "bat not installed — skipping 'bat cache --build'. Run it manually after installing bat."
+fi
+
+# btop (Wave C Tier 3) — file-level links so `~/.config/btop/themes/`
+# remains a real directory btop can write transient state into.
+mkdir -p "$HOME/.config/btop/themes"
+link btop/btop.conf           .config/btop/btop.conf
+link btop/dracula-pro.theme   .config/btop/themes/dracula-pro.theme
+
+# k9s (Wave C Tier 3)
+mkdir -p "$HOME/.config/k9s/skins"
+link k9s/config.yaml          .config/k9s/config.yaml
+link k9s/dracula-pro.yaml     .config/k9s/skins/dracula-pro.yaml
+
+# httpie (Wave C Tier 3)
+mkdir -p "$HOME/.config/httpie/styles"
+link httpie/config.json    .config/httpie/config.json
+link httpie/styles         .config/httpie/styles
+
+# lnav (Wave C Tier 3)
+mkdir -p "$HOME/.lnav/formats/installed"
+link lnav/dracula-pro.json    .lnav/formats/installed/dracula-pro.json
+
+# glow (Wave C Tier 3)
+mkdir -p "$HOME/.config/glow/styles"
+link glow/dracula-pro.json    .config/glow/styles/dracula-pro.json
+
+# freeze (Wave C Tier 3)
+mkdir -p "$HOME/.config/freeze/styles"
+link freeze/dracula-pro.xml    .config/freeze/styles/dracula-pro.xml
+
+# lazydocker (Wave C Tier 3)
+mkdir -p "$HOME/.config/lazydocker"
+link lazydocker/config.yml    .config/lazydocker/config.yml
 
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml

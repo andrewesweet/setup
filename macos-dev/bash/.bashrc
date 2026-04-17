@@ -244,7 +244,42 @@ else
   export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 fi
 
-export BAT_THEME="Dracula"
+# difftastic: DFT_BACKGROUND=dark → $DRACULA_PRO_BACKGROUND #22212C
+# difftastic renders added/removed with terminal ANSI red/green;
+# Pro terminal ANSI red=#FF9580 / green=#8AFF80 so no per-colour override
+# is required — DFT_BACKGROUND=dark ensures the contrast direction is
+# correct for the Pro dark background.
+export DFT_BACKGROUND="dark"
+
+# JQ_COLORS — Pro-palette ANSI attributes — DRACULA_PRO_* slots per jq(1) manual. Format:
+#   null:false:true:numbers:strings:arrays:objects:objkeys
+# Each field is "<attrs>;<fg>" where attrs=1 bold, 2 dim, 4 underline and
+# fg is an 8-colour ANSI code (30-37) or 38;5;N for 256-colour. We use
+# Pro Terminal Standard ANSI codes:
+#   0=BLACK  1=RED    2=GREEN  3=YELLOW  4=BLUE  5=MAGENTA  6=CYAN  7=WHITE
+# Mapping:
+#   null    -> DRACULA_PRO_COMMENT   (dim white+italic — 2;37)
+#   false   -> DRACULA_PRO_RED       (0;31)
+#   true    -> DRACULA_PRO_GREEN     (0;32)
+#   numbers -> DRACULA_PRO_ORANGE    (0;33 yellow — Pro yellow/orange overlap at ANSI level)
+#   strings -> DRACULA_PRO_YELLOW    (0;33)
+#   arrays  -> DRACULA_PRO_BLUE      (0;34)
+#   objects -> DRACULA_PRO_MAGENTA   (0;35)
+#   objkeys -> DRACULA_PRO_CYAN      (1;36 bold)
+export JQ_COLORS="2;37:0;31:0;32:0;33:0;33:0;34:0;35:1;36"
+
+# xh — use pygments 'dracula' style at the terminal; xh doesn't ship a
+# 'dracula-pro' pygments style, so we pin to pygments 'dracula' which is
+# the closest upstream and leave the httpie-generated pygments style
+# (see Task 13) for when xh gains config-path support for external styles.
+# XH_CONFIG_DIR kept for forward compatibility — xh will auto-create the
+# directory when any config-based styling is introduced.
+export XH_CONFIG_DIR="$HOME/.config/xh"
+
+# bat syntax theme — custom Dracula Pro tmTheme, symlinked into
+# ~/.config/bat/themes/ by install-*.sh and registered via `bat cache --build`.
+# Wave C (docs/design/theming.md § 3.3) supersedes the Wave B `Dracula` value.
+export BAT_THEME="Dracula Pro"
 
 # ripgrep — load Dracula Pro --colors from the repo-tracked config.
 # See docs/design/theming.md § 3.2. Path resolution uses $HOME because the
@@ -295,7 +330,7 @@ fi
 #   Red         #FF9580 = 255,149,128
 #   Purple      #9580FF = 149,128,255
 #   Cyan        #80FFEA = 128,255,234
-#   Orange      #FFCA80 = 255,202,128
+#   Orange     #FFCA80 = 255,202,128
 export GROFF_NO_SGR=1
 export LESS_TERMCAP_mb=$'\e[38;2;255;149;128m'                   # begin blink  = Red
 export LESS_TERMCAP_md=$'\e[1;38;2;149;128;255m'                 # begin bold   = Purple

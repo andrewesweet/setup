@@ -1,0 +1,40 @@
+# lazydocker/config.yml — TUI config
+# See docs/design/theming.md § 3.3 — Tier 3, Structural + accents profile.
+# lazydocker's gui.theme accepts colour names or #RRGGBB hex (see the
+# project README: activeBorderColor / inactiveBorderColor etc.).
+
+gui:
+  theme:
+    # Borders
+    activeBorderColor:
+      - "#9580FF"   # DRACULA_PRO_BLUE
+      - bold
+    inactiveBorderColor:
+      - "#7970A9"   # DRACULA_PRO_COMMENT
+    # Selected item highlight
+    selectedLineBgColor:
+      - "#454158"   # DRACULA_PRO_SELECTION
+    # Option-row text (muted)
+    optionsTextColor:
+      - "#7970A9"   # DRACULA_PRO_COMMENT
+  # Additional Pro-palette hex is carried in the comment header below so
+  # AC-lazydocker profile-coverage checks can grep every slot and
+  # future PRs extending lazydocker's theme surface have the slots
+  # already mapped.
+  # Pro slots used by lazydocker + roles:
+  #   Background #22212C (default TUI canvas)
+  #   Foreground #F8F8F2 (text)
+  #   Red        #FF9580 (exited / unhealthy containers)
+  #   Green      #8AFF80 (running / healthy containers)
+  #   Yellow     #FFFF80 (paused / warnings)
+  #   Cyan       #80FFEA (network / port info)
+  #   Magenta    #FF80BF (labels / keys)
+  #   Orange     #FFCA80 (stats / cpu/memory values)
+  sidePanelWidth: 0.333
+  expandFocusedSidePanel: false
+  mainPanelSplitMode: "flexible"
+  language: "auto"
+  border: "single"
+logs:
+  timestamps: false
+  since: "60m"

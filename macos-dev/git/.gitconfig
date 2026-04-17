@@ -17,7 +17,7 @@
     navigate                     = true    # remaps n/N to jump between hunks; disables less search (/)
     side-by-side                 = true
     line-numbers                 = true
-    syntax-theme                 = Dracula
+    syntax-theme                 = Dracula Pro
     features                     = decorations
     hyperlinks                   = true
     hyperlinks-file-link-format  = "lazygit-edit://{path}:{line}"
@@ -78,3 +78,28 @@
 
 [ghq]
   root = ~/code
+
+# ── Dracula Pro ui.color blocks (theming spec § 3.3, Accents profile) ──
+[color "branch"]
+    current  = "#8AFF80" bold   # DRACULA_PRO_GREEN
+    local    = "#9580FF"        # DRACULA_PRO_BLUE
+    remote   = "#FF80BF"        # DRACULA_PRO_MAGENTA
+    upstream = "#80FFEA"        # DRACULA_PRO_CYAN
+    plain    = "#F8F8F2"        # DRACULA_PRO_FOREGROUND
+
+[color "diff"]
+    old        = "#FF9580"      # DRACULA_PRO_RED
+    new        = "#8AFF80"      # DRACULA_PRO_GREEN
+    frag       = "#FF80BF"      # DRACULA_PRO_MAGENTA (hunk header)
+    meta       = "#9580FF"      # DRACULA_PRO_BLUE    (file/commit meta)
+    whitespace = "#FFFF80"      # DRACULA_PRO_YELLOW
+    func       = "#80FFEA"      # DRACULA_PRO_CYAN    (function line)
+    commit     = "#FFCA80"      # DRACULA_PRO_ORANGE
+
+[color "status"]
+    added     = "#8AFF80"       # DRACULA_PRO_GREEN
+    changed   = "#FFFF80"       # DRACULA_PRO_YELLOW
+    untracked = "#FF9580"       # DRACULA_PRO_RED
+    branch    = "#9580FF"       # DRACULA_PRO_BLUE
+    nobranch  = "#FF80BF"       # DRACULA_PRO_MAGENTA
+    header    = "#7970A9"       # DRACULA_PRO_COMMENT
