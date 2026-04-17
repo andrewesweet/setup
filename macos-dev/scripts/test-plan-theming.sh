@@ -319,6 +319,22 @@ check "purple = #9580FF"                    grep -qE '^purple\s*=\s*"#9580FF"' s
 check "red = #FF9580"                       grep -qE '^red\s*=\s*"#FF9580"' starship/starship.toml
 check "yellow = #FFFF80"                    grep -qE '^yellow\s*=\s*"#FFFF80"' starship/starship.toml
 
+# ── AC-B-tmux ────────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-tmux: tmux dracula plugin colours overridden with Pro Base hex"
+check "tmux has @dracula-colors block"    grep -qE '^set -g @dracula-colors "' tmux/.tmux.conf
+check "tmux white = Pro White"            grep -q "white='#F8F8F2'"        tmux/.tmux.conf
+check "tmux gray = Pro Selection"         grep -q "gray='#454158'"         tmux/.tmux.conf
+check "tmux dark_gray = Pro Background"   grep -q "dark_gray='#22212C'"    tmux/.tmux.conf
+check "tmux light_purple = Pro Blue"      grep -q "light_purple='#9580FF'" tmux/.tmux.conf
+check "tmux dark_purple = Pro Comment"    grep -q "dark_purple='#7970A9'"  tmux/.tmux.conf
+check "tmux cyan = Pro Cyan"              grep -q "cyan='#80FFEA'"         tmux/.tmux.conf
+check "tmux green = Pro Green"            grep -q "green='#8AFF80'"        tmux/.tmux.conf
+check "tmux orange = Pro Orange"          grep -q "orange='#FFCA80'"       tmux/.tmux.conf
+check "tmux red = Pro Red"                grep -q "red='#FF9580'"          tmux/.tmux.conf
+check "tmux pink = Pro Magenta"           grep -q "pink='#FF80BF'"         tmux/.tmux.conf
+check "tmux yellow = Pro Yellow"          grep -q "yellow='#FFFF80'"       tmux/.tmux.conf
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
