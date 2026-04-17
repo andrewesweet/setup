@@ -577,6 +577,23 @@ check "install-macos.sh links lnav theme into formats/installed" \
 check "install-wsl.sh   links lnav theme into formats/installed" \
   grep -qE 'link\s+lnav/dracula-pro\.json\s+\.lnav/formats/installed/dracula-pro\.json' install-wsl.sh
 
+# ── AC-glow: dracula-pro.json ships + alias pins it ───────────────────────
+echo ""
+echo "AC-glow: glow Dracula Pro style"
+check "glow/dracula-pro.json exists"              test -f glow/dracula-pro.json
+check "bash alias pins glow --style to Pro style" \
+  grep -qE "alias glow=['\"]glow --style=.*glow/styles/dracula-pro\.json" bash/.bash_aliases
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" "$DRACULA_PRO_YELLOW" \
+           "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" "$DRACULA_PRO_CYAN" \
+           "$DRACULA_PRO_ORANGE"; do
+  check "glow style references $hex" grep -qiF "$hex" glow/dracula-pro.json
+done
+check "install-macos.sh links glow style" \
+  grep -qE 'link\s+glow/dracula-pro\.json\s+\.config/glow/styles/dracula-pro\.json' install-macos.sh
+check "install-wsl.sh   links glow style" \
+  grep -qE 'link\s+glow/dracula-pro\.json\s+\.config/glow/styles/dracula-pro\.json' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

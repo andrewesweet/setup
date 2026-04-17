@@ -442,6 +442,10 @@ link httpie/styles         .config/httpie/styles
 mkdir -p "$HOME/.lnav/formats/installed"
 link lnav/dracula-pro.json    .lnav/formats/installed/dracula-pro.json
 
+# glow (Wave C Tier 3)
+mkdir -p "$HOME/.config/glow/styles"
+link glow/dracula-pro.json    .config/glow/styles/dracula-pro.json
+
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 
