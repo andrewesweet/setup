@@ -2,80 +2,80 @@
 # Source: github.com/dracula/yazi (community-maintained)
 
 [manager]
-cwd = { fg = "#8BE9FD" }
-hovered         = { fg = "#282A36", bg = "#BD93F9" }
+cwd = { fg = "#80FFEA" }
+hovered         = { fg = "#22212C", bg = "#9580FF" }
 preview_hovered = { underline = true }
-find_keyword    = { fg = "#FFB86C", italic = true }
-find_position   = { fg = "#FF79C6", bg = "reset", italic = true }
-marker_selected = { fg = "#50FA7B", bg = "#50FA7B" }
-marker_copied   = { fg = "#F1FA8C", bg = "#F1FA8C" }
-marker_cut      = { fg = "#FF5555", bg = "#FF5555" }
-tab_active      = { fg = "#282A36", bg = "#BD93F9" }
-tab_inactive    = { fg = "#F8F8F2", bg = "#44475A" }
+find_keyword    = { fg = "#FFCA80", italic = true }
+find_position   = { fg = "#FF80BF", bg = "reset", italic = true }
+marker_selected = { fg = "#8AFF80", bg = "#8AFF80" }
+marker_copied   = { fg = "#FFFF80", bg = "#FFFF80" }
+marker_cut      = { fg = "#FF9580", bg = "#FF9580" }
+tab_active      = { fg = "#22212C", bg = "#9580FF" }
+tab_inactive    = { fg = "#F8F8F2", bg = "#454158" }
 tab_width       = 1
 border_symbol   = "│"
-border_style    = { fg = "#6272A4" }
+border_style    = { fg = "#7970A9" }
 syntect_theme   = ""
 
 [status]
 separator_open  = ""
 separator_close = ""
-separator_style = { fg = "#44475A", bg = "#44475A" }
-mode_normal = { fg = "#282A36", bg = "#BD93F9", bold = true }
-mode_select = { fg = "#282A36", bg = "#50FA7B", bold = true }
-mode_unset  = { fg = "#282A36", bg = "#FFB86C", bold = true }
+separator_style = { fg = "#454158", bg = "#454158" }
+mode_normal = { fg = "#22212C", bg = "#9580FF", bold = true }
+mode_select = { fg = "#22212C", bg = "#8AFF80", bold = true }
+mode_unset  = { fg = "#22212C", bg = "#FFCA80", bold = true }
 progress_label   = { fg = "#F8F8F2", bold = true }
-progress_normal  = { fg = "#BD93F9", bg = "#44475A" }
-progress_error   = { fg = "#FF5555", bg = "#44475A" }
-permissions_t = { fg = "#8BE9FD" }
-permissions_r = { fg = "#F1FA8C" }
-permissions_w = { fg = "#FF5555" }
-permissions_x = { fg = "#50FA7B" }
-permissions_s = { fg = "#6272A4" }
+progress_normal  = { fg = "#9580FF", bg = "#454158" }
+progress_error   = { fg = "#FF9580", bg = "#454158" }
+permissions_t = { fg = "#80FFEA" }
+permissions_r = { fg = "#FFFF80" }
+permissions_w = { fg = "#FF9580" }
+permissions_x = { fg = "#8AFF80" }
+permissions_s = { fg = "#7970A9" }
 
 [input]
-border   = { fg = "#BD93F9" }
+border   = { fg = "#9580FF" }
 title    = {}
 value    = {}
 selected = { reversed = true }
 
 [select]
-border   = { fg = "#BD93F9" }
-active   = { fg = "#FF79C6" }
+border   = { fg = "#9580FF" }
+active   = { fg = "#FF80BF" }
 inactive = {}
 
 [tasks]
-border  = { fg = "#BD93F9" }
+border  = { fg = "#9580FF" }
 title   = {}
 hovered = { underline = true }
 
 [which]
-mask            = { bg = "#282A36" }
-cand            = { fg = "#8BE9FD" }
-rest            = { fg = "#6272A4" }
-desc            = { fg = "#FF79C6" }
+mask            = { bg = "#22212C" }
+cand            = { fg = "#80FFEA" }
+rest            = { fg = "#7970A9" }
+desc            = { fg = "#FF80BF" }
 separator       = "  "
-separator_style = { fg = "#44475A" }
+separator_style = { fg = "#454158" }
 
 [help]
-on      = { fg = "#FF79C6" }
-exec    = { fg = "#8BE9FD" }
-desc    = { fg = "#6272A4" }
-hovered = { bg = "#44475A", bold = true }
-footer  = { fg = "#282A36", bg = "#F8F8F2" }
+on      = { fg = "#FF80BF" }
+exec    = { fg = "#80FFEA" }
+desc    = { fg = "#7970A9" }
+hovered = { bg = "#454158", bold = true }
+footer  = { fg = "#22212C", bg = "#F8F8F2" }
 
 [filetype]
 rules = [
-  { mime = "image/*",                fg = "#FFB86C" },
-  { mime = "video/*",                fg = "#F1FA8C" },
-  { mime = "audio/*",                fg = "#F1FA8C" },
-  { mime = "application/zip",        fg = "#FF79C6" },
-  { mime = "application/gzip",       fg = "#FF79C6" },
-  { mime = "application/x-tar",      fg = "#FF79C6" },
-  { mime = "application/x-bzip",     fg = "#FF79C6" },
-  { mime = "application/x-bzip2",    fg = "#FF79C6" },
-  { mime = "application/x-7z-compressed", fg = "#FF79C6" },
-  { mime = "application/x-rar",      fg = "#FF79C6" },
+  { mime = "image/*",                fg = "#FFCA80" },
+  { mime = "video/*",                fg = "#FFFF80" },
+  { mime = "audio/*",                fg = "#FFFF80" },
+  { mime = "application/zip",        fg = "#FF80BF" },
+  { mime = "application/gzip",       fg = "#FF80BF" },
+  { mime = "application/x-tar",      fg = "#FF80BF" },
+  { mime = "application/x-bzip",     fg = "#FF80BF" },
+  { mime = "application/x-bzip2",    fg = "#FF80BF" },
+  { mime = "application/x-7z-compressed", fg = "#FF80BF" },
+  { mime = "application/x-rar",      fg = "#FF80BF" },
   { name = "*",                      fg = "#F8F8F2" },
-  { name = "*/",                     fg = "#BD93F9" },
+  { name = "*/",                     fg = "#9580FF" },
 ]

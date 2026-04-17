@@ -360,6 +360,22 @@ check "error = Red"                         grep -q '"#FF9580"' gh-dash/config.y
 check "border.primary = Purple"             grep -q '"#9580FF"' gh-dash/config.yml
 check "no Classic hex remain"               bash -c "! grep -qE \"#(BD93F9|FF5555|50FA7B|FFB86C|6272A4|44475A|282A36|FF79C6|F1FA8C|8BE9FD)\" gh-dash/config.yml"
 
+# ── AC-B-yazi ────────────────────────────────────────────────────────────────
+echo ""
+echo "AC-B-yazi: yazi/theme.toml uses Pro Base hex only"
+check "background = #22212C"   grep -q '"#22212C"' yazi/theme.toml
+check "foreground = #F8F8F2"   grep -q '"#F8F8F2"' yazi/theme.toml
+check "comment = #7970A9"      grep -q '"#7970A9"' yazi/theme.toml
+check "selection = #454158"    grep -q '"#454158"' yazi/theme.toml
+check "purple = #9580FF"       grep -q '"#9580FF"' yazi/theme.toml
+check "cyan = #80FFEA"         grep -q '"#80FFEA"' yazi/theme.toml
+check "green = #8AFF80"        grep -q '"#8AFF80"' yazi/theme.toml
+check "yellow = #FFFF80"       grep -q '"#FFFF80"' yazi/theme.toml
+check "orange = #FFCA80"       grep -q '"#FFCA80"' yazi/theme.toml
+check "pink = #FF80BF"         grep -q '"#FF80BF"' yazi/theme.toml
+check "red = #FF9580"          grep -q '"#FF9580"' yazi/theme.toml
+check "no Classic hex remain"  bash -c "! grep -qE \"#(BD93F9|6272A4|44475A|282A36|FF5555|50FA7B|FFB86C|FF79C6|F1FA8C|8BE9FD)\" yazi/theme.toml"
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
