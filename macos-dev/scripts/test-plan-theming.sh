@@ -594,6 +594,25 @@ check "install-macos.sh links glow style" \
 check "install-wsl.sh   links glow style" \
   grep -qE 'link\s+glow/dracula-pro\.json\s+\.config/glow/styles/dracula-pro\.json' install-wsl.sh
 
+# ── AC-freeze: chroma XML style ships + alias pins it ──────────────────────
+echo ""
+echo "AC-freeze: freeze chroma Dracula Pro style"
+check "freeze/dracula-pro.xml exists"             test -f freeze/dracula-pro.xml
+check 'freeze XML declares chroma <style name="dracula-pro">' \
+  grep -qE '<style name="dracula-pro">' freeze/dracula-pro.xml
+check "bash alias pins freeze --theme to Pro style" \
+  grep -qE "alias freeze=['\"]freeze --theme=.*freeze/styles/dracula-pro\.xml" bash/.bash_aliases
+for hex in "$DRACULA_PRO_BACKGROUND" "$DRACULA_PRO_FOREGROUND" "$DRACULA_PRO_COMMENT" \
+           "$DRACULA_PRO_RED" "$DRACULA_PRO_GREEN" "$DRACULA_PRO_YELLOW" \
+           "$DRACULA_PRO_BLUE" "$DRACULA_PRO_MAGENTA" "$DRACULA_PRO_CYAN" \
+           "$DRACULA_PRO_ORANGE"; do
+  check "freeze xml references $hex" grep -qiF "$hex" freeze/dracula-pro.xml
+done
+check "install-macos.sh links freeze style" \
+  grep -qE 'link\s+freeze/dracula-pro\.xml\s+\.config/freeze/styles/dracula-pro\.xml' install-macos.sh
+check "install-wsl.sh   links freeze style" \
+  grep -qE 'link\s+freeze/dracula-pro\.xml\s+\.config/freeze/styles/dracula-pro\.xml' install-wsl.sh
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

@@ -470,6 +470,9 @@ alias xh='xh --style=dracula-pro'
 # glow — pin the Dracula Pro markdown style. --style accepts a file path.
 alias glow='glow --style="$HOME/.config/glow/styles/dracula-pro.json"'
 
+# freeze — pin the Dracula Pro chroma style.
+alias freeze='freeze --theme="$HOME/.config/freeze/styles/dracula-pro.xml"'
+
 # rip2 (MilesCranmer/rip2) — safe rm with undo. Graveyard at
 # ~/.local/share/graveyard (per §7.3 of design). Two aliases:
 #   rrip     — undo last deletion

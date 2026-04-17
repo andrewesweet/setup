@@ -446,6 +446,10 @@ link lnav/dracula-pro.json    .lnav/formats/installed/dracula-pro.json
 mkdir -p "$HOME/.config/glow/styles"
 link glow/dracula-pro.json    .config/glow/styles/dracula-pro.json
 
+# freeze (Wave C Tier 3)
+mkdir -p "$HOME/.config/freeze/styles"
+link freeze/dracula-pro.xml    .config/freeze/styles/dracula-pro.xml
+
 # gh-dash (Plan Layer 1b-iii)
 link gh-dash/config.yml  .config/gh-dash/config.yml
 
