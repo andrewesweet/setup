@@ -149,10 +149,10 @@ check "install-wsl.sh guards TPM clone on [[ ! -d ]]" \
 check "install-wsl.sh mentions tmux-thumbs Rust caveat in next steps" \
   grep -qE 'tmux-thumbs.*Rust|Rust.*tmux-thumbs' install-wsl.sh
 
-# ── AC-12: BAT_THEME = Dracula ───────────────────────────────────────────
+# ── AC-12: BAT_THEME = Dracula Pro ───────────────────────────────────────
 echo ""
-echo "AC-12: BAT_THEME is Dracula"
-check "BAT_THEME=Dracula"  grep -qE 'export BAT_THEME="Dracula"' bash/.bashrc
+echo "AC-12: BAT_THEME is Dracula Pro (post theming Wave A — custom tmTheme)"
+check "BAT_THEME=Dracula Pro"  grep -qE 'export BAT_THEME="Dracula Pro"' bash/.bashrc
 check "old Monokai theme removed" bash -c '! grep -q "Monokai Extended" bash/.bashrc'
 
 # ── AC-13: FZF_DEFAULT_OPTS has Dracula colors ───────────────────────────

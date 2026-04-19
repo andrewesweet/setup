@@ -138,8 +138,12 @@ check "y() body cds into the yazi-selected directory" \
 echo ""
 echo "AC-7: jqp/.jqp.yaml"
 check "jqp/.jqp.yaml exists" test -f jqp/.jqp.yaml
-check "jqp config has theme: dracula" \
-  grep -qE '^theme:\s*dracula\s*$' jqp/.jqp.yaml
+check "jqp config has Pro palette theme table (post theming Wave B/C)" \
+  grep -qE '^theme:\s*$' jqp/.jqp.yaml
+check "jqp theme references Pro Foreground hex" \
+  grep -qE 'fg:\s*"#F8F8F2"' jqp/.jqp.yaml
+check "jqp theme references Pro Background hex" \
+  grep -qE 'bg:\s*"#22212C"' jqp/.jqp.yaml
 check "install-macos.sh links jqp/.jqp.yaml" \
   grep -qE 'link\s+jqp/\.jqp\.yaml' install-macos.sh
 check "install-wsl.sh links jqp/.jqp.yaml" \

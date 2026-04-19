@@ -105,10 +105,10 @@ check "command_history key is ABSENT"         \
 # ── AC-10: Starship uses Dracula palette ──────────────────────────────────
 echo ""
 echo "AC-10: Starship Dracula palette"
-check "starship palette = dracula"            \
-  grep -qE '^palette\s*=\s*"dracula"' starship/starship.toml
-check "[palettes.dracula] table exists"       \
-  grep -qE '^\[palettes\.dracula\]' starship/starship.toml
+check "starship palette = dracula-pro (Pro palette post theming Wave A)"  \
+  grep -qE '^palette\s*=\s*"dracula-pro"' starship/starship.toml
+check "[palettes.dracula-pro] table exists"                              \
+  grep -qE '^\[palettes\.dracula-pro\]' starship/starship.toml
 for color in background current_line foreground comment cyan green orange pink purple red yellow; do
   check "palette has '$color'"                \
     grep -qE "^$color\s*=" starship/starship.toml
