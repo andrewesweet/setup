@@ -239,6 +239,96 @@ gh_release_install() {
   rm -rf "$tmp"
 }
 
+# ── gh_release_deb_install ──────────────────────────────────────────────
+# Install from a signed .deb asset on a GitHub release. Preferred over
+# gh_release_install for tools whose upstream publishes Debian packages,
+# because dpkg handles PATH (/usr/bin), shell completions, and uninstall
+# via `apt remove` automatically.
+#
+# Usage: gh_release_deb_install <owner/repo> <binary-for-idempotency> [<asset-prefix>]
+#   owner/repo:       e.g. "sxyazi/yazi"
+#   binary-for-idempotency: the command to `command -v` for skip check
+#   asset-prefix:     filename-prefix pattern (default: binary name)
+#
+# Prefers gnu over musl; filters out android/termux variants.
+gh_release_deb_install() {
+  local repo="$1" binary="$2" asset_prefix="${3:-$2}"
+  local arch tmp url
+
+  # Idempotency: skip if the binary is already on PATH from an upstream
+  # source (typical after dpkg install → /usr/bin). Unlike binary-tarball
+  # installs, .deb packages place into system paths so we can trust the
+  # PATH check here.
+  if command -v "$binary" >/dev/null 2>&1; then
+    printf "  already installed: %s\n" "$binary"
+    return 0
+  fi
+
+  case "$(uname -m)" in
+    x86_64)  arch='amd64|x86_64' ;;
+    aarch64|arm64) arch='arm64|aarch64' ;;
+    *)       warn "gh_release_deb_install: unsupported arch $(uname -m) for $binary"; return 1 ;;
+  esac
+
+  local releases_json
+  log "fetching latest release metadata: $repo"
+  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+    releases_json="$(gh api "repos/$repo/releases/latest" 2>/dev/null)"
+  else
+    local -a auth_header=()
+    local token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
+    [[ -n "$token" ]] && auth_header=(-H "Authorization: Bearer $token")
+    releases_json="$(curl -fsSL "${auth_header[@]}" "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null)"
+  fi
+  if [[ -z "$releases_json" ]]; then
+    warn "gh_release_deb_install: cannot reach GitHub API for $repo"
+    return 1
+  fi
+
+  # Pick .deb asset: start with asset_prefix + arch token. `.deb` implies
+  # linux so the OS tag is treated as optional — e.g. xh names its file
+  # `xh_<ver>_amd64.deb` with no `linux` in it. Filter out android/termux
+  # variants explicitly; prefer gnu over musl below.
+  local name_guard="/${asset_prefix}[-_]"
+  local -a candidates
+  mapfile -t candidates < <(
+    printf '%s' "$releases_json" \
+      | grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
+      | sed -E 's/.*"([^"]+)"$/\1/' \
+      | grep -E "$name_guard" \
+      | grep -iE "($arch)" \
+      | grep -viE 'android|termux|windows|darwin|apple' \
+      | grep -E '\.deb$'
+  )
+  url=""
+  local c
+  for c in "${candidates[@]}"; do
+    [[ "$c" == *musl* ]] && continue
+    url="$c"; break
+  done
+  [[ -z "$url" && ${#candidates[@]} -gt 0 ]] && url="${candidates[0]}"
+
+  if [[ -z "$url" ]]; then
+    warn "gh_release_deb_install: no matching .deb asset for $repo"
+    return 1
+  fi
+
+  log "downloading $url"
+  tmp="$(mktemp -d)"
+  if ! curl -fsSL -o "$tmp/pkg.deb" "$url"; then
+    warn "gh_release_deb_install: download failed for $url"
+    rm -rf "$tmp"
+    return 1
+  fi
+  if ! sudo dpkg -i "$tmp/pkg.deb"; then
+    warn "gh_release_deb_install: dpkg install failed for $repo"
+    rm -rf "$tmp"
+    return 1
+  fi
+  printf "  installed %s via dpkg (%s)\n" "$binary" "$(basename "$url")"
+  rm -rf "$tmp"
+}
+
 # Precondition: $HOME must be on a native Linux filesystem (ext4), not on
 # /mnt/c/ (9P bridge to Windows — ~10× slower, kills git perf on ghq tree).
 check_home_on_ext4() {
@@ -376,16 +466,18 @@ fi
 # package only landed in Noble (24.04). gh_release_install handles both arches.
 log "installing release binaries (Layer 1a)"
 gh_release_install "atuinsh/atuin"                atuin
-gh_release_install "alexpasmantier/television"    tv
+# television, xh, yazi, carapace ship signed .deb on their GitHub releases
+# — prefer dpkg over a raw tarball/zip drop for system PATH + uninstall.
+gh_release_deb_install "alexpasmantier/television" tv
+gh_release_deb_install "ducaale/xh"                xh
 
 log "installing release binaries (Layer 1b-i)"
-gh_release_install "ducaale/xh"                   xh
 gh_release_install "joshmedeski/sesh"             sesh
-gh_release_install "sxyazi/yazi"                  yazi
+gh_release_deb_install "sxyazi/yazi"               yazi
 gh_release_install "MilesCranmer/rip2"            rip2 rip rip
 gh_release_install "noahgorstein/jqp"             jqp
 gh_release_install "dlvhdr/diffnav"               diffnav
-gh_release_install "rsteube/carapace-bin"         carapace carapace-bin
+gh_release_deb_install "carapace-sh/carapace-bin"  carapace carapace-bin
 
 # ── Step 2b: Core binaries from GitHub releases ──────────────────────────
 # Tools that either (a) aren't in apt, or (b) have a stale apt version.
@@ -421,9 +513,14 @@ gh_release_install "jesseduffield/lazydocker"     lazydocker
 gh_release_install "x-motemen/ghq"                ghq
 gh_release_install "google/yamlfmt"               yamlfmt
 gh_release_install "rhysd/actionlint"             actionlint
-gh_release_install "woodruffw/zizmor"             zizmor
 # fzf: apt ships 0.44 (2023); bashrc uses `fzf --bash` (0.48+) for init.
 gh_release_install "junegunn/fzf"                 fzf
+# zizmor is primarily distributed via PyPI per upstream docs; install via
+# uv (already on PATH) rather than a raw GitHub release tarball.
+if command -v uv >/dev/null 2>&1 && ! command -v zizmor >/dev/null 2>&1; then
+  log "installing zizmor via uv tool"
+  uv tool install zizmor || warn "zizmor install via uv failed"
+fi
 
 # ── Step 2c: Upstream shell installers ───────────────────────────────────
 # starship, mise, and bun all publish official install scripts that pick
