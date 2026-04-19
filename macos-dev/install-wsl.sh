@@ -391,7 +391,31 @@ gh_release_install "rsteube/carapace-bin"         carapace carapace-bin
 # Tools that either (a) aren't in apt, or (b) have a stale apt version.
 # Neovim 0.9 in Ubuntu 24.04 is too old for LazyVim which wants 0.10+.
 log "installing core binaries (latest GitHub releases)"
-gh_release_install "neovim/neovim"                nvim
+# neovim ships as a self-contained tree (bin/nvim + share/nvim/runtime/),
+# not a single binary — gh_release_install is binary-only. Extract the
+# whole archive into ~/.local/opt/nvim and symlink bin/nvim onto PATH.
+if [[ ! -x "$HOME/.local/opt/nvim/bin/nvim" ]]; then
+  log "installing neovim (extract full tree)"
+  nvim_tmp="$(mktemp -d)"
+  nvim_url="$(gh api repos/neovim/neovim/releases/latest --jq \
+    '.assets[].browser_download_url' 2>/dev/null \
+    | grep -E 'nvim-linux-x86_64\.tar\.gz$' | head -1)"
+  if [[ -n "$nvim_url" ]] \
+      && curl -fsSL -o "$nvim_tmp/nvim.tar.gz" "$nvim_url" \
+      && tar -xzf "$nvim_tmp/nvim.tar.gz" -C "$nvim_tmp"; then
+    mkdir -p "$HOME/.local/opt"
+    rm -rf "$HOME/.local/opt/nvim"
+    mv "$nvim_tmp"/nvim-linux-* "$HOME/.local/opt/nvim"
+    ln -sf "$HOME/.local/opt/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+    printf "  installed nvim → ~/.local/opt/nvim (symlink ~/.local/bin/nvim)\n"
+  else
+    warn "neovim install failed (url='$nvim_url')"
+  fi
+  rm -rf "$nvim_tmp"
+else
+  log "neovim already installed at ~/.local/opt/nvim"
+fi
+
 gh_release_install "jesseduffield/lazygit"        lazygit
 gh_release_install "jesseduffield/lazydocker"     lazydocker
 gh_release_install "x-motemen/ghq"                ghq
