@@ -121,8 +121,11 @@ gh_release_install() {
   local arch os tmp asset url
   mkdir -p "$HOME/.local/bin"
 
-  # Idempotency: already installed.
-  if [[ -x "$HOME/.local/bin/$binary" ]] || command -v "$binary" &>/dev/null; then
+  # Idempotency: already installed in ~/.local/bin.
+  # We intentionally don't skip when the binary exists elsewhere on PATH
+  # (e.g. stale apt version) — the caller wants the upstream release, and
+  # ~/.local/bin is earlier in PATH so our copy wins.
+  if [[ -x "$HOME/.local/bin/$binary" ]]; then
     printf "  already installed: %s\n" "$binary"
     return 0
   fi
@@ -338,7 +341,7 @@ if ! sudo apt install -y \
   shellcheck \
   direnv \
   unzip \
-  ripgrep fd-find bat fzf zoxide eza git-delta \
+  ripgrep fd-find bat zoxide eza git-delta \
   kitty; then
   err "apt install failed — aborting install"
   exit 1
@@ -395,6 +398,8 @@ gh_release_install "x-motemen/ghq"                ghq
 gh_release_install "google/yamlfmt"               yamlfmt
 gh_release_install "rhysd/actionlint"             actionlint
 gh_release_install "woodruffw/zizmor"             zizmor
+# fzf: apt ships 0.44 (2023); bashrc uses `fzf --bash` (0.48+) for init.
+gh_release_install "junegunn/fzf"                 fzf
 
 # ── Step 2c: Upstream shell installers ───────────────────────────────────
 # starship, mise, and bun all publish official install scripts that pick
