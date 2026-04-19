@@ -1,9 +1,9 @@
 -- plugins/python.lua — Python language overrides.
 -- Layers on top of lazyvim.plugins.extras.lang.python.
 --
--- The Extra honours vim.g.lazyvim_python_lsp — setting it to "ty"
--- disables pyright/basedpyright and enables the ty LSP (astral-sh's
--- new Python LSP, installed via uv tool, NOT via Mason).
+-- Sets the Python LSP to 'ty' (astral-sh's new type checker, installed
+-- via uv tool, NOT via Mason). Explicitly disables pyright/basedpyright
+-- since vim.g.lazyvim_python_lsp alone does not prevent them from loading.
 
 vim.g.lazyvim_python_lsp = "ty"
 vim.g.lazyvim_python_formatter = "ruff"
@@ -26,6 +26,12 @@ return {
             organizeImports = true,
           },
         },
+      })
+      opts.servers.basedpyright = vim.tbl_deep_extend("force", opts.servers.basedpyright or {}, {
+        enabled = false,
+      })
+      opts.servers.pyright = vim.tbl_deep_extend("force", opts.servers.pyright or {}, {
+        enabled = false,
       })
       return opts
     end,
