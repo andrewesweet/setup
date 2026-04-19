@@ -232,8 +232,10 @@ if command -v uv &>/dev/null; then
   # pygments Dracula Pro style (Wave B — local style, PyPI package not yet
   # published as of 2026-04-17; re-verify in follow-up and replace with
   # `uv tool install pygments-dracula-pro` once available).
-  uv tool install --from "$DOTFILES/pygments" pygments-dracula-pro-local \
-    --with pygments || warn "pygments-dracula-pro-local install failed"
+  # Install pygments as the tool; attach the local style package as a
+  # plugin dependency so pygmentize discovers it via the entry point.
+  uv tool install pygments --with "$DOTFILES/pygments" \
+    || warn "pygments-dracula-pro-local install failed"
 else
   warn "uv not available, skipping uv tool installs"
 fi

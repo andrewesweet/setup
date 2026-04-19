@@ -368,7 +368,9 @@ trap 'rm -rf "$restore_home"' EXIT
 
 # Run --restore with the fake HOME
 # On WSL, --restore exits before apt so no sudo issue. On macOS, same.
-restore_output=$(HOME="$restore_home" bash "$INSTALL_SCRIPT" --restore < /dev/null 2>&1 || true)
+# SKIP_DRACULA_PRO=1 bypasses the Dracula Pro preflight (the fake HOME has
+# no ~/dracula-pro/ and Tier 1 theming isn't under test here).
+restore_output=$(HOME="$restore_home" SKIP_DRACULA_PRO=1 bash "$INSTALL_SCRIPT" --restore < /dev/null 2>&1 || true)
 
 if [[ -f "$restore_home/.restoretest" ]]; then
   if [[ "$(cat "$restore_home/.restoretest")" == "RESTORED CONTENT" ]]; then

@@ -817,8 +817,8 @@ check "pygments/pyproject.toml exists"        test -f pygments/pyproject.toml
 check "style has Pro Purple"                  grep -qE '"#9580FF"|PURPLE\s*=\s*"#9580FF"' pygments/dracula_pro.py
 check "entry point = pygments.styles"         grep -qE '"pygments\.styles"' pygments/pyproject.toml
 check "entry key = dracula-pro"               grep -qE '"dracula-pro"\s*=' pygments/pyproject.toml
-check "install-macos.sh installs local style" grep -qE 'uv tool install --from .*pygments.*pygments-dracula-pro-local' install-macos.sh
-check "install-wsl.sh   installs local style" grep -qE 'uv tool install --from .*pygments.*pygments-dracula-pro-local' install-wsl.sh
+check "install-macos.sh installs local style" grep -qE 'uv tool install pygments --with .*pygments' install-macos.sh
+check "install-wsl.sh   installs local style" grep -qE 'uv tool install pygments --with .*pygments' install-wsl.sh
 # Runtime check gated on pygmentize being available — only asserted in --full
 if [[ "${FULL:-false}" == true ]] && command -v pygmentize &>/dev/null; then
   check "pygmentize knows dracula-pro style"  bash -c "pygmentize -L styles | grep -q dracula-pro"
