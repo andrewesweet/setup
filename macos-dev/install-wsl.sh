@@ -320,10 +320,17 @@ gh_release_deb_install() {
     rm -rf "$tmp"
     return 1
   fi
+  # dpkg will leave the package half-configured if any Depends are missing
+  # (yazi pulls 7zip / ffmpeg / poppler-utils / clipboard helpers). Follow
+  # with `apt install -f` to pull the missing deps from apt — the binary
+  # itself is already unpacked to /usr/bin by this point either way.
   if ! sudo dpkg -i "$tmp/pkg.deb"; then
-    warn "gh_release_deb_install: dpkg install failed for $repo"
-    rm -rf "$tmp"
-    return 1
+    log "dpkg reported missing deps — resolving via apt install -f"
+    if ! sudo apt install -f -y; then
+      warn "gh_release_deb_install: apt install -f failed for $repo"
+      rm -rf "$tmp"
+      return 1
+    fi
   fi
   printf "  installed %s via dpkg (%s)\n" "$binary" "$(basename "$url")"
   rm -rf "$tmp"
