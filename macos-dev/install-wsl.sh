@@ -99,11 +99,14 @@ link() {
 # ── gh_release_install ───────────────────────────────────────────────────
 # Download a GitHub release binary and install it into ~/.local/bin.
 #
-# Usage: gh_release_install <owner/repo> <binary-name> [<asset-pattern>]
-#   owner/repo:     e.g. "joshmedeski/sesh"
-#   binary-name:    the executable to place in ~/.local/bin (e.g. "sesh")
-#   asset-pattern:  optional extra regex to narrow the asset match
-#                   (defaults to the arch pattern below)
+# Usage: gh_release_install <owner/repo> <binary-name> [<asset-prefix>] [<archive-binary>]
+#   owner/repo:       e.g. "joshmedeski/sesh"
+#   binary-name:      the executable to place in ~/.local/bin (e.g. "sesh")
+#   asset-prefix:     asset filename prefix before arch/os token, if it
+#                     differs from binary-name (e.g. "carapace-bin" for
+#                     rsteube/carapace-bin which installs as 'carapace')
+#   archive-binary:   binary name inside the archive, if it differs from
+#                     binary-name (e.g. MilesCranmer/rip2 ships 'rip')
 #
 # Idempotent: skips if ~/.local/bin/<binary-name> is already executable.
 # This is a coarse idempotency check — for version pinning, delete the
@@ -112,7 +115,9 @@ link() {
 # Requires: curl, tar, (optional) jq. Falls back to grep/sed parsing if
 # jq is unavailable (which it is during early bootstrap on fresh WSL).
 gh_release_install() {
-  local repo="$1" binary="$2" extra_pattern="${3:-}"
+  local repo="$1" binary="$2" asset_prefix="${3:-$2}" archive_binary="${4:-$2}"
+  # Default asset_prefix falls back to binary when empty string passed positionally.
+  [[ -z "$asset_prefix" ]] && asset_prefix="$binary"
   local arch os tmp asset url
   mkdir -p "$HOME/.local/bin"
 
@@ -137,34 +142,56 @@ gh_release_install() {
   esac
 
   log "fetching latest release metadata: $repo"
-  local api="https://api.github.com/repos/$repo/releases/latest"
   local releases_json
-  if ! releases_json="$(curl -fsSL "$api" 2>/dev/null)"; then
-    warn "gh_release_install: cannot reach GitHub API for $repo"
-    return 1
+  # Prefer 'gh api' (authenticated, 5000/hr). Fall back to anonymous curl
+  # (60/hr) for bootstrap before gh is available, with $GITHUB_TOKEN /
+  # $GH_TOKEN as an intermediate auth option.
+  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+    if ! releases_json="$(gh api "repos/$repo/releases/latest" 2>/dev/null)"; then
+      warn "gh_release_install: gh api failed for $repo"
+      return 1
+    fi
+  else
+    local -a auth_header=()
+    local token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
+    [[ -n "$token" ]] && auth_header=(-H "Authorization: Bearer $token")
+    if ! releases_json="$(curl -fsSL "${auth_header[@]}" "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null)"; then
+      warn "gh_release_install: cannot reach GitHub API for $repo"
+      return 1
+    fi
   fi
 
-  # Select a .tar.gz asset matching both arch and os, plus any extra_pattern.
-  # Prefer gnu over musl when both exist (glibc on Ubuntu).
-  local pattern="($arch).*($os)"
-  [[ -n "$extra_pattern" ]] && pattern="$pattern.*$extra_pattern"
-
-  url="$(printf '%s' "$releases_json" \
-    | grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
-    | sed -E 's/.*"([^"]+)"$/\1/' \
-    | grep -E "$pattern" \
-    | grep -E '\.tar\.gz$|\.tgz$' \
-    | grep -vE 'musl' \
-    | head -1)"
-
-  # Fallback: musl-only releases (e.g. some Rust static binaries).
-  if [[ -z "$url" ]]; then
-    url="$(printf '%s' "$releases_json" \
+  # Candidate asset URLs. To distinguish sibling binaries (atuin vs
+  # atuin-server), the asset filename must start with "<archive_binary>[-_]"
+  # followed immediately by an arch or os token — no intervening word
+  # (so "atuin-x86_64-..." matches but "atuin-server-x86_64-..." does not).
+  # Arch and os match case-insensitively and independently (no ordering
+  # assumption). Archive extensions: tar.gz, tgz, zip.
+  # Name guard: filename starts with "<asset_prefix>[-_]", optionally followed
+  # by a version token (digits/dots, optionally v-prefixed), then an arch or
+  # os token. This admits "carapace-bin_1.6.4_linux_amd64" but rejects
+  # "atuin-server-x86_64" (server is a word, not a version or arch/os).
+  local name_guard="/${asset_prefix}[-_]([vV]?[0-9][0-9.]*[-_])?((x86_64|amd64|x64|aarch64|arm64)|[Ll]inux|darwin|[Aa]pple)"
+  local -a candidates
+  mapfile -t candidates < <(
+    printf '%s' "$releases_json" \
       | grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
       | sed -E 's/.*"([^"]+)"$/\1/' \
-      | grep -E "$pattern" \
-      | grep -E '\.tar\.gz$|\.tgz$' \
-      | head -1)"
+      | grep -E "$name_guard" \
+      | grep -iE "($arch)" \
+      | grep -iE "($os)" \
+      | grep -E '\.(tar\.gz|tgz|zip)$'
+  )
+
+  # Prefer gnu over musl over anything else (glibc on Ubuntu).
+  url=""
+  for c in "${candidates[@]}"; do
+    [[ "$c" == *musl* ]] && continue
+    url="$c"; break
+  done
+  # Fallback: musl-only releases (e.g. rip2).
+  if [[ -z "$url" && ${#candidates[@]} -gt 0 ]]; then
+    url="${candidates[0]}"
   fi
 
   if [[ -z "$url" ]]; then
@@ -174,20 +201,32 @@ gh_release_install() {
 
   log "downloading $url"
   tmp="$(mktemp -d)"
-  if ! curl -fsSL -o "$tmp/asset.tar.gz" "$url"; then
+  local ext="tar.gz"
+  [[ "$url" == *.zip ]] && ext="zip"
+  if ! curl -fsSL -o "$tmp/asset.$ext" "$url"; then
     warn "gh_release_install: download failed for $url"
     rm -rf "$tmp"
     return 1
   fi
 
-  # Extract and locate the binary. Handles flat archives and subdir archives.
-  tar -xzf "$tmp/asset.tar.gz" -C "$tmp"
-  asset="$(find "$tmp" -type f -name "$binary" -perm -u+x | head -1)"
+  # Extract and locate the binary. Handles flat and subdir archives, tar + zip.
+  case "$ext" in
+    tar.gz) tar -xzf "$tmp/asset.$ext" -C "$tmp" ;;
+    zip)
+      if ! command -v unzip >/dev/null 2>&1; then
+        warn "gh_release_install: unzip not available, cannot extract $url"
+        rm -rf "$tmp"
+        return 1
+      fi
+      unzip -q "$tmp/asset.$ext" -d "$tmp"
+      ;;
+  esac
+  asset="$(find "$tmp" -type f -name "$archive_binary" -perm -u+x | head -1)"
   if [[ -z "$asset" ]]; then
-    asset="$(find "$tmp" -type f -name "$binary" | head -1)"
+    asset="$(find "$tmp" -type f -name "$archive_binary" | head -1)"
   fi
   if [[ -z "$asset" ]]; then
-    warn "gh_release_install: binary '$binary' not found in archive for $repo"
+    warn "gh_release_install: binary '$archive_binary' not found in archive for $repo"
     rm -rf "$tmp"
     return 1
   fi
@@ -297,7 +336,8 @@ if ! sudo apt install -y \
   git tmux tree wget curl \
   jq \
   shellcheck \
-  direnv; then
+  direnv \
+  unzip; then
   err "apt install failed — aborting install"
   exit 1
 fi
@@ -325,10 +365,10 @@ log "installing release binaries (Layer 1b-i)"
 gh_release_install "ducaale/xh"                   xh
 gh_release_install "joshmedeski/sesh"             sesh
 gh_release_install "sxyazi/yazi"                  yazi
-gh_release_install "MilesCranmer/rip2"            rip2
+gh_release_install "MilesCranmer/rip2"            rip2 rip rip
 gh_release_install "noahgorstein/jqp"             jqp
 gh_release_install "dlvhdr/diffnav"               diffnav
-gh_release_install "rsteube/carapace-bin"         carapace
+gh_release_install "rsteube/carapace-bin"         carapace carapace-bin
 
 # ── Step 3: Post-bootstrap tool installs ─────────────────────────────────────
 if command -v uv &>/dev/null; then
@@ -338,8 +378,10 @@ if command -v uv &>/dev/null; then
   # pygments Dracula Pro style (Wave B — local style, PyPI package not yet
   # published as of 2026-04-17; re-verify in follow-up and replace with
   # `uv tool install pygments-dracula-pro` once available).
-  uv tool install --from "$DOTFILES/pygments" pygments-dracula-pro-local \
-    --with pygments || warn "pygments-dracula-pro-local install failed"
+  # Install pygments as the tool; attach the local style package as a
+  # plugin dependency so pygmentize discovers it via the entry point.
+  uv tool install pygments --with "$DOTFILES/pygments" \
+    || warn "pygments-dracula-pro-local install failed"
 else
   warn "uv not available, skipping uv tool installs (added in later plan)"
 fi
