@@ -337,10 +337,24 @@ if ! sudo apt install -y \
   jq \
   shellcheck \
   direnv \
-  unzip; then
+  unzip \
+  ripgrep fd-find bat fzf zoxide eza git-delta \
+  kitty; then
   err "apt install failed — aborting install"
   exit 1
 fi
+
+# Ubuntu packages bat as 'batcat' and fd-find as 'fdfind' to avoid binary
+# clashes. The rest of the config (bashrc, nvim, git delta) calls them by
+# their upstream names. Provide shims in ~/.local/bin for both.
+mkdir -p "$HOME/.local/bin"
+for pair in "batcat:bat" "fdfind:fd"; do
+  src="${pair%:*}" dst="${pair#*:}"
+  if command -v "$src" >/dev/null 2>&1 && [[ ! -e "$HOME/.local/bin/$dst" ]]; then
+    ln -sf "$(command -v "$src")" "$HOME/.local/bin/$dst"
+    printf "  linked    ~/.local/bin/%s → %s\n" "$dst" "$(command -v "$src")"
+  fi
+done
 
 # ── Step 1b: TPM (tmux plugin manager) ───────────────────────────────────
 # TPM is not in apt. Clone directly; plugins install on first tmux launch
@@ -369,6 +383,48 @@ gh_release_install "MilesCranmer/rip2"            rip2 rip rip
 gh_release_install "noahgorstein/jqp"             jqp
 gh_release_install "dlvhdr/diffnav"               diffnav
 gh_release_install "rsteube/carapace-bin"         carapace carapace-bin
+
+# ── Step 2b: Core binaries from GitHub releases ──────────────────────────
+# Tools that either (a) aren't in apt, or (b) have a stale apt version.
+# Neovim 0.9 in Ubuntu 24.04 is too old for LazyVim which wants 0.10+.
+log "installing core binaries (latest GitHub releases)"
+gh_release_install "neovim/neovim"                nvim
+gh_release_install "jesseduffield/lazygit"        lazygit
+gh_release_install "jesseduffield/lazydocker"     lazydocker
+gh_release_install "x-motemen/ghq"                ghq
+gh_release_install "google/yamlfmt"               yamlfmt
+gh_release_install "rhysd/actionlint"             actionlint
+gh_release_install "woodruffw/zizmor"             zizmor
+
+# ── Step 2c: Upstream shell installers ───────────────────────────────────
+# starship, mise, and bun all publish official install scripts that pick
+# the right arch/libc and drop a binary into ~/.local/bin or ~/.<tool>/bin.
+# Each is idempotent (the scripts detect an existing install and skip).
+if ! command -v starship >/dev/null 2>&1; then
+  log "installing starship (official installer)"
+  curl -fsSL https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$HOME/.local/bin" \
+    || warn "starship install failed"
+else
+  log "starship already installed: $(command -v starship)"
+fi
+if ! command -v mise >/dev/null 2>&1 && [[ ! -x "$HOME/.local/bin/mise" ]]; then
+  log "installing mise (official installer)"
+  curl -fsSL https://mise.run | sh || warn "mise install failed"
+else
+  log "mise already installed"
+fi
+if ! command -v bun >/dev/null 2>&1 && [[ ! -x "$HOME/.bun/bin/bun" ]]; then
+  log "installing bun (official installer)"
+  curl -fsSL https://bun.sh/install | bash || warn "bun install failed"
+  # Bun drops its binary in ~/.bun/bin; link into ~/.local/bin for PATH parity.
+  if [[ -x "$HOME/.bun/bin/bun" ]]; then
+    ln -sf "$HOME/.bun/bin/bun" "$HOME/.local/bin/bun"
+  fi
+else
+  log "bun already installed"
+fi
+# Ensure the freshly-installed bin is visible for the rest of this run.
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:$PATH"
 
 # ── Step 3: Post-bootstrap tool installs ─────────────────────────────────────
 if command -v uv &>/dev/null; then
