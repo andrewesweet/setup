@@ -241,6 +241,7 @@ fi
 # bun global installs (OpenCode and critique)
 if command -v bun &>/dev/null; then
   log "installing bun global packages (opencode-ai, critique)"
+  export NODE_EXTRA_CA_CERTS="$HOME/.config/certs/db-ca-bundle.pem"
   bun install -g opencode-ai critique || warn "bun global install failed"
 else
   warn "bun not available, skipping opencode/critique install"
@@ -290,7 +291,7 @@ if command -v gcloud &>/dev/null; then
   gcloud components install --quiet \
     alpha beta bq gke-gcloud-auth-plugin \
     pubsub-emulator cloud-datastore-emulator cloud-firestore-emulator \
-    cloud-build-local bigtable spanner-emulator || warn "gcloud components install failed (component manager may be disabled for package-managed installs)"
+    cloud-build-local bigtable || warn "gcloud components install failed (component manager may be disabled for package-managed installs)"
 else
   warn "gcloud SDK not installed — this is a PREREQUISITE for the dotfiles"
   warn ""

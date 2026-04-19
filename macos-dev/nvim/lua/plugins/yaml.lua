@@ -18,6 +18,11 @@ return {
           args = { "-formatter", "basic", "-indentless_arrays=true" },
         },
       },
+      format_on_save = function(bufnr)
+        if vim.bo[bufnr].filetype == "yaml" then
+          return { lsp_format = "fallback", timeout_ms = 1000 }
+        end
+      end,
     },
   },
 }
