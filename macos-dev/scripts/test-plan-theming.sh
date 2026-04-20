@@ -912,6 +912,41 @@ else
   check_contrast_pair "bat primary"       4.5 extract_bat
 fi
 
+# ── AC-theme-tier2-retint ────────────────────────────────────────────────────
+# Derived Classic-background tints in Tier 2 source themes MUST be
+# re-tinted against Pro bg #22212C (docs/design/theming-qa.md § 6).
+# shellcheck source=scripts/lib/tier2-retint-expected.sh
+if [[ -f scripts/lib/tier2-retint-expected.sh ]]; then
+  # shellcheck disable=SC1091
+  source scripts/lib/tier2-retint-expected.sh
+fi
+
+echo ""
+echo "AC-theme-tier2-retint: Tier 2 derived tints re-tinted against Pro bg"
+check_tier2_retint() {
+  local key tool slot expected actual
+  for key in "${!TIER2_RETINT_EXPECTED[@]}"; do
+    tool="${key%%:*}"
+    slot="${key#*:}"
+    expected="${TIER2_RETINT_EXPECTED[$key]}"
+    case "$tool" in
+      opencode)
+        actual=$(jq -r --arg s "$slot" '.defs[$s] // empty' \
+          opencode/themes/dracula-pro.json)
+        if [[ "${actual^^}" == "${expected^^}" ]]; then
+          ok "$tool:$slot = $expected"
+        else
+          nok "$tool:$slot expected $expected got '${actual:-<missing>}'"
+        fi
+        ;;
+      *)
+        skp "$tool:$slot" "no extractor"
+        ;;
+    esac
+  done
+}
+check_tier2_retint
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"

@@ -13,8 +13,8 @@
     "cyan": "#80FFEA",
     "purple": "#9580FF",
     "pink": "#FF80BF",
-    "bgDiffAdded": "#2B3A2F",
-    "bgDiffRemoved": "#3D2A2E"
+    "bgDiffAdded": "#253125",
+    "bgDiffRemoved": "#372124"
   },
   "theme": {
     "primary": "purple",
