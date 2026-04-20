@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 # test-plan10.sh — smoke tests for Plan 10 (neovim configuration)
 #
-# Validates:
-#   - All 8 nvim config files exist
-#   - init.lua bootstraps LazyVim
-#   - options.lua has required settings
-#   - autocmds.lua has yaml.github detection
-#   - lsp.lua: vim.g before return, no require('lspconfig'), ty not in Mason
-#   - formatting.lua: format_on_save, no markdownlint in conform
-#   - linting.lua: zizmor, no InsertLeave
-#   - integrations.lua: all plugins present, key mappings correct
-#   - Install scripts have correct link() mapping
-#   - Plans 2–9 link() calls preserved (regression)
+# Validates the aggressive LazyVim Extras adoption target state:
+#   - lazyvim.json declares 13 Extras (the canonical manifest)
+#   - lazy-lock.json is tracked and valid JSON
+#   - lazy.lua has NO extras imports (lazyvim.json owns them)
+#   - Old monolithic plugin files deleted (formatting/linting/integrations/lsp)
+#   - Per-language plugin files: go, python, bash, ghactions, yaml
+#   - Misc plugins: tmux-nav, direnv, opencode, octo, learning (unchanged)
+#   - config/ trimmed: options (2 non-defaults), keymaps (jj/jk), autocmds (gh-actions only)
+#   - Install script link() calls preserved (regression)
 #
 # Usage: bash scripts/test-plan10.sh
 # Exit: 0 if all tests pass, 1 if any fail
@@ -45,181 +43,250 @@ check() {
 echo "Plan 10: neovim configuration smoke tests"
 echo ""
 
-# ── File existence ─────────────────────────────────────────────────────────
-echo "File existence:"
+# ── File existence (target state) ────────────────────────────────────────
+echo "File existence (target state):"
 check "init.lua exists"            test -f "$REPO_ROOT/nvim/init.lua"
 check "lazy.lua exists"            test -f "$REPO_ROOT/nvim/lua/config/lazy.lua"
+check "lazyvim.json exists"        test -f "$REPO_ROOT/nvim/lazyvim.json"
+check "lazy-lock.json exists"      test -f "$REPO_ROOT/nvim/lazy-lock.json"
 check "options.lua exists"         test -f "$REPO_ROOT/nvim/lua/config/options.lua"
 check "keymaps.lua exists"         test -f "$REPO_ROOT/nvim/lua/config/keymaps.lua"
 check "autocmds.lua exists"        test -f "$REPO_ROOT/nvim/lua/config/autocmds.lua"
-check "lsp.lua exists"            test -f "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "formatting.lua exists"      test -f "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "linting.lua exists"        test -f "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "integrations.lua exists"    test -f "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "learning.lua exists"        test -f "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+check "plugins/learning.lua exists" test -f "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+check "plugins/go.lua exists"      test -f "$REPO_ROOT/nvim/lua/plugins/go.lua"
+check "plugins/python.lua exists"  test -f "$REPO_ROOT/nvim/lua/plugins/python.lua"
+check "plugins/bash.lua exists"    test -f "$REPO_ROOT/nvim/lua/plugins/bash.lua"
+check "plugins/ghactions.lua exists" test -f "$REPO_ROOT/nvim/lua/plugins/ghactions.lua"
+check "plugins/yaml.lua exists"    test -f "$REPO_ROOT/nvim/lua/plugins/yaml.lua"
+check "plugins/tmux-nav.lua exists" test -f "$REPO_ROOT/nvim/lua/plugins/tmux-nav.lua"
+check "plugins/direnv.lua exists"  test -f "$REPO_ROOT/nvim/lua/plugins/direnv.lua"
+check "plugins/opencode.lua exists" test -f "$REPO_ROOT/nvim/lua/plugins/opencode.lua"
+check "plugins/octo.lua exists"    test -f "$REPO_ROOT/nvim/lua/plugins/octo.lua"
 
-# ── init.lua ──────────────────────────────────────────────────────────────
+# ── AC-1: lazy-lock.json valid JSON + names lazy.nvim ────────────────────
 echo ""
-echo "init.lua:"
-check "bootstraps LazyVim"         grep -q 'config.lazy' "$REPO_ROOT/nvim/init.lua"
-
-# ── lazy.lua ──────────────────────────────────────────────────────────────
-# Bootstrap file from LazyVim/starter — without it, init.lua's
-# require('config.lazy') fails on startup with E5113 module not found.
-echo ""
-echo "lazy.lua:"
-check "clones lazy.nvim"           grep -q 'lazy.nvim.git' "$REPO_ROOT/nvim/lua/config/lazy.lua"
-check "prepends lazypath to rtp"   grep -q "vim.opt.rtp:prepend(lazypath)" "$REPO_ROOT/nvim/lua/config/lazy.lua"
-check "imports lazyvim.plugins"    grep -q 'lazyvim.plugins' "$REPO_ROOT/nvim/lua/config/lazy.lua"
-check "imports plugins dir"        grep -q '"plugins"' "$REPO_ROOT/nvim/lua/config/lazy.lua"
-
-# ── options.lua ───────────────────────────────────────────────────────────
-echo ""
-echo "options.lua:"
-check "tabstop = 2"                grep -q 'tabstop.*2' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "shiftwidth = 2"            grep -q 'shiftwidth.*2' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "expandtab = true"           grep -q 'expandtab.*true' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "relativenumber = true"      grep -q 'relativenumber.*true' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "colorcolumn = 100"          grep -q 'colorcolumn.*100' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "clipboard = unnamedplus"    grep -q 'clipboard.*unnamedplus' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "scrolloff = 8"             grep -q 'scrolloff.*8' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "updatetime = 200"           grep -q 'updatetime.*200' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "undofile = true"            grep -q 'undofile.*true' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "listchars with trail"       grep -q 'trail' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "smartindent = true"         grep -q 'smartindent.*true' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "number = true"              grep -q 'number.*true' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "wrap = false"               grep -q 'wrap.*false' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "undolevels = 10000"         grep -q 'undolevels.*10000' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "splitbelow = true"          grep -q 'splitbelow.*true' "$REPO_ROOT/nvim/lua/config/options.lua"
-check "splitright = true"          grep -q 'splitright.*true' "$REPO_ROOT/nvim/lua/config/options.lua"
-
-# ── autocmds.lua ──────────────────────────────────────────────────────────
-echo ""
-echo "autocmds.lua:"
-check "yaml.github filetype"       grep -q 'yaml.github' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
-check "treesitter yaml register"   grep -q 'treesitter.language.register' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
-check "VimResized autocmd"         grep -q 'VimResized' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
-check "strip whitespace on save"   grep -q 'strip_whitespace' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
-check "github workflows pattern"   grep -q 'github/workflows' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
-check "github actions pattern"     grep -q 'github/actions' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
-
-# ── lsp.lua — critical requirements ──────────────────────────────────────
-echo ""
-echo "lsp.lua — critical requirements:"
-check "lazyvim_python_lsp = ty"    grep -q 'lazyvim_python_lsp.*ty' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "lazyvim_python_formatter"   grep -q 'lazyvim_python_formatter.*ruff' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-
-# vim.g assignments MUST be before return
-vimg_line=$(grep -n 'lazyvim_python_lsp' "$REPO_ROOT/nvim/lua/plugins/lsp.lua" | head -1 | cut -d: -f1)
-return_line=$(grep -n '^return' "$REPO_ROOT/nvim/lua/plugins/lsp.lua" | head -1 | cut -d: -f1)
-if [[ -n "$vimg_line" && -n "$return_line" ]] && (( vimg_line < return_line )); then
-  ok "vim.g assignments before return"
+echo "AC-1: nvim/lazy-lock.json committed and valid"
+if command -v python3 &>/dev/null; then
+  if python3 -c "import json; d = json.load(open('$REPO_ROOT/nvim/lazy-lock.json')); assert 'lazy.nvim' in d" 2>/dev/null; then
+    ok "lazy-lock.json parses as JSON and names lazy.nvim"
+  else
+    nok "lazy-lock.json parses as JSON and names lazy.nvim"
+  fi
 else
-  nok "vim.g assignments before return"
+  nok "lazy-lock.json parses as JSON and names lazy.nvim (python3 not available)"
 fi
 
-# MUST NOT use require('lspconfig')
-if grep -q "require.*lspconfig" "$REPO_ROOT/nvim/lua/plugins/lsp.lua"; then
-  nok "no require('lspconfig') call"
+# ── AC-2: lazyvim.json declares exactly 13 Extras ────────────────────────
+echo ""
+echo "AC-2: lazyvim.json declares 13 Extras"
+if command -v python3 &>/dev/null; then
+  extras_count=$(python3 -c "import json; d = json.load(open('$REPO_ROOT/nvim/lazyvim.json')); print(len(d.get('extras', [])))" 2>/dev/null)
+  if [[ "$extras_count" == "13" ]]; then
+    ok "lazyvim.json has exactly 13 extras ($extras_count)"
+  else
+    nok "lazyvim.json has exactly 13 extras (got: $extras_count)"
+  fi
+  for extra in 'coding.mini-surround' 'dap.core' 'editor.fzf' 'editor.harpoon2' \
+               'lang.docker' 'lang.git' 'lang.go' 'lang.helm' 'lang.json' \
+               'lang.markdown' 'lang.python' 'lang.terraform' 'lang.yaml'; do
+    if python3 -c "import json; d = json.load(open('$REPO_ROOT/nvim/lazyvim.json')); assert any('$extra' in e for e in d['extras'])" 2>/dev/null; then
+      ok "lazyvim.json includes $extra"
+    else
+      nok "lazyvim.json includes $extra"
+    fi
+  done
 else
-  ok "no require('lspconfig') call"
+  nok "lazyvim.json extras validation (python3 not available)"
 fi
 
-# ty MUST NOT be in Mason's ensure_installed
-if grep -A 20 'ensure_installed' "$REPO_ROOT/nvim/lua/plugins/lsp.lua" | grep -q '"ty"'; then
-  nok "ty not in Mason ensure_installed"
+# ── AC-3: lazy.lua has no extras imports (lazyvim.json owns them) ────────
+echo ""
+echo "AC-3: lazy.lua has no extras imports"
+if grep -qE 'lazyvim\.plugins\.extras\.' "$REPO_ROOT/nvim/lua/config/lazy.lua"; then
+  nok "lazy.lua should NOT have lazyvim.plugins.extras imports (lazyvim.json owns them)"
 else
-  ok "ty not in Mason ensure_installed"
+  ok "lazy.lua has no lazyvim.plugins.extras imports (lazyvim.json owns them)"
+fi
+check "lazy.lua still imports lazyvim.plugins" \
+  grep -q 'lazyvim.plugins' "$REPO_ROOT/nvim/lua/config/lazy.lua"
+check "lazy.lua still imports plugins dir" \
+  grep -q '"plugins"' "$REPO_ROOT/nvim/lua/config/lazy.lua"
+
+# ── AC-4: Old monolithic plugin files deleted ────────────────────────────
+echo ""
+echo "AC-4: Old plugin files deleted"
+for gone in formatting.lua linting.lua integrations.lua lsp.lua; do
+  if [[ -f "$REPO_ROOT/nvim/lua/plugins/$gone" ]]; then
+    nok "plugins/$gone should be DELETED"
+  else
+    ok "plugins/$gone deleted"
+  fi
+done
+
+# ── AC-5: plugins/go.lua gopls settings ─────────────────────────────────
+echo ""
+echo "AC-5: plugins/go.lua merged gopls settings"
+if [[ -f "$REPO_ROOT/nvim/lua/plugins/go.lua" ]]; then
+  for needle in 'unusedparams.*true' 'shadow.*true' 'staticcheck.*true' \
+                'gofumpt.*true' 'usePlaceholders.*true' 'completeUnimported.*true' \
+                'parameterNames.*true' 'assignVariableTypes.*true'; do
+    check "go.lua gopls has $needle" \
+      grep -qE "$needle" "$REPO_ROOT/nvim/lua/plugins/go.lua"
+  done
 fi
 
-# ── lsp.lua — servers ────────────────────────────────────────────────────
+# ── AC-6: plugins/python.lua ty + ruff overrides ────────────────────────
 echo ""
-echo "lsp.lua — servers:"
-check "basedpyright disabled"      grep -q 'basedpyright.*false' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "pyright disabled"           grep -q 'pyright.*false' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "pylsp disabled"             grep -q 'pylsp.*false' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "ty enabled"                 grep -q 'ty.*enabled.*true' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "ruff enabled"               grep -q 'ruff.*enabled.*true' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "gopls configured"           grep -q 'gopls' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "bashls configured"          grep -q 'bashls' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "terraformls configured"     grep -q 'terraformls' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "yamlls configured"          grep -q 'yamlls' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "gh_actions_ls configured"   grep -q 'gh_actions_ls' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "jsonls configured"          grep -q 'jsonls' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "schemastore.nvim"           grep -q 'schemastore.nvim' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "gh_actions_ls yaml.github"  grep -q 'gh_actions_ls.*yaml\.github' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-# mason.nvim moved orgs from williamboman to mason-org. Pin the new
-# URL so lazy.nvim doesn't error with "origin has changed" against
-# fresh installs that pull the new URL via LazyVim's transitive spec.
-check "mason.nvim uses mason-org"  grep -q '"mason-org/mason.nvim"' "$REPO_ROOT/nvim/lua/plugins/lsp.lua"
-check "no williamboman/mason"      bash -c "! grep -q 'williamboman/mason' '$REPO_ROOT/nvim/lua/plugins/lsp.lua'"
-
-# ── formatting.lua ────────────────────────────────────────────────────────
-echo ""
-echo "formatting.lua:"
-check "conform.nvim plugin"        grep -q 'conform.nvim' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "format_on_save"             grep -q 'format_on_save' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "timeout_ms = 1000"          grep -q 'timeout_ms.*1000' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "lsp_format = fallback"      grep -q 'lsp_format.*fallback' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "shfmt for sh"               grep -q 'sh.*shfmt' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "ruff_fix + ruff_format"     grep -q 'ruff_fix.*ruff_format' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "gofumpt + goimports"        grep -q 'gofumpt.*goimports' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "yaml.github = prettier"     grep -q 'yaml.github.*prettier' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "markdown = prettier"        grep -q 'markdown.*prettier' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-check "shfmt args -i 2 -ci"       grep -q 'shfmt.*prepend_args' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"
-
-# markdownlint-cli2 MUST NOT be in conform (it's a linter)
-if grep -q 'markdownlint' "$REPO_ROOT/nvim/lua/plugins/formatting.lua"; then
-  nok "no markdownlint in conform (it's a linter)"
-else
-  ok "no markdownlint in conform (it's a linter)"
+echo "AC-6: plugins/python.lua preserves ty + ruff"
+if [[ -f "$REPO_ROOT/nvim/lua/plugins/python.lua" ]]; then
+  check "python.lua sets lazyvim_python_lsp = ty" \
+    grep -qE 'lazyvim_python_lsp.*"ty"' "$REPO_ROOT/nvim/lua/plugins/python.lua"
+  check "python.lua sets lazyvim_python_formatter = ruff" \
+    grep -qE 'lazyvim_python_formatter.*"ruff"' "$REPO_ROOT/nvim/lua/plugins/python.lua"
+  check "python.lua ty has autostart = true" \
+    grep -qE 'autostart.*true' "$REPO_ROOT/nvim/lua/plugins/python.lua"
+  check "python.lua ruff has fixAll" \
+    grep -q 'fixAll' "$REPO_ROOT/nvim/lua/plugins/python.lua"
+  check "python.lua ruff has organizeImports" \
+    grep -q 'organizeImports' "$REPO_ROOT/nvim/lua/plugins/python.lua"
 fi
 
-# ── linting.lua ───────────────────────────────────────────────────────────
+# ── AC-7: plugins/bash.lua bashls + shfmt + shellcheck ──────────────────
 echo ""
-echo "linting.lua:"
-check "nvim-lint plugin"           grep -q 'nvim-lint' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "BufWritePost event"         grep -q 'BufWritePost' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "BufReadPost event"          grep -q 'BufReadPost' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "shellcheck for sh"          grep -q 'sh.*shellcheck' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "golangcilint for go"        grep -q 'go.*golangcilint' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "zizmor for yaml.github"     grep -q 'yaml.github.*zizmor' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "markdownlint-cli2 for md"   grep -q 'markdown.*markdownlint' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "actionlint for yaml.github" grep -q 'yaml.github.*actionlint' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-check "tflint for terraform"       grep -q 'terraform.*tflint' "$REPO_ROOT/nvim/lua/plugins/linting.lua"
-
-# InsertLeave MUST NOT be in events (prevents lag)
-if grep -q 'InsertLeave' "$REPO_ROOT/nvim/lua/plugins/linting.lua"; then
-  nok "no InsertLeave in lint events (prevents lag)"
-else
-  ok "no InsertLeave in lint events (prevents lag)"
+echo "AC-7: plugins/bash.lua preserves bash tooling"
+if [[ -f "$REPO_ROOT/nvim/lua/plugins/bash.lua" ]]; then
+  check "bash.lua has bashls" \
+    grep -q 'bashls' "$REPO_ROOT/nvim/lua/plugins/bash.lua"
+  check "bash.lua has shellcheckPath" \
+    grep -q 'shellcheckPath' "$REPO_ROOT/nvim/lua/plugins/bash.lua"
+  check "bash.lua has shfmt prepend_args" \
+    grep -q 'prepend_args' "$REPO_ROOT/nvim/lua/plugins/bash.lua"
+  check "bash.lua has shfmt -i 2" \
+    grep -q '"-i"' "$REPO_ROOT/nvim/lua/plugins/bash.lua"
+  check "bash.lua has shellcheck linter" \
+    grep -q 'shellcheck' "$REPO_ROOT/nvim/lua/plugins/bash.lua"
+  check "bash.lua conform for sh" \
+    grep -q 'sh.*shfmt' "$REPO_ROOT/nvim/lua/plugins/bash.lua"
+  check "bash.lua nvim-lint for sh" \
+    grep -q 'sh.*shellcheck' "$REPO_ROOT/nvim/lua/plugins/bash.lua"
 fi
 
-# ── integrations.lua ──────────────────────────────────────────────────────
+# ── AC-8: plugins/ghactions.lua gh_actions_ls + linters ──────────────────
 echo ""
-echo "integrations.lua:"
-check "lazygit.nvim"               grep -q 'lazygit.nvim' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "vim-tmux-navigator"         grep -q 'vim-tmux-navigator' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "direnv.vim"                 grep -q 'direnv.vim' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "fzf-lua"                    grep -q 'fzf-lua' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "gitsigns.nvim"              grep -q 'gitsigns.nvim' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "which-key.nvim"             grep -q 'which-key.nvim' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "leader+fs = live_grep"      grep -q 'leader>fs.*live_grep' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "leader+fw = grep_cword"     grep -q 'leader>fw.*grep_cword' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "fzf_opts explicit"          grep -q 'fzf_opts' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "C-h tmux navigate"          grep -q 'C-h.*TmuxNavigateLeft' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "leader+gg = LazyGit"        grep -q 'leader>gg.*LazyGit' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "gitsigns stage_hunk"        grep -q 'stage_hunk' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
-check "gitsigns blame_line"        grep -q 'blame_line' "$REPO_ROOT/nvim/lua/plugins/integrations.lua"
+echo "AC-8: plugins/ghactions.lua preserves GH Actions tooling"
+if [[ -f "$REPO_ROOT/nvim/lua/plugins/ghactions.lua" ]]; then
+  check "ghactions.lua has gh_actions_ls" \
+    grep -q 'gh_actions_ls' "$REPO_ROOT/nvim/lua/plugins/ghactions.lua"
+  check "ghactions.lua has yaml.github filetype" \
+    grep -q 'yaml.github' "$REPO_ROOT/nvim/lua/plugins/ghactions.lua"
+  check "ghactions.lua has actionlint" \
+    grep -q 'actionlint' "$REPO_ROOT/nvim/lua/plugins/ghactions.lua"
+  check "ghactions.lua has zizmor" \
+    grep -q 'zizmor' "$REPO_ROOT/nvim/lua/plugins/ghactions.lua"
+fi
 
-# ── learning.lua — vim training plugins ──────────────────────────────────
+# ── AC-9: plugins/yaml.lua is conform-only (no LSP override) ────────────
 echo ""
-echo "learning.lua:"
-check "hardtime.nvim plugin"       grep -q 'm4xshen/hardtime.nvim' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
-check "hardtime nui dependency"    grep -q 'MunifTanjim/nui.nvim' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
-check "precognition.nvim plugin"   grep -q 'tris203/precognition.nvim' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
-check "vim-be-good plugin"         grep -q 'ThePrimeagen/vim-be-good' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
-check "vim-be-good cmd loaded"     grep -q 'cmd = "VimBeGood"' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+echo "AC-9: plugins/yaml.lua is yamlfmt conform override only"
+if [[ -f "$REPO_ROOT/nvim/lua/plugins/yaml.lua" ]]; then
+  check "yaml.lua has yamlfmt" \
+    grep -q 'yamlfmt' "$REPO_ROOT/nvim/lua/plugins/yaml.lua"
+  check "yaml.lua has conform.nvim" \
+    grep -q 'conform.nvim' "$REPO_ROOT/nvim/lua/plugins/yaml.lua"
+  if grep -q 'nvim-lspconfig' "$REPO_ROOT/nvim/lua/plugins/yaml.lua"; then
+    nok "yaml.lua should NOT have nvim-lspconfig override (lang.yaml Extra defaults accepted)"
+  else
+    ok "yaml.lua has no nvim-lspconfig override (lang.yaml Extra defaults accepted)"
+  fi
+fi
+
+# ── AC-10: plugins/json.lua does NOT exist ───────────────────────────────
+echo ""
+echo "AC-10: no plugins/json.lua (lang.json Extra defaults accepted)"
+if [[ -f "$REPO_ROOT/nvim/lua/plugins/json.lua" ]]; then
+  nok "plugins/json.lua should NOT exist (lang.json Extra defaults accepted)"
+else
+  ok "plugins/json.lua does not exist (lang.json Extra defaults accepted)"
+fi
+
+# ── AC-11: plugins/learning.lua unchanged ────────────────────────────────
+echo ""
+echo "AC-11: plugins/learning.lua unchanged"
+check "hardtime.nvim present" \
+  grep -q 'm4xshen/hardtime.nvim' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+check "precognition.nvim present" \
+  grep -q 'tris203/precognition.nvim' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+check "vim-be-good present" \
+  grep -q 'ThePrimeagen/vim-be-good' "$REPO_ROOT/nvim/lua/plugins/learning.lua"
+
+# ── AC-12: plugins/tmux-nav.lua + direnv.lua exist ──────────────────────
+echo ""
+echo "AC-12: tmux-nav + direnv plugins exist"
+check "tmux-nav.lua has vim-tmux-navigator" \
+  grep -q 'vim-tmux-navigator' "$REPO_ROOT/nvim/lua/plugins/tmux-nav.lua"
+check "tmux-nav.lua has C-h keymap" \
+  grep -q 'C-h' "$REPO_ROOT/nvim/lua/plugins/tmux-nav.lua"
+check "direnv.lua has direnv.vim" \
+  grep -q 'direnv.vim' "$REPO_ROOT/nvim/lua/plugins/direnv.lua"
+
+# ── AC-13: plugins/opencode.lua adopted ──────────────────────────────────
+echo ""
+echo "AC-13: plugins/opencode.lua adopted"
+check "opencode.lua has opencode.nvim" \
+  grep -q 'opencode.nvim' "$REPO_ROOT/nvim/lua/plugins/opencode.lua"
+
+# ── AC-13b: plugins/octo.lua adopted ────────────────────────────────────
+echo ""
+echo "AC-13b: plugins/octo.lua adopted"
+check "octo.lua has octo.nvim" \
+  grep -q 'octo.nvim' "$REPO_ROOT/nvim/lua/plugins/octo.lua"
+
+# ── AC-14: config/options.lua trimmed ────────────────────────────────────
+echo ""
+echo "AC-14: config/options.lua trimmed to non-defaults"
+check "colorcolumn = 120" \
+  grep -qE 'colorcolumn.*120' "$REPO_ROOT/nvim/lua/config/options.lua"
+check "scrolloff = 8" \
+  grep -q 'scrolloff.*8' "$REPO_ROOT/nvim/lua/config/options.lua"
+# Must NOT have LazyVim-default-duplicated settings
+for default_setting in 'tabstop' 'shiftwidth' 'expandtab' 'smartindent' \
+                       'relativenumber' 'number' 'cursorline' 'ignorecase' \
+                       'smartcase' 'undofile' 'undolevels' 'confirm' \
+                       'splitbelow' 'splitright' 'updatetime' 'listchars' \
+                       'clipboard' 'wrap'; do
+  if grep -qE "^[^-]*opt\.$default_setting" "$REPO_ROOT/nvim/lua/config/options.lua"; then
+    nok "options.lua should NOT set $default_setting (LazyVim default)"
+  else
+    ok "options.lua does not redundantly set $default_setting"
+  fi
+done
+
+# ── AC-15: config/keymaps.lua has jj/jk → Esc ───────────────────────────
+echo ""
+echo "AC-15: config/keymaps.lua has jj/jk escape bindings"
+check "jj → Esc" grep -q '"jj".*Esc' "$REPO_ROOT/nvim/lua/config/keymaps.lua"
+check "jk → Esc" grep -q '"jk".*Esc' "$REPO_ROOT/nvim/lua/config/keymaps.lua"
+
+# ── AC-16: config/autocmds.lua has gh-actions filetype only ──────────────
+echo ""
+echo "AC-16: config/autocmds.lua has gh-actions filetype detection only"
+check "yaml.github filetype" \
+  grep -q 'yaml.github' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
+check "treesitter yaml register" \
+  grep -q 'treesitter.language.register' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
+check "github workflows pattern" \
+  grep -q 'github/workflows' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
+# Must NOT have LazyVim-covered autocmds
+if grep -q 'VimResized' "$REPO_ROOT/nvim/lua/config/autocmds.lua"; then
+  nok "autocmds.lua should NOT have VimResized (LazyVim covers this)"
+else
+  ok "autocmds.lua does not have VimResized (LazyVim covers)"
+fi
+if grep -q 'strip_whitespace' "$REPO_ROOT/nvim/lua/config/autocmds.lua"; then
+  nok "autocmds.lua should NOT have strip_whitespace (conform covers this)"
+else
+  ok "autocmds.lua does not have strip_whitespace (conform covers)"
+fi
 
 # ── Install script link() calls ──────────────────────────────────────────
 echo ""
@@ -227,7 +294,7 @@ echo "Install scripts:"
 check "macos: nvim mapping"        grep -q 'link nvim.*\.config/nvim' "$REPO_ROOT/install-macos.sh"
 check "wsl: nvim mapping"          grep -q 'link nvim.*\.config/nvim' "$REPO_ROOT/install-wsl.sh"
 
-# Regression: Plans 2–9 link() calls preserved
+# Regression: prior plans' link() calls preserved
 check "macos: bash links preserved"      test "$(grep -c 'link bash/' "$REPO_ROOT/install-macos.sh")" -eq 4
 check "macos: git links preserved"       test "$(grep -c 'link git/' "$REPO_ROOT/install-macos.sh")" -eq 2
 check "macos: kitty link preserved (kitty.conf only — dracula-pro.conf removed by theming Wave A)"  test "$(grep -c 'link kitty/' "$REPO_ROOT/install-macos.sh")" -eq 1
@@ -255,9 +322,11 @@ if [[ "$fail" -gt 0 ]]; then
 fi
 echo ""
 
-# Current count: 101 tests. Floor should be within ~10% of actual.
-if (( total < 91 )); then
-  echo "WARNING: only $total tests ran (expected >= 91). Were tests deleted?"
+# Floor check: at full target state ~115 tests run. During migration,
+# per-language plugin files don't exist yet so those AC blocks are skipped.
+# Floor is set conservatively to catch accidental test deletion.
+if (( total < 90 )); then
+  echo "WARNING: only $total tests ran (expected >= 90). Were tests deleted?"
   exit 1
 fi
 

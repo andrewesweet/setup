@@ -232,8 +232,10 @@ if command -v uv &>/dev/null; then
   # pygments Dracula Pro style (Wave B — local style, PyPI package not yet
   # published as of 2026-04-17; re-verify in follow-up and replace with
   # `uv tool install pygments-dracula-pro` once available).
-  uv tool install --from "$DOTFILES/pygments" pygments-dracula-pro-local \
-    --with pygments || warn "pygments-dracula-pro-local install failed"
+  # Install pygments as the tool; attach the local style package as a
+  # plugin dependency so pygmentize discovers it via the entry point.
+  uv tool install pygments --with "$DOTFILES/pygments" \
+    || warn "pygments-dracula-pro-local install failed"
 else
   warn "uv not available, skipping uv tool installs"
 fi
@@ -241,6 +243,7 @@ fi
 # bun global installs (OpenCode and critique)
 if command -v bun &>/dev/null; then
   log "installing bun global packages (opencode-ai, critique)"
+  export NODE_EXTRA_CA_CERTS="$HOME/.config/certs/db-ca-bundle.pem"
   bun install -g opencode-ai critique || warn "bun global install failed"
 else
   warn "bun not available, skipping opencode/critique install"
@@ -290,7 +293,7 @@ if command -v gcloud &>/dev/null; then
   gcloud components install --quiet \
     alpha beta bq gke-gcloud-auth-plugin \
     pubsub-emulator cloud-datastore-emulator cloud-firestore-emulator \
-    cloud-build-local bigtable spanner-emulator || warn "gcloud components install failed (component manager may be disabled for package-managed installs)"
+    cloud-build-local bigtable || warn "gcloud components install failed (component manager may be disabled for package-managed installs)"
 else
   warn "gcloud SDK not installed — this is a PREREQUISITE for the dotfiles"
   warn ""

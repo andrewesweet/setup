@@ -99,11 +99,14 @@ link() {
 # ── gh_release_install ───────────────────────────────────────────────────
 # Download a GitHub release binary and install it into ~/.local/bin.
 #
-# Usage: gh_release_install <owner/repo> <binary-name> [<asset-pattern>]
-#   owner/repo:     e.g. "joshmedeski/sesh"
-#   binary-name:    the executable to place in ~/.local/bin (e.g. "sesh")
-#   asset-pattern:  optional extra regex to narrow the asset match
-#                   (defaults to the arch pattern below)
+# Usage: gh_release_install <owner/repo> <binary-name> [<asset-prefix>] [<archive-binary>]
+#   owner/repo:       e.g. "joshmedeski/sesh"
+#   binary-name:      the executable to place in ~/.local/bin (e.g. "sesh")
+#   asset-prefix:     asset filename prefix before arch/os token, if it
+#                     differs from binary-name (e.g. "carapace-bin" for
+#                     rsteube/carapace-bin which installs as 'carapace')
+#   archive-binary:   binary name inside the archive, if it differs from
+#                     binary-name (e.g. MilesCranmer/rip2 ships 'rip')
 #
 # Idempotent: skips if ~/.local/bin/<binary-name> is already executable.
 # This is a coarse idempotency check — for version pinning, delete the
@@ -112,12 +115,17 @@ link() {
 # Requires: curl, tar, (optional) jq. Falls back to grep/sed parsing if
 # jq is unavailable (which it is during early bootstrap on fresh WSL).
 gh_release_install() {
-  local repo="$1" binary="$2" extra_pattern="${3:-}"
+  local repo="$1" binary="$2" asset_prefix="${3:-$2}" archive_binary="${4:-$2}"
+  # Default asset_prefix falls back to binary when empty string passed positionally.
+  [[ -z "$asset_prefix" ]] && asset_prefix="$binary"
   local arch os tmp asset url
   mkdir -p "$HOME/.local/bin"
 
-  # Idempotency: already installed.
-  if [[ -x "$HOME/.local/bin/$binary" ]] || command -v "$binary" &>/dev/null; then
+  # Idempotency: already installed in ~/.local/bin.
+  # We intentionally don't skip when the binary exists elsewhere on PATH
+  # (e.g. stale apt version) — the caller wants the upstream release, and
+  # ~/.local/bin is earlier in PATH so our copy wins.
+  if [[ -x "$HOME/.local/bin/$binary" ]]; then
     printf "  already installed: %s\n" "$binary"
     return 0
   fi
@@ -137,34 +145,56 @@ gh_release_install() {
   esac
 
   log "fetching latest release metadata: $repo"
-  local api="https://api.github.com/repos/$repo/releases/latest"
   local releases_json
-  if ! releases_json="$(curl -fsSL "$api" 2>/dev/null)"; then
-    warn "gh_release_install: cannot reach GitHub API for $repo"
-    return 1
+  # Prefer 'gh api' (authenticated, 5000/hr). Fall back to anonymous curl
+  # (60/hr) for bootstrap before gh is available, with $GITHUB_TOKEN /
+  # $GH_TOKEN as an intermediate auth option.
+  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+    if ! releases_json="$(gh api "repos/$repo/releases/latest" 2>/dev/null)"; then
+      warn "gh_release_install: gh api failed for $repo"
+      return 1
+    fi
+  else
+    local -a auth_header=()
+    local token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
+    [[ -n "$token" ]] && auth_header=(-H "Authorization: Bearer $token")
+    if ! releases_json="$(curl -fsSL "${auth_header[@]}" "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null)"; then
+      warn "gh_release_install: cannot reach GitHub API for $repo"
+      return 1
+    fi
   fi
 
-  # Select a .tar.gz asset matching both arch and os, plus any extra_pattern.
-  # Prefer gnu over musl when both exist (glibc on Ubuntu).
-  local pattern="($arch).*($os)"
-  [[ -n "$extra_pattern" ]] && pattern="$pattern.*$extra_pattern"
-
-  url="$(printf '%s' "$releases_json" \
-    | grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
-    | sed -E 's/.*"([^"]+)"$/\1/' \
-    | grep -E "$pattern" \
-    | grep -E '\.tar\.gz$|\.tgz$' \
-    | grep -vE 'musl' \
-    | head -1)"
-
-  # Fallback: musl-only releases (e.g. some Rust static binaries).
-  if [[ -z "$url" ]]; then
-    url="$(printf '%s' "$releases_json" \
+  # Candidate asset URLs. To distinguish sibling binaries (atuin vs
+  # atuin-server), the asset filename must start with "<archive_binary>[-_]"
+  # followed immediately by an arch or os token — no intervening word
+  # (so "atuin-x86_64-..." matches but "atuin-server-x86_64-..." does not).
+  # Arch and os match case-insensitively and independently (no ordering
+  # assumption). Archive extensions: tar.gz, tgz, zip.
+  # Name guard: filename starts with "<asset_prefix>[-_]", optionally followed
+  # by a version token (digits/dots, optionally v-prefixed), then an arch or
+  # os token. This admits "carapace-bin_1.6.4_linux_amd64" but rejects
+  # "atuin-server-x86_64" (server is a word, not a version or arch/os).
+  local name_guard="/${asset_prefix}[-_]([vV]?[0-9][0-9.]*[-_])?((x86_64|amd64|x64|aarch64|arm64)|[Ll]inux|darwin|[Aa]pple)"
+  local -a candidates
+  mapfile -t candidates < <(
+    printf '%s' "$releases_json" \
       | grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
       | sed -E 's/.*"([^"]+)"$/\1/' \
-      | grep -E "$pattern" \
-      | grep -E '\.tar\.gz$|\.tgz$' \
-      | head -1)"
+      | grep -E "$name_guard" \
+      | grep -iE "($arch)" \
+      | grep -iE "($os)" \
+      | grep -E '\.(tar\.gz|tgz|zip)$'
+  )
+
+  # Prefer gnu over musl over anything else (glibc on Ubuntu).
+  url=""
+  for c in "${candidates[@]}"; do
+    [[ "$c" == *musl* ]] && continue
+    url="$c"; break
+  done
+  # Fallback: musl-only releases (e.g. rip2).
+  if [[ -z "$url" && ${#candidates[@]} -gt 0 ]]; then
+    url="${candidates[0]}"
   fi
 
   if [[ -z "$url" ]]; then
@@ -174,26 +204,135 @@ gh_release_install() {
 
   log "downloading $url"
   tmp="$(mktemp -d)"
-  if ! curl -fsSL -o "$tmp/asset.tar.gz" "$url"; then
+  local ext="tar.gz"
+  [[ "$url" == *.zip ]] && ext="zip"
+  if ! curl -fsSL -o "$tmp/asset.$ext" "$url"; then
     warn "gh_release_install: download failed for $url"
     rm -rf "$tmp"
     return 1
   fi
 
-  # Extract and locate the binary. Handles flat archives and subdir archives.
-  tar -xzf "$tmp/asset.tar.gz" -C "$tmp"
-  asset="$(find "$tmp" -type f -name "$binary" -perm -u+x | head -1)"
+  # Extract and locate the binary. Handles flat and subdir archives, tar + zip.
+  case "$ext" in
+    tar.gz) tar -xzf "$tmp/asset.$ext" -C "$tmp" ;;
+    zip)
+      if ! command -v unzip >/dev/null 2>&1; then
+        warn "gh_release_install: unzip not available, cannot extract $url"
+        rm -rf "$tmp"
+        return 1
+      fi
+      unzip -q "$tmp/asset.$ext" -d "$tmp"
+      ;;
+  esac
+  asset="$(find "$tmp" -type f -name "$archive_binary" -perm -u+x | head -1)"
   if [[ -z "$asset" ]]; then
-    asset="$(find "$tmp" -type f -name "$binary" | head -1)"
+    asset="$(find "$tmp" -type f -name "$archive_binary" | head -1)"
   fi
   if [[ -z "$asset" ]]; then
-    warn "gh_release_install: binary '$binary' not found in archive for $repo"
+    warn "gh_release_install: binary '$archive_binary' not found in archive for $repo"
     rm -rf "$tmp"
     return 1
   fi
 
   install -m 0755 "$asset" "$HOME/.local/bin/$binary"
   printf "  installed %s → ~/.local/bin/%s\n" "$binary" "$binary"
+  rm -rf "$tmp"
+}
+
+# ── gh_release_deb_install ──────────────────────────────────────────────
+# Install from a signed .deb asset on a GitHub release. Preferred over
+# gh_release_install for tools whose upstream publishes Debian packages,
+# because dpkg handles PATH (/usr/bin), shell completions, and uninstall
+# via `apt remove` automatically.
+#
+# Usage: gh_release_deb_install <owner/repo> <binary-for-idempotency> [<asset-prefix>]
+#   owner/repo:       e.g. "sxyazi/yazi"
+#   binary-for-idempotency: the command to `command -v` for skip check
+#   asset-prefix:     filename-prefix pattern (default: binary name)
+#
+# Prefers gnu over musl; filters out android/termux variants.
+gh_release_deb_install() {
+  local repo="$1" binary="$2" asset_prefix="${3:-$2}"
+  local arch tmp url
+
+  # Idempotency: skip if the binary is already on PATH from an upstream
+  # source (typical after dpkg install → /usr/bin). Unlike binary-tarball
+  # installs, .deb packages place into system paths so we can trust the
+  # PATH check here.
+  if command -v "$binary" >/dev/null 2>&1; then
+    printf "  already installed: %s\n" "$binary"
+    return 0
+  fi
+
+  case "$(uname -m)" in
+    x86_64)  arch='amd64|x86_64' ;;
+    aarch64|arm64) arch='arm64|aarch64' ;;
+    *)       warn "gh_release_deb_install: unsupported arch $(uname -m) for $binary"; return 1 ;;
+  esac
+
+  local releases_json
+  log "fetching latest release metadata: $repo"
+  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+    releases_json="$(gh api "repos/$repo/releases/latest" 2>/dev/null)"
+  else
+    local -a auth_header=()
+    local token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
+    [[ -n "$token" ]] && auth_header=(-H "Authorization: Bearer $token")
+    releases_json="$(curl -fsSL "${auth_header[@]}" "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null)"
+  fi
+  if [[ -z "$releases_json" ]]; then
+    warn "gh_release_deb_install: cannot reach GitHub API for $repo"
+    return 1
+  fi
+
+  # Pick .deb asset: start with asset_prefix + arch token. `.deb` implies
+  # linux so the OS tag is treated as optional — e.g. xh names its file
+  # `xh_<ver>_amd64.deb` with no `linux` in it. Filter out android/termux
+  # variants explicitly; prefer gnu over musl below.
+  local name_guard="/${asset_prefix}[-_]"
+  local -a candidates
+  mapfile -t candidates < <(
+    printf '%s' "$releases_json" \
+      | grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
+      | sed -E 's/.*"([^"]+)"$/\1/' \
+      | grep -E "$name_guard" \
+      | grep -iE "($arch)" \
+      | grep -viE 'android|termux|windows|darwin|apple' \
+      | grep -E '\.deb$'
+  )
+  url=""
+  local c
+  for c in "${candidates[@]}"; do
+    [[ "$c" == *musl* ]] && continue
+    url="$c"; break
+  done
+  [[ -z "$url" && ${#candidates[@]} -gt 0 ]] && url="${candidates[0]}"
+
+  if [[ -z "$url" ]]; then
+    warn "gh_release_deb_install: no matching .deb asset for $repo"
+    return 1
+  fi
+
+  log "downloading $url"
+  tmp="$(mktemp -d)"
+  if ! curl -fsSL -o "$tmp/pkg.deb" "$url"; then
+    warn "gh_release_deb_install: download failed for $url"
+    rm -rf "$tmp"
+    return 1
+  fi
+  # dpkg will leave the package half-configured if any Depends are missing
+  # (yazi pulls 7zip / ffmpeg / poppler-utils / clipboard helpers). Follow
+  # with `apt install -f` to pull the missing deps from apt — the binary
+  # itself is already unpacked to /usr/bin by this point either way.
+  if ! sudo dpkg -i "$tmp/pkg.deb"; then
+    log "dpkg reported missing deps — resolving via apt install -f"
+    if ! sudo apt install -f -y; then
+      warn "gh_release_deb_install: apt install -f failed for $repo"
+      rm -rf "$tmp"
+      return 1
+    fi
+  fi
+  printf "  installed %s via dpkg (%s)\n" "$binary" "$(basename "$url")"
   rm -rf "$tmp"
 }
 
@@ -297,10 +436,25 @@ if ! sudo apt install -y \
   git tmux tree wget curl \
   jq \
   shellcheck \
-  direnv; then
+  direnv \
+  unzip \
+  ripgrep fd-find bat zoxide eza git-delta \
+  kitty; then
   err "apt install failed — aborting install"
   exit 1
 fi
+
+# Ubuntu packages bat as 'batcat' and fd-find as 'fdfind' to avoid binary
+# clashes. The rest of the config (bashrc, nvim, git delta) calls them by
+# their upstream names. Provide shims in ~/.local/bin for both.
+mkdir -p "$HOME/.local/bin"
+for pair in "batcat:bat" "fdfind:fd"; do
+  src="${pair%:*}" dst="${pair#*:}"
+  if command -v "$src" >/dev/null 2>&1 && [[ ! -e "$HOME/.local/bin/$dst" ]]; then
+    ln -sf "$(command -v "$src")" "$HOME/.local/bin/$dst"
+    printf "  linked    ~/.local/bin/%s → %s\n" "$dst" "$(command -v "$src")"
+  fi
+done
 
 # ── Step 1b: TPM (tmux plugin manager) ───────────────────────────────────
 # TPM is not in apt. Clone directly; plugins install on first tmux launch
@@ -319,16 +473,91 @@ fi
 # package only landed in Noble (24.04). gh_release_install handles both arches.
 log "installing release binaries (Layer 1a)"
 gh_release_install "atuinsh/atuin"                atuin
-gh_release_install "alexpasmantier/television"    tv
+# television, xh, yazi, carapace ship signed .deb on their GitHub releases
+# — prefer dpkg over a raw tarball/zip drop for system PATH + uninstall.
+gh_release_deb_install "alexpasmantier/television" tv
+gh_release_deb_install "ducaale/xh"                xh
 
 log "installing release binaries (Layer 1b-i)"
-gh_release_install "ducaale/xh"                   xh
 gh_release_install "joshmedeski/sesh"             sesh
-gh_release_install "sxyazi/yazi"                  yazi
-gh_release_install "MilesCranmer/rip2"            rip2
+gh_release_deb_install "sxyazi/yazi"               yazi
+gh_release_install "MilesCranmer/rip2"            rip2 rip rip
 gh_release_install "noahgorstein/jqp"             jqp
 gh_release_install "dlvhdr/diffnav"               diffnav
-gh_release_install "rsteube/carapace-bin"         carapace
+gh_release_deb_install "carapace-sh/carapace-bin"  carapace carapace-bin
+
+# ── Step 2b: Core binaries from GitHub releases ──────────────────────────
+# Tools that either (a) aren't in apt, or (b) have a stale apt version.
+# Neovim 0.9 in Ubuntu 24.04 is too old for LazyVim which wants 0.10+.
+log "installing core binaries (latest GitHub releases)"
+# neovim ships as a self-contained tree (bin/nvim + share/nvim/runtime/),
+# not a single binary — gh_release_install is binary-only. Extract the
+# whole archive into ~/.local/opt/nvim and symlink bin/nvim onto PATH.
+if [[ ! -x "$HOME/.local/opt/nvim/bin/nvim" ]]; then
+  log "installing neovim (extract full tree)"
+  nvim_tmp="$(mktemp -d)"
+  nvim_url="$(gh api repos/neovim/neovim/releases/latest --jq \
+    '.assets[].browser_download_url' 2>/dev/null \
+    | grep -E 'nvim-linux-x86_64\.tar\.gz$' | head -1)"
+  if [[ -n "$nvim_url" ]] \
+      && curl -fsSL -o "$nvim_tmp/nvim.tar.gz" "$nvim_url" \
+      && tar -xzf "$nvim_tmp/nvim.tar.gz" -C "$nvim_tmp"; then
+    mkdir -p "$HOME/.local/opt"
+    rm -rf "$HOME/.local/opt/nvim"
+    mv "$nvim_tmp"/nvim-linux-* "$HOME/.local/opt/nvim"
+    ln -sf "$HOME/.local/opt/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+    printf "  installed nvim → ~/.local/opt/nvim (symlink ~/.local/bin/nvim)\n"
+  else
+    warn "neovim install failed (url='$nvim_url')"
+  fi
+  rm -rf "$nvim_tmp"
+else
+  log "neovim already installed at ~/.local/opt/nvim"
+fi
+
+gh_release_install "jesseduffield/lazygit"        lazygit
+gh_release_install "jesseduffield/lazydocker"     lazydocker
+gh_release_install "x-motemen/ghq"                ghq
+gh_release_install "google/yamlfmt"               yamlfmt
+gh_release_install "rhysd/actionlint"             actionlint
+# fzf: apt ships 0.44 (2023); bashrc uses `fzf --bash` (0.48+) for init.
+gh_release_install "junegunn/fzf"                 fzf
+# zizmor is primarily distributed via PyPI per upstream docs; install via
+# uv (already on PATH) rather than a raw GitHub release tarball.
+if command -v uv >/dev/null 2>&1 && ! command -v zizmor >/dev/null 2>&1; then
+  log "installing zizmor via uv tool"
+  uv tool install zizmor || warn "zizmor install via uv failed"
+fi
+
+# ── Step 2c: Upstream shell installers ───────────────────────────────────
+# starship, mise, and bun all publish official install scripts that pick
+# the right arch/libc and drop a binary into ~/.local/bin or ~/.<tool>/bin.
+# Each is idempotent (the scripts detect an existing install and skip).
+if ! command -v starship >/dev/null 2>&1; then
+  log "installing starship (official installer)"
+  curl -fsSL https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$HOME/.local/bin" \
+    || warn "starship install failed"
+else
+  log "starship already installed: $(command -v starship)"
+fi
+if ! command -v mise >/dev/null 2>&1 && [[ ! -x "$HOME/.local/bin/mise" ]]; then
+  log "installing mise (official installer)"
+  curl -fsSL https://mise.run | sh || warn "mise install failed"
+else
+  log "mise already installed"
+fi
+if ! command -v bun >/dev/null 2>&1 && [[ ! -x "$HOME/.bun/bin/bun" ]]; then
+  log "installing bun (official installer)"
+  curl -fsSL https://bun.sh/install | bash || warn "bun install failed"
+  # Bun drops its binary in ~/.bun/bin; link into ~/.local/bin for PATH parity.
+  if [[ -x "$HOME/.bun/bin/bun" ]]; then
+    ln -sf "$HOME/.bun/bin/bun" "$HOME/.local/bin/bun"
+  fi
+else
+  log "bun already installed"
+fi
+# Ensure the freshly-installed bin is visible for the rest of this run.
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:$PATH"
 
 # ── Step 3: Post-bootstrap tool installs ─────────────────────────────────────
 if command -v uv &>/dev/null; then
@@ -338,8 +567,10 @@ if command -v uv &>/dev/null; then
   # pygments Dracula Pro style (Wave B — local style, PyPI package not yet
   # published as of 2026-04-17; re-verify in follow-up and replace with
   # `uv tool install pygments-dracula-pro` once available).
-  uv tool install --from "$DOTFILES/pygments" pygments-dracula-pro-local \
-    --with pygments || warn "pygments-dracula-pro-local install failed"
+  # Install pygments as the tool; attach the local style package as a
+  # plugin dependency so pygmentize discovers it via the entry point.
+  uv tool install pygments --with "$DOTFILES/pygments" \
+    || warn "pygments-dracula-pro-local install failed"
 else
   warn "uv not available, skipping uv tool installs (added in later plan)"
 fi

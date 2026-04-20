@@ -131,8 +131,8 @@ check "gh-dash has lazygit keybinding" \
   grep -qE 'name:[[:space:]]*lazygit' gh-dash/config.yml
 check "gh-dash has C → opencode binding" \
   bash -c 'grep -B1 -A4 -E "key:[[:space:]]*C\b" gh-dash/config.yml | grep -qE "tmux new-window|opencode"'
-check "gh-dash theme uses Dracula palette (#BD93F9 or #6272A4)" \
-  grep -qE '#BD93F9|#6272A4|#50FA7B' gh-dash/config.yml
+check "gh-dash theme uses Dracula Pro palette (post theming Wave B)" \
+  grep -qE '#9580FF|#7970A9|#8AFF80' gh-dash/config.yml
 check "install-macos.sh links gh-dash config" \
   grep -qE 'link\s+gh-dash/config\.yml' install-macos.sh
 check "install-wsl.sh links gh-dash config" \
