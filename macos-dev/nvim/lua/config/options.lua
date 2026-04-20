@@ -6,3 +6,26 @@
 
 vim.opt.colorcolumn = "120"  -- visible right margin (was 100; user preference)
 vim.opt.scrolloff   = 8      -- keep 8 lines of context above/below cursor
+
+-- yaml.github filetype detection. Must run at init (here) rather than in
+-- autocmds.lua: LazyVim loads config.autocmds on VeryLazy, which fires
+-- AFTER cmdline-opened buffers have resolved their filetype — so a
+-- `nvim .github/workflows/ci.yml` invocation would otherwise end up as
+-- plain `yaml`. options.lua is loaded by LazyVim during init, before any
+-- buffer filetype resolution.
+-- Patterns: neovim's vim.filetype pattern matcher rejects the trailing `$`
+-- end-of-string anchor (hits go to plain `yaml`). Leave the match open-ended
+-- and require `.+/` at the start so we only match nested paths, never a
+-- bare `.github/` string embedded in some other filename.
+vim.filetype.add({
+  pattern = {
+    [".+/%.github/workflows/[^/]+%.ya?ml"] = "yaml.github",
+    [".+/%.github/actions/[^/]+/action%.ya?ml"] = "yaml.github",
+  },
+  filename = {
+    ["action.yml"] = "yaml.github",
+    ["action.yaml"] = "yaml.github",
+  },
+})
+
+vim.treesitter.language.register("yaml", "yaml.github")

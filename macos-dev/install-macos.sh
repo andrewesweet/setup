@@ -392,6 +392,12 @@ link starship/starship.toml  .config/starship.toml
 link lazygit/config.yml      .config/lazygit/config.yml
 link mise/config.toml        .config/mise/config.toml
 
+# mise refuses to read config.toml outside its trusted allowlist and prints
+# an error on every shell start. Trust DOTFILES up-front; idempotent.
+if command -v mise >/dev/null 2>&1; then
+  mise trust "$DOTFILES" >/dev/null 2>&1 || true
+fi
+
 # atuin (Plan Layer 1a)
 link atuin/config.toml        .config/atuin/config.toml
 
