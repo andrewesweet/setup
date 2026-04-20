@@ -376,6 +376,10 @@ When: inspecting the committed config or runtime output
 Then: <specific grep or runtime check>
 ```
 
+> ACs AC-theme-no-classic-leak, AC-theme-contrast, and AC-theme-tier2-retint
+> are defined in `theming-qa.md` and run as part of the same
+> `test-plan-theming.sh` invocation.
+
 ACs SHALL assert every slot in the tool's coverage profile (§ 5.1). Partial
 coverage fails the AC.
 
