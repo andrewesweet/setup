@@ -1,6 +1,15 @@
 # Git worktrees (created at repo root by git worktree add)
 .worktrees/
 
+# Claude Code per-user / local state. `.claude/` at repo root is a
+# transient nested-worktree scratch area; `macos-dev/.claude/` holds
+# per-user permission and output-style overrides that belong to the
+# individual checkout, not the project. Convention (Claude Code):
+# `settings.local.json` is user-local; `settings.json` is shareable
+# and would be committed separately if ever needed.
+.claude/
+macos-dev/.claude/
+
 # Session-continuation scratch pads and superseded draft plans.
 # Committed plans live under docs/superpowers/plans/; anything under
 # macos-dev/docs/plans/continuation-*.md is per-session context for
