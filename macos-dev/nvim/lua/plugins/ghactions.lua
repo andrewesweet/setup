@@ -23,16 +23,67 @@ return {
       end
       opts.servers.gh_actions_ls = vim.tbl_deep_extend("force", opts.servers.gh_actions_ls or {}, {
         filetypes = { "yaml.github" },
-        -- Prefer the repo root (.git or .github) as a root marker, but
-        -- fall back to the file's directory so the server still starts
-        -- on workflow files checked out in non-git trees.
-        root_dir = function(fname)
-          return vim.fs.root(fname, { ".git", ".github" }) or vim.fs.dirname(fname)
+        -- nvim-lspconfig's gh_actions_ls upstream expects the new
+        -- neovim 0.11+ root_dir signature: `function(bufnr, on_dir)`
+        -- and calls `on_dir(root)` when a match is found. An old-style
+        -- `function(fname) return root end` is silently ignored by
+        -- vim.lsp.enable — on_dir never fires, no root gets picked,
+        -- autostart quietly declines to attach. (Found via divergence
+        -- from upstream lspconfig spec.)
+        root_dir = function(bufnr, on_dir)
+          local parent = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+          if
+            vim.endswith(parent, "/.github/workflows")
+            or vim.endswith(parent, "/.forgejo/workflows")
+            or vim.endswith(parent, "/.gitea/workflows")
+          then
+            on_dir(parent)
+            return
+          end
+          local root = vim.fs.root(bufnr, { ".git", ".github" })
+          if root then
+            on_dir(root)
+          end
         end,
         init_options = {
           sessionToken = gh_token(),
         },
       })
+
+      -- yamlls also needs to attach to yaml.github (schemastore completion
+      -- + validation). LazyVim's lang.yaml extra registers the default
+      -- filetypes { yaml, yaml.docker-compose, yaml.gitlab, yaml.helm-values }
+      -- — append yaml.github so workflow buffers match.
+      opts.servers.yamlls = opts.servers.yamlls or {}
+      local yamlls_ft = opts.servers.yamlls.filetypes
+        or { "yaml", "yaml.docker-compose", "yaml.gitlab", "yaml.helm-values" }
+      if not vim.tbl_contains(yamlls_ft, "yaml.github") then
+        table.insert(yamlls_ft, "yaml.github")
+      end
+      opts.servers.yamlls.filetypes = yamlls_ft
+
+      -- Retro-attach sweep: LazyVim's lsp plugin loads on BufReadPre and
+      -- mason-lspconfig.setup calls vim.lsp.enable asynchronously inside
+      -- the plugin's config() — so for a cmdline-opened buffer
+      -- (`nvim .github/workflows/ci.yml`) the FileType event can fire
+      -- before vim.lsp.enable's internal autocmd is registered, and the
+      -- LSP never sees that buffer. After VimEnter everything is wired;
+      -- re-emit a synthetic FileType on every already-open yaml.github
+      -- buffer so the autostart path engages retroactively.
+      vim.api.nvim_create_autocmd("VimEnter", {
+        once = true,
+        callback = function()
+          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.bo[buf].filetype == "yaml.github" then
+              vim.api.nvim_exec_autocmds("FileType", {
+                buffer = buf,
+                modeline = false,
+              })
+            end
+          end
+        end,
+      })
+
       return opts
     end,
   },
