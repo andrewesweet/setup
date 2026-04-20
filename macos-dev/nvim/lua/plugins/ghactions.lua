@@ -1,6 +1,6 @@
 -- plugins/ghactions.lua — GitHub Actions tooling.
 -- No LazyVim Extra covers this niche. yaml.github filetype is
--- registered in config/autocmds.lua (load-bearing).
+-- registered in config/options.lua (load-bearing, runs at init).
 
 return {
   {
@@ -22,9 +22,11 @@ return {
       linters_by_ft = {
         ["yaml.github"] = { "actionlint", "zizmor" },
       },
-      linters = {
-        zizmor = { args = { "--format", "plain", "--no-progress" } },
-      },
+      -- DO NOT override zizmor args: nvim-lint ships with
+      -- `{ "--format", "json-v1" }` and a parser that expects the
+      -- json-v1 schema. Forcing plain/no-progress output made the
+      -- parser emit "Expected value but found invalid token at
+      -- character 1" on every save. Accept the default.
     },
   },
 }
