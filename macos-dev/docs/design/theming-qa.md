@@ -149,8 +149,9 @@ Dracula Classic spec at `draculatheme.com/spec` plus Bright variants:
 | Pink | `#FF79C6` |
 | Bright Red | `#FF6E6E` |
 | Bright Green | `#69FF94` |
-| Bright Blue | `#D6ACFF` |
 | Bright Yellow | `#FFFFA5` |
+| Bright Blue | `#D6ACFF` |
+| Bright Magenta | `#FF92DF` |
 | Bright Cyan | `#A4FFFF` |
 
 `*` Foreground `#F8F8F2` is shared between Classic and Pro Base. It MUST
@@ -210,7 +211,7 @@ touching this design.
 ```
 AC-theme-no-classic-leak: No Classic hex value appears in any Pro-themed file
 Given: all config files listed in scripts/lib/themed-files.sh
-When: grep -iE '(#282a36|#6272a4|#44475a|#ff5555|#ffb86c|#f1fa8c|#50fa7b|#8be9fd|#bd93f9|#ff79c6|#ff6e6e|#69ff94|#d6acff|#ffffa5|#a4ffff)' applied to each file
+When: grep -iE '(#282a36|#6272a4|#44475a|#ff5555|#ffb86c|#f1fa8c|#50fa7b|#8be9fd|#bd93f9|#ff79c6|#ff6e6e|#69ff94|#d6acff|#ffffa5|#ff92df|#a4ffff)' applied to each file
 Then: zero matches, excluding comment-only lines and lines marked '# classic-allowed'
 ```
 
@@ -432,9 +433,9 @@ introduced. Runtime budget: under 500 ms total on CI (pure text scans plus
   Current Line / Comment slot (same hex). `AnsiBrightWhite #FFFFFF`
   is shared with Pro (`DRACULA_PRO_BRIGHT_WHITE`) and therefore excluded
   per the § 4.2 Foreground-style exclusion rule. `AnsiBrightMagenta
-  #FF92DF` differs from Pro's `#FF99CC` and is not currently blocked;
-  adding it is a scope-expansion question tracked separately, not a
-  mismatch in the five values this item audited.
+  #FF92DF` differs from Pro's `#FF99CC` and has now been added to the
+  § 4.2 blocklist and `CLASSIC_HEX_BLOCKLIST` (2026-04-20, follow-up to
+  this audit); table now enumerates 16 blocklist entries.
 - § 6.3 re-tint arithmetic uses sRGB linear subtraction; gamma-correct
   re-tinting (OKLab) would be more perceptually accurate but adds a
   Python dependency. Deferred; current scheme is good enough to catch

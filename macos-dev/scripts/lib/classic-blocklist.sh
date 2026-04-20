@@ -4,8 +4,9 @@
 # Dracula Classic hex blocklist. See docs/design/theming-qa.md § 4.2.
 #
 # These 16 hex values are the full set of distinct Classic named-slot
-# colours minus the Foreground (#F8F8F2), which is shared between Classic
-# and Dracula Pro Base and therefore MUST NOT be blocked.
+# colours (including the eight Ansi bright variants per
+# spec.draculatheme.com) minus the Foreground (#F8F8F2), which is shared
+# between Classic and Dracula Pro Base and therefore MUST NOT be blocked.
 #
 # Values are stored lowercase for case-insensitive matching via grep -i.
 # Sourced file, not executable.
@@ -25,8 +26,9 @@ CLASSIC_HEX_BLOCKLIST=(
   "#ff79c6"  # Pink
   "#ff6e6e"  # Bright Red
   "#69ff94"  # Bright Green
-  "#d6acff"  # Bright Blue
   "#ffffa5"  # Bright Yellow
+  "#d6acff"  # Bright Blue
+  "#ff92df"  # Bright Magenta
   "#a4ffff"  # Bright Cyan
 )
 export CLASSIC_HEX_BLOCKLIST
