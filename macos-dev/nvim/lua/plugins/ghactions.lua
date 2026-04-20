@@ -9,8 +9,11 @@ return {
       opts.servers = opts.servers or {}
       opts.servers.gh_actions_ls = vim.tbl_deep_extend("force", opts.servers.gh_actions_ls or {}, {
         filetypes = { "yaml.github" },
+        -- Prefer the repo root (.git or .github) as a root marker, but
+        -- fall back to the file's directory so the server still starts
+        -- on workflow files checked out in non-git trees.
         root_dir = function(fname)
-          return vim.fs.root(fname, ".git")
+          return vim.fs.root(fname, { ".git", ".github" }) or vim.fs.dirname(fname)
         end,
       })
       return opts

@@ -29,3 +29,14 @@ vim.filetype.add({
 })
 
 vim.treesitter.language.register("yaml", "yaml.github")
+
+-- Treesitter's language.register only teaches the parser registry about
+-- the alias; it doesn't start the highlighter. Hook FileType directly so
+-- yaml.github buffers get syntax highlighting without needing a manual
+-- `:TSBufEnable`.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "yaml.github",
+  callback = function(ev)
+    pcall(vim.treesitter.start, ev.buf, "yaml")
+  end,
+})
