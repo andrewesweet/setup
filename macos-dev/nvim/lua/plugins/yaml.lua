@@ -2,8 +2,18 @@
 --
 -- lang.yaml Extra's yamlls defaults (including schemastore.nvim auto-inject
 -- for common YAML filetypes) are accepted as-is. This file only replaces
--- the default YAML formatter (prettier) with yamlfmt, which produces
--- K8s-friendly output that respects existing indentation conventions.
+-- the default YAML formatter (prettier) with yamlfmt.
+--
+-- Formatter args intentionally stay empty: yamlfmt's cosmetic knobs
+-- (indentless_arrays, scan_folded_as_literal, etc.) are config-file-only
+-- in v0.x — they're *not* CLI flags. Passing them as args made the
+-- formatter abort with "flag provided but not defined" on every save.
+-- Projects that want non-default behaviour drop a .yamlfmt in the repo
+-- root; yamlfmt auto-discovers it.
+--
+-- LazyVim already wires format_on_save globally via conform, so this
+-- spec no longer sets it locally (doing so triggered a "Don't set
+-- opts.format_on_save for conform.nvim" warning on every session).
 
 return {
   {
@@ -12,17 +22,6 @@ return {
       formatters_by_ft = {
         yaml = { "yamlfmt" },
       },
-      formatters = {
-        yamlfmt = {
-          command = "yamlfmt",
-          args = { "-formatter", "basic", "-indentless_arrays=true" },
-        },
-      },
-      format_on_save = function(bufnr)
-        if vim.bo[bufnr].filetype == "yaml" then
-          return { lsp_format = "fallback", timeout_ms = 1000 }
-        end
-      end,
     },
   },
 }
