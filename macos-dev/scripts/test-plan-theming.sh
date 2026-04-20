@@ -864,6 +864,54 @@ check_no_classic_leak() {
 }
 check_no_classic_leak
 
+# ── AC-theme-contrast ────────────────────────────────────────────────────────
+# docs/design/theming-qa.md § 5 — extract fg/bg hex pairs from each tool's
+# committed config and assert WCAG 2.1 AA contrast ratios (primary ≥ 4.5,
+# muted ≥ 3.0). Extractors live in scripts/lib/extract-pair.sh; the ratio
+# calculator is scripts/lib/contrast.py (Python 3 stdlib only).
+if [[ -f scripts/lib/extract-pair.sh ]]; then
+  # shellcheck source=scripts/lib/extract-pair.sh
+  # shellcheck disable=SC1091
+  source scripts/lib/extract-pair.sh
+fi
+
+check_contrast_pair() {
+  local label="$1" threshold="$2"; shift 2
+  local pair
+  if ! pair=$("$@" 2>/dev/null) || [[ -z "$pair" ]]; then
+    skp "$label" "config absent"
+    return
+  fi
+  # shellcheck disable=SC2086
+  set -- $pair
+  local fg="$1" bg="$2"
+  if python3 scripts/lib/contrast.py "$fg" "$bg" --threshold "$threshold" >/dev/null 2>&1; then
+    local ratio
+    ratio=$(python3 scripts/lib/contrast.py "$fg" "$bg" --threshold 0 2>/dev/null | awk -F= '{print $2}')
+    ok "$label ($fg on $bg = ${ratio} ≥ ${threshold}:1)"
+  else
+    local ratio
+    ratio=$(python3 scripts/lib/contrast.py "$fg" "$bg" --threshold 0 2>/dev/null | awk -F= '{print $2}')
+    nok "$label ($fg on $bg = ${ratio}, < ${threshold}:1)"
+  fi
+}
+
+echo ""
+echo "AC-theme-contrast: fg/bg pairs meet WCAG 2.1 AA (theming-qa.md § 5)"
+if ! command -v python3 >/dev/null 2>&1; then
+  skp "contrast checks" "python3 not available"
+elif [[ ! -f scripts/lib/contrast.py ]]; then
+  skp "contrast checks" "scripts/lib/contrast.py missing"
+else
+  check_contrast_pair "opencode primary"  4.5 extract_opencode_primary
+  check_contrast_pair "opencode muted"    3.0 extract_opencode_muted
+  check_contrast_pair "ghostty primary"   4.5 extract_ghostty
+  check_contrast_pair "kitty primary"     4.5 extract_kitty
+  check_contrast_pair "btop primary"      4.5 extract_btop
+  check_contrast_pair "k9s primary"       4.5 extract_k9s
+  check_contrast_pair "bat primary"       4.5 extract_bat
+fi
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
