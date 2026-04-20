@@ -269,13 +269,16 @@ check "jk → Esc" grep -q '"jk".*Esc' "$REPO_ROOT/nvim/lua/config/keymaps.lua"
 
 # ── AC-16: config/autocmds.lua has gh-actions filetype only ──────────────
 echo ""
-echo "AC-16: config/autocmds.lua has gh-actions filetype detection only"
+echo "AC-16: config/options.lua has gh-actions filetype detection"
+# vim.filetype.add + vim.treesitter.language.register were relocated from
+# autocmds.lua (loaded on VeryLazy — too late for cmdline-opened buffers)
+# to options.lua (loaded at init).
 check "yaml.github filetype" \
-  grep -q 'yaml.github' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
+  grep -q 'yaml.github' "$REPO_ROOT/nvim/lua/config/options.lua"
 check "treesitter yaml register" \
-  grep -q 'treesitter.language.register' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
+  grep -q 'treesitter.language.register' "$REPO_ROOT/nvim/lua/config/options.lua"
 check "github workflows pattern" \
-  grep -q 'github/workflows' "$REPO_ROOT/nvim/lua/config/autocmds.lua"
+  grep -q 'github/workflows' "$REPO_ROOT/nvim/lua/config/options.lua"
 # Must NOT have LazyVim-covered autocmds
 if grep -q 'VimResized' "$REPO_ROOT/nvim/lua/config/autocmds.lua"; then
   nok "autocmds.lua should NOT have VimResized (LazyVim covers this)"
