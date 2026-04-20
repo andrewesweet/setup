@@ -21,6 +21,9 @@ return {
     opts = {
       formatters_by_ft = {
         yaml = { "yamlfmt" },
+        -- GitHub Actions workflow files get the `yaml.github` filetype
+        -- from options.lua; map them explicitly so `:w` still reformats.
+        ["yaml.github"] = { "yamlfmt" },
       },
     },
   },
