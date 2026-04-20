@@ -415,12 +415,26 @@ introduced. Runtime budget: under 500 ms total on CI (pure text scans plus
 
 ## 9. Open items
 
-- § 4.2 Bright-variant Classic hex values (`#FF6E6E`, `#69FF94`,
+- ~~§ 4.2 Bright-variant Classic hex values (`#FF6E6E`, `#69FF94`,
   `#D6ACFF`, `#FFFFA5`, `#A4FFFF`) are taken from an auxiliary Dracula
   Classic Bright table; the authoritative spec page lists three of the
   five explicitly. Wave-implementation plan SHALL verify against the
   canonical `dracula/dracula-theme` spec repo at pin time and adjust the
-  blocklist if any hex differs.
+  blocklist if any hex differs.~~
+  **Resolved 2026-04-20**: audited against `https://spec.draculatheme.com/`
+  (Ansi Palette section), which explicitly enumerates all eight bright
+  variants: `AnsiBrightBlack #6272A4`, `AnsiBrightRed #FF6E6E`,
+  `AnsiBrightGreen #69FF94`, `AnsiBrightYellow #FFFFA5`,
+  `AnsiBrightBlue #D6ACFF`, `AnsiBrightMagenta #FF92DF`,
+  `AnsiBrightCyan #A4FFFF`, `AnsiBrightWhite #FFFFFF`. All five values
+  currently in `CLASSIC_HEX_BLOCKLIST` verify exactly; no amendment
+  required. `AnsiBrightBlack #6272A4` is already blocked under the
+  Current Line / Comment slot (same hex). `AnsiBrightWhite #FFFFFF`
+  is shared with Pro (`DRACULA_PRO_BRIGHT_WHITE`) and therefore excluded
+  per the § 4.2 Foreground-style exclusion rule. `AnsiBrightMagenta
+  #FF92DF` differs from Pro's `#FF99CC` and is not currently blocked;
+  adding it is a scope-expansion question tracked separately, not a
+  mismatch in the five values this item audited.
 - § 6.3 re-tint arithmetic uses sRGB linear subtraction; gamma-correct
   re-tinting (OKLab) would be more perceptually accurate but adds a
   Python dependency. Deferred; current scheme is good enough to catch
