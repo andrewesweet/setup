@@ -826,6 +826,44 @@ else
   skp "pygmentize runtime check" "pygmentize not installed or not --full mode"
 fi
 
+# ── AC-theme-no-classic-leak ─────────────────────────────────────────────────
+# docs/design/theming-qa.md § 4: grep every Pro-themed file for any Classic
+# hex value (§ 4.2 blocklist, Foreground #F8F8F2 excluded). Matches are
+# full-token, case-insensitive. Shell-style comment lines (`^\s*#`) and
+# lines tagged `# classic-allowed` are skipped per § 4.4.
+echo ""
+echo "AC-theme-no-classic-leak: no Classic hex in themed files"
+
+# shellcheck source=scripts/lib/themed-files.sh
+# shellcheck disable=SC1091
+source scripts/lib/themed-files.sh
+# shellcheck source=scripts/lib/classic-blocklist.sh
+# shellcheck disable=SC1091
+source scripts/lib/classic-blocklist.sh
+
+check_no_classic_leak() {
+  local any_fail=0
+  local file hits
+  while IFS= read -r file; do
+    [[ -z "$file" ]] && continue
+    [[ -f "$file" ]] || continue
+    # Drop comment-only lines and classic-allowed escape-hatch lines,
+    # then hunt for any Classic hex value. `|| true` keeps pipefail happy
+    # when grep finds nothing.
+    hits=$(grep -vE '^\s*#|# classic-allowed' "$file" \
+      | grep -inE "$CLASSIC_HEX_REGEX" || true)
+    if [[ -n "$hits" ]]; then
+      nok "classic leak in ${file#"$THEMED_FILES_ROOT"/}"
+      printf '%s\n' "$hits" | sed 's/^/      /'
+      any_fail=1
+    fi
+  done < <(themed_files)
+  if (( any_fail == 0 )); then
+    ok "no Classic hex values in any themed file"
+  fi
+}
+check_no_classic_leak
+
 echo ""
 echo "---------------------------------------------------------------"
 printf "Passed: ${C_GREEN}%d${C_RESET}  Failed: ${C_RED}%d${C_RESET}  Skipped: ${C_YELLOW}%d${C_RESET}\n" "$pass" "$fail" "$skip"
