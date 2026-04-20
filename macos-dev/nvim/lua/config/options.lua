@@ -33,10 +33,23 @@ vim.treesitter.language.register("yaml", "yaml.github")
 -- Treesitter's language.register only teaches the parser registry about
 -- the alias; it doesn't start the highlighter. Hook FileType directly so
 -- yaml.github buffers get syntax highlighting without needing a manual
--- `:TSBufEnable`.
+-- `:TSBufEnable`. FileType covers buffers opened after this module loads;
+-- a VimEnter sweep catches the cmdline-opened buffer (e.g. `nvim ci.yml`)
+-- whose FileType already fired before options.lua registered the autocmd.
+local function start_ts_yaml(buf)
+  pcall(vim.treesitter.start, buf, "yaml")
+end
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "yaml.github",
-  callback = function(ev)
-    pcall(vim.treesitter.start, ev.buf, "yaml")
+  callback = function(ev) start_ts_yaml(ev.buf) end,
+})
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.bo[buf].filetype == "yaml.github" then
+        start_ts_yaml(buf)
+      end
+    end
   end,
 })
