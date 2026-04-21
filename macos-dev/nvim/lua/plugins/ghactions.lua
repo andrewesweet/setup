@@ -17,11 +17,24 @@ return {
       -- [gh_actions_ls], [ty], [ruff], …). Without this, two linters
       -- producing superficially similar messages on the same file
       -- are indistinguishable in virtual_text + float.
+      -- Append the rule code to every diagnostic (e.g. `[artipacked]`).
+      -- Linters like zizmor and actionlint expose the audit rule name
+      -- via `diagnostic.code`; that string is the googleable identifier
+      -- for each finding and appears in the float popup by default, but
+      -- the virtual_text trailer drops it. Add a `suffix` that puts it
+      -- back — and keep `source = "always"` so the virtual_text reads
+      -- `● zizmor: credential persistence [artipacked]`.
+      local function code_suffix(diag)
+        if diag.code and diag.code ~= "" then
+          return " [" .. diag.code .. "]"
+        end
+        return ""
+      end
       opts.diagnostics = opts.diagnostics or {}
       opts.diagnostics.virtual_text = vim.tbl_deep_extend(
         "force",
         opts.diagnostics.virtual_text or {},
-        { source = "always" }
+        { source = "always", suffix = code_suffix }
       )
       opts.diagnostics.float = vim.tbl_deep_extend(
         "force",
