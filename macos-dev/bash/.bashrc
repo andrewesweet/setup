@@ -95,7 +95,10 @@ bind -m vi-insert '"\C-e": end-of-line'
 # ── 6. History ──────────────────────────────────────────────────────────────
 export HISTSIZE=100000
 export HISTFILESIZE=200000
-export HISTCONTROL=ignoreboth:erasedups
+export HISTCONTROL=ignoredups:erasedups
+# (was ignoreboth:erasedups; dropped the `ignorespace` half — kitty's shell
+# integration warns that leading-space-hidden commands can't be surfaced
+# in the window title via the DEBUG trap, and erasedups already dedupes.)
 export HISTTIMEFORMAT='%F %T '
 shopt -s histappend
 shopt -s cmdhist
