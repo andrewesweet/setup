@@ -50,17 +50,12 @@ return {
         },
       })
 
-      -- yamlls also needs to attach to yaml.github (schemastore completion
-      -- + validation). LazyVim's lang.yaml extra registers the default
-      -- filetypes { yaml, yaml.docker-compose, yaml.gitlab, yaml.helm-values }
-      -- — append yaml.github so workflow buffers match.
-      opts.servers.yamlls = opts.servers.yamlls or {}
-      local yamlls_ft = opts.servers.yamlls.filetypes
-        or { "yaml", "yaml.docker-compose", "yaml.gitlab", "yaml.helm-values" }
-      if not vim.tbl_contains(yamlls_ft, "yaml.github") then
-        table.insert(yamlls_ft, "yaml.github")
-      end
-      opts.servers.yamlls.filetypes = yamlls_ft
+      -- Intentionally do NOT attach yamlls to yaml.github: yamlls has no
+      -- GitHub Actions schema, so it marks every workflow-specific key
+      -- (jobs, runs-on, uses, with, …) as a warning. Under LSP-based
+      -- semantic highlighting that paints the whole file yellow with
+      -- underlines. gh_actions_ls owns validation + completion for
+      -- workflows; let yamlls stay on generic yaml only.
 
       -- Retro-attach sweep: LazyVim's lsp plugin loads on BufReadPre and
       -- mason-lspconfig.setup calls vim.lsp.enable asynchronously inside
