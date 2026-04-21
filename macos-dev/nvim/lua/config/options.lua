@@ -74,6 +74,65 @@ local diag_underline_hl = {
   [vim.diagnostic.severity.INFO]  = "DiagnosticUnderlineInfo",
   [vim.diagnostic.severity.HINT]  = "DiagnosticUnderlineHint",
 }
+-- `:DiagSources` — list every tool producing diagnostics for the current
+-- buffer. Covers LSP clients (yamlls, gh_actions_ls, ty, ruff, gopls, …),
+-- nvim-lint linters (actionlint, zizmor, shellcheck, …), and any other
+-- source that has published extmarks via vim.diagnostic.set. Handy when
+-- virtual_text shows findings from only one source and you want to
+-- confirm which others have (or haven't) run.
+vim.api.nvim_create_user_command("DiagSources", function()
+  local buf = vim.api.nvim_get_current_buf()
+  local lines = { "Diagnostic sources for buffer " .. buf .. " (ft=" .. vim.bo.filetype .. "):" }
+
+  local lsp_clients = vim.lsp.get_clients({ bufnr = buf })
+  if #lsp_clients > 0 then
+    table.insert(lines, "  LSP clients:")
+    for _, c in ipairs(lsp_clients) do
+      table.insert(lines, string.format("    - %s (id=%d)", c.name, c.id))
+    end
+  else
+    table.insert(lines, "  LSP clients: none")
+  end
+
+  local ok, lint = pcall(require, "lint")
+  if ok then
+    local linters = (lint.linters_by_ft or {})[vim.bo.filetype] or {}
+    if #linters > 0 then
+      table.insert(lines, "  nvim-lint linters:")
+      for _, l in ipairs(linters) do
+        table.insert(lines, "    - " .. l)
+      end
+    else
+      table.insert(lines, "  nvim-lint linters: none for ft=" .. vim.bo.filetype)
+    end
+  end
+
+  -- Unique sources actually appearing in current diagnostics (post-filter
+  -- by whichever tool published them).
+  local seen_src, src_list = {}, {}
+  for _, d in ipairs(vim.diagnostic.get(buf)) do
+    local s = d.source or "(no source)"
+    if not seen_src[s] then
+      seen_src[s] = true
+      table.insert(src_list, s)
+    end
+  end
+  if #src_list > 0 then
+    table.insert(lines, "  Active diagnostics published by:")
+    for _, s in ipairs(src_list) do
+      table.insert(lines, "    - " .. s)
+    end
+  else
+    table.insert(lines, "  Active diagnostics: none")
+  end
+
+  vim.api.nvim_echo(
+    vim.tbl_map(function(l) return { l .. "\n" } end, lines),
+    false,
+    {}
+  )
+end, { desc = "List LSP + nvim-lint tools processing the current buffer" })
+
 vim.diagnostic.handlers.underline = {
   show = function(ns, bufnr, diagnostics, display_opts)
     local priority = (display_opts and display_opts.priority) or 50
