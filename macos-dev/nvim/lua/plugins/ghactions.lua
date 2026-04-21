@@ -7,6 +7,20 @@ return {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
       opts.servers = opts.servers or {}
+
+      -- zizmor emits multi-line *range* diagnostics — `overly broad
+      -- permissions` covers every job block (line 6 → end-of-file),
+      -- `credential persistence` spans each affected job's steps list.
+      -- nvim underlines the full range, so a workflow with several
+      -- findings ends up underlined top-to-bottom, which masks syntax
+      -- highlighting. Keep signs + virtual_text for discoverability,
+      -- but drop the underline for anything below ERROR severity so
+      -- broad-range warnings stop repainting the whole buffer.
+      opts.diagnostics = opts.diagnostics or {}
+      opts.diagnostics.underline = {
+        severity = { min = vim.diagnostic.severity.ERROR },
+      }
+
       -- Pull a GitHub token from gh CLI at server start. The actions
       -- language server version shipped by Mason dereferences
       -- init_options.sessionToken eagerly during its `initialize` RPC
