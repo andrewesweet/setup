@@ -677,6 +677,20 @@ link starship/starship.toml  .config/starship.toml
 link lazygit/config.yml      .config/lazygit/config.yml
 link mise/config.toml        .config/mise/config.toml
 
+# mise refuses to read config.toml outside its trusted allowlist and prints
+# an error on every shell start ("Config files in … are not trusted"). Trust
+# the DOTFILES directory up-front so the symlinked config is honoured from
+# the first login shell. Idempotent: re-running is a no-op.
+if command -v mise >/dev/null 2>&1; then
+  mise trust "$DOTFILES" >/dev/null 2>&1 || true
+fi
+
+# WSL2-only: GUI-session env vars for Mesa/GL/xdg-desktop-portal.
+# systemd-user sources ~/.config/environment.d/*.conf once per login,
+# so GUI apps launched from that session (kitty under WSLg, etc.)
+# inherit these without needing per-app wrapper scripts.
+link environment.d/wsl-gui.conf  .config/environment.d/wsl-gui.conf
+
 # atuin (Plan Layer 1a)
 link atuin/config.toml        .config/atuin/config.toml
 

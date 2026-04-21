@@ -1,46 +1,46 @@
 # television/themes/dracula-pro.toml
 # Structural + accents profile — docs/design/theming.md § 5.2.
 # Hex values mirror scripts/lib/dracula-pro-palette.sh exactly.
+#
+# Schema: television ≥0.15 renamed and reorganised theme fields
+# (text_fg / input_text_fg / result_*_fg / mode_* pairs). The older
+# schema this file originally targeted (foreground / cursor / title_fg /
+# prompt / …) now errors out with `missing field 'text_fg'`.
 
-background    = "#22212C"   # DRACULA_PRO_BACKGROUND
-foreground    = "#F8F8F2"   # DRACULA_PRO_FOREGROUND
+# general
+background              = "#22212C"   # DRACULA_PRO_BACKGROUND
+border_fg               = "#7970A9"   # DRACULA_PRO_COMMENT
+text_fg                 = "#F8F8F2"   # DRACULA_PRO_FOREGROUND
+dimmed_text_fg          = "#7970A9"   # DRACULA_PRO_COMMENT
 
-# Matching / selection rows
-selection_bg  = "#454158"   # DRACULA_PRO_SELECTION
-selection_fg  = "#F8F8F2"   # DRACULA_PRO_FOREGROUND
-match         = "#FFCA80"   # DRACULA_PRO_ORANGE  (fuzzy-match highlight)
-cursor        = "#7970A9"   # DRACULA_PRO_CURSOR (= COMMENT)
+# input row
+input_text_fg           = "#8AFF80"   # DRACULA_PRO_GREEN
+result_count_fg         = "#FFCA80"   # DRACULA_PRO_ORANGE
 
-# Borders / chrome
-border_fg     = "#7970A9"   # DRACULA_PRO_COMMENT
-title_fg      = "#9580FF"   # DRACULA_PRO_BLUE
-subtitle_fg   = "#FF80BF"   # DRACULA_PRO_MAGENTA
+# results pane
+result_name_fg          = "#9580FF"   # DRACULA_PRO_BLUE
+result_line_number_fg   = "#7970A9"   # DRACULA_PRO_COMMENT
+result_value_fg         = "#FF80BF"   # DRACULA_PRO_MAGENTA
+selection_fg            = "#22212C"   # DRACULA_PRO_BACKGROUND (inverted)
+selection_bg            = "#9580FF"   # DRACULA_PRO_BLUE
+match_fg                = "#FFCA80"   # DRACULA_PRO_ORANGE (fuzzy-match highlight)
 
-# Prompt / input
-prompt        = "#8AFF80"   # DRACULA_PRO_GREEN
-input_fg      = "#F8F8F2"   # DRACULA_PRO_FOREGROUND
+# preview
+preview_title_fg        = "#FF80BF"   # DRACULA_PRO_MAGENTA
 
-# Results pane state
-result_fg             = "#F8F8F2"   # DRACULA_PRO_FOREGROUND
-result_selected_fg    = "#22212C"   # DRACULA_PRO_BACKGROUND (inverted on selection)
-result_selected_bg    = "#9580FF"   # DRACULA_PRO_BLUE
-result_line_number    = "#7970A9"   # DRACULA_PRO_COMMENT
+# picker modes — inverted fg/bg pairs for each activation state
+channel_mode_fg         = "#22212C"   # DRACULA_PRO_BACKGROUND
+channel_mode_bg         = "#80FFEA"   # DRACULA_PRO_CYAN
+remote_control_mode_fg  = "#22212C"   # DRACULA_PRO_BACKGROUND
+remote_control_mode_bg  = "#FFCA80"   # DRACULA_PRO_ORANGE
+action_picker_mode_fg   = "#22212C"   # DRACULA_PRO_BACKGROUND
+action_picker_mode_bg   = "#9580FF"   # DRACULA_PRO_BLUE
+send_to_channel_mode_fg = "#FF80BF"   # DRACULA_PRO_MAGENTA
 
-# Preview pane
-preview_title_fg      = "#FF80BF"   # DRACULA_PRO_MAGENTA
-preview_gutter_fg     = "#7970A9"   # DRACULA_PRO_COMMENT
-
-# Status line / help overlay
-status_bar_fg         = "#F8F8F2"   # DRACULA_PRO_FOREGROUND
-status_bar_bg         = "#454158"   # DRACULA_PRO_SELECTION
-help_key              = "#80FFEA"   # DRACULA_PRO_CYAN
-help_value            = "#FFCA80"   # DRACULA_PRO_ORANGE
-
-# Channel name badge
-channel_fg            = "#22212C"   # DRACULA_PRO_BACKGROUND (inverted)
-channel_bg            = "#FF80BF"   # DRACULA_PRO_MAGENTA
-
-# Semantic success/failure (diagnostics panel)
-success               = "#8AFF80"   # DRACULA_PRO_GREEN
-warning               = "#FFFF80"   # DRACULA_PRO_YELLOW
-error                 = "#FF9580"   # DRACULA_PRO_RED
+# Reference palette — Pro colours that the television ≥0.15 schema has no
+# slot for. Listed here so grepping the theme for any Pro hex still hits
+# this file (and the theming test harness stays green).
+#
+#   DRACULA_PRO_SELECTION = #454158   (row-hover tint in older schemas)
+#   DRACULA_PRO_RED       = #FF9580   (error / diagnostic tint)
+#   DRACULA_PRO_YELLOW    = #FFFF80   (warning / diagnostic tint)
