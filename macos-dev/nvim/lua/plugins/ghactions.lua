@@ -8,18 +8,10 @@ return {
     opts = function(_, opts)
       opts.servers = opts.servers or {}
 
-      -- zizmor emits multi-line *range* diagnostics — `overly broad
-      -- permissions` covers every job block (line 6 → end-of-file),
-      -- `credential persistence` spans each affected job's steps list.
-      -- nvim underlines the full range, so a workflow with several
-      -- findings ends up underlined top-to-bottom, which masks syntax
-      -- highlighting. Keep signs + virtual_text for discoverability,
-      -- but drop the underline for anything below ERROR severity so
-      -- broad-range warnings stop repainting the whole buffer.
-      opts.diagnostics = opts.diagnostics or {}
-      opts.diagnostics.underline = {
-        severity = { min = vim.diagnostic.severity.ERROR },
-      }
+      -- First-line-only underline handler lives in config/options.lua
+      -- (runs at init so the override is in place before any plugin
+      -- publishes diagnostics). See the comment block there for why
+      -- zizmor's multi-line range findings made this necessary.
 
       -- Pull a GitHub token from gh CLI at server start. The actions
       -- language server version shipped by Mason dereferences
