@@ -13,6 +13,22 @@ return {
       -- publishes diagnostics). See the comment block there for why
       -- zizmor's multi-line range findings made this necessary.
 
+      -- Tag every diagnostic with its source ([zizmor], [actionlint],
+      -- [gh_actions_ls], [ty], [ruff], …). Without this, two linters
+      -- producing superficially similar messages on the same file
+      -- are indistinguishable in virtual_text + float.
+      opts.diagnostics = opts.diagnostics or {}
+      opts.diagnostics.virtual_text = vim.tbl_deep_extend(
+        "force",
+        opts.diagnostics.virtual_text or {},
+        { source = "always" }
+      )
+      opts.diagnostics.float = vim.tbl_deep_extend(
+        "force",
+        opts.diagnostics.float or {},
+        { source = "always" }
+      )
+
       -- Pull a GitHub token from gh CLI at server start. The actions
       -- language server version shipped by Mason dereferences
       -- init_options.sessionToken eagerly during its `initialize` RPC
