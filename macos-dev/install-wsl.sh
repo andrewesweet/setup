@@ -685,6 +685,12 @@ if command -v mise >/dev/null 2>&1; then
   mise trust "$DOTFILES" >/dev/null 2>&1 || true
 fi
 
+# WSL2-only: GUI-session env vars for Mesa/GL/xdg-desktop-portal.
+# systemd-user sources ~/.config/environment.d/*.conf once per login,
+# so GUI apps launched from that session (kitty under WSLg, etc.)
+# inherit these without needing per-app wrapper scripts.
+link environment.d/wsl-gui.conf  .config/environment.d/wsl-gui.conf
+
 # atuin (Plan Layer 1a)
 link atuin/config.toml        .config/atuin/config.toml
 
