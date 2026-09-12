@@ -35,6 +35,9 @@ export DOTFILES
 # See macos-dev/docs/design/theming.md § 4.3.
 # shellcheck source=scripts/lib/dracula-pro-palette.sh disable=SC1091
 source "$DOTFILES/scripts/lib/dracula-pro-palette.sh"
+# OpenCode personal-overrides scaffold (shared with install-macos.sh).
+# shellcheck source=scripts/lib/opencode-local-scaffold.sh disable=SC1091
+source "$DOTFILES/scripts/lib/opencode-local-scaffold.sh"
 DRACULA_PRO_OK=0
 if [[ -d "$HOME/dracula-pro" ]]; then
   DRACULA_PRO_OK=1
@@ -763,13 +766,10 @@ link opencode/themes/dracula-pro.json           .config/opencode/themes/dracula-
 link opencode/instructions/git-conventions.md   .config/opencode/instructions/git-conventions.md
 link opencode/instructions/scratch-dirs.md      .config/opencode/instructions/scratch-dirs.md
 
-# OpenCode personal overrides (peer directory, scaffolded if absent)
-if [[ ! -f "$HOME/.config/opencode-local/opencode.jsonc" ]]; then
-  mkdir -p "$HOME/.config/opencode-local"
-  echo '{}' > "$HOME/.config/opencode-local/opencode.jsonc"
-  printf "  created  %s\n" "$HOME/.config/opencode-local/opencode.jsonc"
-fi
-mkdir -p "$HOME/.config/opencode-local"
+# OpenCode personal overrides (peer directory, scaffolded if absent).
+# Scaffold body lives in scripts/lib/opencode-local-scaffold.sh (shared with
+# install-macos.sh) so both installers write the identical default content.
+scaffold_opencode_local
 
 # nvim (Plan 10)
 link nvim  .config/nvim

@@ -114,13 +114,13 @@ bash scripts/install-ai-conventions.sh
 ### Local overrides
 
 These files allow machine-specific customization without modifying tracked dotfiles.
-All are in `.gitignore` and never committed. The installer scaffolds empty defaults where needed.
+All are in `.gitignore` and never committed. The installer scaffolds defaults where needed.
 
 | File / Directory | Purpose |
 |-----------------|---------|
 | `~/.bashrc.local` | Extra shell config, aliases, exports |
 | `~/.gitconfig.local` | Work-specific Git author, signing key |
-| `~/.config/opencode-local/opencode.jsonc` | Personal OpenCode config overrides (model, permissions) |
+| `~/.config/opencode-local/opencode.jsonc` | Personal OpenCode config overrides (model, permissions). Scaffolded if absent with `$schema` and `experimental.openTelemetry: true` so spans export to the collector named by `OTEL_EXPORTER_OTLP_ENDPOINT` |
 | `~/.config/opencode-local/` | Personal OpenCode agents, commands, modes, plugins |
 | `container/dev.env` | Environment variables for dev container |
 | `container/custom-ca.pem` | Corporate TLS proxy CA certificate (for container builds) |
