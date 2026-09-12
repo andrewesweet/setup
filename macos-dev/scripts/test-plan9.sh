@@ -216,6 +216,7 @@ source "$REPO_ROOT/scripts/lib/opencode-local-scaffold.sh"
 out="$(HOME="$scaffold_home" scaffold_opencode_local)"
 check "fresh HOME: reports created"      grep -q "created  $scaffold_file" <<<"$out"
 check "fresh HOME: openTelemetry = true" test "$(otel_flag "$scaffold_file")" = "True"
+# shellcheck disable=SC2016  # python -c body is intentionally literal
 check "fresh HOME: \$schema set"          python3 -c '
 import json, re, sys
 text = re.sub(r"^\s*//.*$", "", open(sys.argv[1]).read(), flags=re.M)

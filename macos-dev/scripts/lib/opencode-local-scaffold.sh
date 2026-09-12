@@ -18,9 +18,19 @@
 scaffold_opencode_local() {
   local file="$HOME/.config/opencode-local/opencode.jsonc"
   mkdir -p "${file%/*}"
-  if [[ ! -f "$file" ]] || [[ "$(tr -d '[:space:]' < "$file" \
-      | sed 's#"$schema":"https://opencode.ai/config.json",*##')" == "{}" ]]; then
-    cat > "$file" <<'JSONC'
+  # Upgrade the placeholder in both forms it takes on previously-installed
+  # hosts: the bare `{}` written by earlier installers, and the same file as
+  # OpenCode rewrites it on first launch (schema key added, nothing else).
+  # Any other content is personal and is never touched.
+  if [[ -f "$file" ]]; then
+    # shellcheck disable=SC2016  # literal key, expansion not wanted
+    local schema_key='"$schema":"https://opencode.ai/config.json",'
+    local stripped
+    stripped="$(tr -d '[:space:]' < "$file")"
+    stripped="${stripped//"$schema_key"/}"
+    [[ "$stripped" == "{}" ]] || return 0
+  fi
+  cat > "$file" <<'JSONC'
 {
   // OpenTelemetry spans are exported to the collector named by
   // $OTEL_EXPORTER_OTLP_ENDPOINT.
@@ -28,6 +38,5 @@ scaffold_opencode_local() {
   "experimental": { "openTelemetry": true }
 }
 JSONC
-    printf "  created  %s\n" "$file"
-  fi
+  printf "  created  %s\n" "$file"
 }
