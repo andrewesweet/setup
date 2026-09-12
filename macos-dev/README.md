@@ -120,7 +120,7 @@ All are in `.gitignore` and never committed. The installer scaffolds defaults wh
 |-----------------|---------|
 | `~/.bashrc.local` | Extra shell config, aliases, exports |
 | `~/.gitconfig.local` | Work-specific Git author, signing key |
-| `~/.config/opencode-local/opencode.jsonc` | Personal OpenCode config overrides (model, permissions). Scaffolded if absent with `$schema` and `experimental.openTelemetry: true` so spans export to the collector named by `OTEL_EXPORTER_OTLP_ENDPOINT` |
+| `~/.config/opencode-local/opencode.jsonc` | Personal OpenCode config overrides (model, permissions). Scaffolded with `$schema` and `experimental.openTelemetry: true` when absent or still the empty `{}` placeholder from earlier installs, so spans export to the collector named by `OTEL_EXPORTER_OTLP_ENDPOINT` |
 | `~/.config/opencode-local/` | Personal OpenCode agents, commands, modes, plugins |
 | `container/dev.env` | Environment variables for dev container |
 | `container/custom-ca.pem` | Corporate TLS proxy CA certificate (for container builds) |
