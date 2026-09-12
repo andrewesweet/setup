@@ -183,6 +183,70 @@ check "wsl: starship links preserved"    test "$(grep -c 'link starship/' "$REPO
 check "wsl: lazygit links preserved"     test "$(grep -c 'link lazygit/' "$REPO_ROOT/install-wsl.sh")" -eq 1
 check "wsl: mise links preserved"        test "$(grep -c 'link mise/' "$REPO_ROOT/install-wsl.sh")" -eq 1
 
+# ── opencode-local scaffold (scripts/lib/opencode-local-scaffold.sh) ─────
+# Behavioural: run scaffold_opencode_local against a throwaway HOME and parse
+# the file it writes (the same file OPENCODE_CONFIG points at in bash/.bashrc).
+echo ""
+echo "opencode-local scaffold:"
+
+# Print the value of experimental.openTelemetry from a JSONC file, or "absent".
+# Uses `opencode debug config` (the real consumer) when installed; otherwise
+# strips // comments and parses with python3.
+otel_flag() {
+  local f="$1"
+  if command -v opencode >/dev/null 2>&1; then
+    ( cd "${f%/*}" && OPENCODE_CONFIG="$f" OPENCODE_CONFIG_DIR="${f%/*}" \
+        opencode debug config --pure 2>/dev/null ) \
+      | python3 -c 'import json,sys; print(json.load(sys.stdin).get("experimental",{}).get("openTelemetry","absent"))'
+  else
+    python3 -c '
+import json, re, sys
+text = re.sub(r"^\s*//.*$", "", open(sys.argv[1]).read(), flags=re.M)
+text = re.sub(r",\s*([}\]])", r"\1", text)  # OpenCode writes trailing commas
+print(json.loads(text).get("experimental", {}).get("openTelemetry", "absent"))' "$f"
+  fi
+}
+
+scaffold_home="$(mktemp -d)"
+scaffold_file="$scaffold_home/.config/opencode-local/opencode.jsonc"
+# shellcheck source=lib/opencode-local-scaffold.sh disable=SC1091
+source "$REPO_ROOT/scripts/lib/opencode-local-scaffold.sh"
+
+# Fresh HOME: file created, flag on, $schema set.
+out="$(HOME="$scaffold_home" scaffold_opencode_local)"
+check "fresh HOME: reports created"      grep -q "created  $scaffold_file" <<<"$out"
+check "fresh HOME: openTelemetry = true" test "$(otel_flag "$scaffold_file")" = "True"
+check "fresh HOME: \$schema set"          python3 -c '
+import json, re, sys
+text = re.sub(r"^\s*//.*$", "", open(sys.argv[1]).read(), flags=re.M)
+sys.exit(0 if json.loads(text).get("$schema") == "https://opencode.ai/config.json" else 1)' "$scaffold_file"
+
+# Rerun: idempotent, file untouched.
+before="$(cat "$scaffold_file")"
+out="$(HOME="$scaffold_home" scaffold_opencode_local)"
+check "rerun: nothing reported"          test -z "$out"
+check "rerun: file unchanged"            test "$(cat "$scaffold_file")" = "$before"
+
+# Personal content: never overwritten.
+printf '{ "model": "keep-me" }\n' > "$scaffold_file"
+HOME="$scaffold_home" scaffold_opencode_local >/dev/null
+check "personal file: preserved"         grep -q 'keep-me' "$scaffold_file"
+check "personal file: flag not injected" test "$(otel_flag "$scaffold_file")" = "absent"
+
+# Legacy {} placeholder (with whitespace/newline variants): upgraded.
+# OpenCode 1.18.x rewrites a loaded {} file to `{\n  "$schema": "...",}` on
+# first launch, so hosts that ran the old installer and then used OpenCode hold
+# that form, not {}. It carries no personal settings and must upgrade too.
+for placeholder in '{}' '{ }' $'{}\n' $'  {\n}\n' \
+    $'{\n  "$schema": "https://opencode.ai/config.json",}' \
+    $'{\n  "$schema": "https://opencode.ai/config.json",\n}'; do
+  printf '%s' "$placeholder" > "$scaffold_file"
+  HOME="$scaffold_home" scaffold_opencode_local >/dev/null
+  check "placeholder $(printf '%q' "$placeholder"): upgraded" test "$(otel_flag "$scaffold_file")" = "True"
+done
+
+rm -rf "$scaffold_home"
+
 # ── Summary ────────────────────────────────────────────────────────────────
 echo ""
 total=$((pass + fail))
@@ -193,9 +257,9 @@ if [[ "$fail" -gt 0 ]]; then
 fi
 echo ""
 
-# Current count: 82 tests. Floor should be within ~10% of actual.
-if (( total < 74 )); then
-  echo "WARNING: only $total tests ran (expected >= 74). Were tests deleted?"
+# Current count: 96 tests. Floor should be within ~10% of actual.
+if (( total < 86 )); then
+  echo "WARNING: only $total tests ran (expected >= 86). Were tests deleted?"
   exit 1
 fi
 

@@ -7,7 +7,9 @@
 #
 # Scaffold-if-absent: a personal overrides file with real content is never
 # overwritten. The empty `{}` placeholder written by earlier installers holds
-# no personal settings and is replaced by the current scaffold.
+# no personal settings and is replaced by the current scaffold. OpenCode
+# rewrites a loaded `{}` to `{ "$schema": "https://opencode.ai/config.json", }`
+# on first launch; that form is the same placeholder and is replaced too.
 
 # Create the opencode-local directory and write the overrides file when it is
 # absent or still the empty `{}` placeholder. The scaffold carries $schema plus
@@ -16,7 +18,8 @@
 scaffold_opencode_local() {
   local file="$HOME/.config/opencode-local/opencode.jsonc"
   mkdir -p "${file%/*}"
-  if [[ ! -f "$file" ]] || [[ "$(tr -d '[:space:]' < "$file")" == "{}" ]]; then
+  if [[ ! -f "$file" ]] || [[ "$(tr -d '[:space:]' < "$file" \
+      | sed 's#"$schema":"https://opencode.ai/config.json",*##')" == "{}" ]]; then
     cat > "$file" <<'JSONC'
 {
   // OpenTelemetry spans are exported to the collector named by
