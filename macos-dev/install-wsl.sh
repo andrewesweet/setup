@@ -766,7 +766,7 @@ link opencode/themes/dracula-pro.json           .config/opencode/themes/dracula-
 link opencode/instructions/git-conventions.md   .config/opencode/instructions/git-conventions.md
 link opencode/instructions/scratch-dirs.md      .config/opencode/instructions/scratch-dirs.md
 
-# OpenCode personal overrides (peer directory, scaffolded if absent).
+# OpenCode personal overrides (scaffold rules: README.md, Local overrides).
 # Scaffold body lives in scripts/lib/opencode-local-scaffold.sh (shared with
 # install-macos.sh) so both installers write the identical default content.
 scaffold_opencode_local

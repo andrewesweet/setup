@@ -11,10 +11,7 @@
 # rewrites a loaded `{}` to `{ "$schema": "https://opencode.ai/config.json", }`
 # on first launch; that form is the same placeholder and is replaced too.
 
-# Create the opencode-local directory and write the overrides file when it is
-# absent or still the empty `{}` placeholder. The scaffold carries $schema plus
-# the OpenTelemetry flag so installs export spans to the loopback collector
-# named by $OTEL_EXPORTER_OTLP_ENDPOINT.
+# User-facing scaffold rules: README.md, Local overrides.
 scaffold_opencode_local() {
   local file="$HOME/.config/opencode-local/opencode.jsonc"
   mkdir -p "${file%/*}"
@@ -26,11 +23,11 @@ scaffold_opencode_local() {
     # shellcheck disable=SC2016  # literal key, expansion not wanted
     local schema_key='"$schema":"https://opencode.ai/config.json",'
     local stripped
-    stripped="$(tr -d '[:space:]' < "$file")"
+    stripped="$(tr -d '[:space:]' <"$file")"
     stripped="${stripped//"$schema_key"/}"
     [[ "$stripped" == "{}" ]] || return 0
   fi
-  cat > "$file" <<'JSONC'
+  cat >"$file" <<'JSONC'
 {
   // OpenTelemetry spans are exported to the collector named by
   // $OTEL_EXPORTER_OTLP_ENDPOINT.

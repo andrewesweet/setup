@@ -114,19 +114,29 @@ bash scripts/install-ai-conventions.sh
 ### Local overrides
 
 These files allow machine-specific customization without modifying tracked dotfiles.
-All are in `.gitignore` and never committed. The installer scaffolds defaults where needed.
+All are in `.gitignore` and never committed.
+The installer scaffolds defaults where needed.
 
 | File / Directory | Purpose |
 |-----------------|---------|
 | `~/.bashrc.local` | Extra shell config, aliases, exports |
 | `~/.gitconfig.local` | Work-specific Git author, signing key |
-| `~/.config/opencode-local/opencode.jsonc` | Personal OpenCode config overrides (model, permissions). Scaffolded with `$schema` and `experimental.openTelemetry: true` when absent or still the empty `{}` placeholder from earlier installs, so spans export to the collector named by `OTEL_EXPORTER_OTLP_ENDPOINT` |
+| `~/.config/opencode-local/opencode.jsonc` | See scaffold rules below. |
 | `~/.config/opencode-local/` | Personal OpenCode agents, commands, modes, plugins |
 | `container/dev.env` | Environment variables for dev container |
 | `container/custom-ca.pem` | Corporate TLS proxy CA certificate (for container builds) |
 
+Both installers scaffold the personal OpenCode file with `$schema` and
+`experimental.openTelemetry: true` when it is absent. They also upgrade the old
+empty `{}` placeholder, including the schema-only form with a trailing comma
+that OpenCode writes on first launch. All other existing content stays
+unchanged. For an existing personal configuration, add `"openTelemetry": true`
+to its `experimental` object to enable spans. Spans export to the collector
+named by `OTEL_EXPORTER_OTLP_ENDPOINT`.
+
 **OpenCode override precedence:**
 Remote (org) -> Global (team baseline in `~/.config/opencode/`) -> Custom (personal in `~/.config/opencode-local/`) -> Project (`./opencode.jsonc`).
+
 Each layer overrides the previous. To change where personal overrides are stored, set `OPENCODE_CONFIG` and `OPENCODE_CONFIG_DIR` in `~/.bashrc.local`.
 
 **VS Code-primary users:** Add `export EDITOR='code --wait'` to `~/.bashrc.local` to use VS Code as the default editor instead of Neovim.
