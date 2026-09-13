@@ -207,6 +207,26 @@ print(json.loads(text).get("experimental", {}).get("openTelemetry", "absent"))' 
   fi
 }
 
+# Print "present" when @mlflow/opencode is in a JSONC file's plugin array,
+# "absent" otherwise. Same dual-path strategy as otel_flag above; the opencode
+# path checks membership because the global baseline merges its own plugins
+# into the resolved config.
+mlflow_plugin() {
+  local f="$1"
+  if command -v opencode >/dev/null 2>&1; then
+    ( cd "${f%/*}" && OPENCODE_CONFIG="$f" OPENCODE_CONFIG_DIR="${f%/*}" \
+        opencode debug config --pure 2>/dev/null ) \
+      | python3 -c 'import json,sys; p=json.load(sys.stdin).get("plugin",[]); print("present" if isinstance(p,list) and "@mlflow/opencode" in p else "absent")'
+  else
+    python3 -c '
+import json, re, sys
+text = re.sub(r"^\s*//.*$", "", open(sys.argv[1]).read(), flags=re.M)
+text = re.sub(r",\s*([}\]])", r"\1", text)  # OpenCode writes trailing commas
+p = json.loads(text).get("plugin", [])
+print("present" if isinstance(p, list) and "@mlflow/opencode" in p else "absent")' "$f"
+  fi
+}
+
 scaffold_home="$(mktemp -d)"
 scaffold_file="$scaffold_home/.config/opencode-local/opencode.jsonc"
 # shellcheck source=lib/opencode-local-scaffold.sh disable=SC1091
@@ -216,6 +236,7 @@ source "$REPO_ROOT/scripts/lib/opencode-local-scaffold.sh"
 out="$(HOME="$scaffold_home" scaffold_opencode_local)"
 check "fresh HOME: reports created"      grep -q "created  $scaffold_file" <<<"$out"
 check "fresh HOME: openTelemetry = true" test "$(otel_flag "$scaffold_file")" = "True"
+check "fresh HOME: MLflow plugin"        test "$(mlflow_plugin "$scaffold_file")" = "present"
 # shellcheck disable=SC2016  # python -c body is intentionally literal
 check "fresh HOME: \$schema set"          python3 -c '
 import json, re, sys
@@ -233,6 +254,7 @@ printf '{ "model": "keep-me" }\n' > "$scaffold_file"
 HOME="$scaffold_home" scaffold_opencode_local >/dev/null
 check "personal file: preserved"         grep -q 'keep-me' "$scaffold_file"
 check "personal file: flag not injected" test "$(otel_flag "$scaffold_file")" = "absent"
+check "personal file: plugin not injected" test "$(mlflow_plugin "$scaffold_file")" = "absent"
 
 # Legacy {} placeholder (with whitespace/newline variants): upgraded.
 # OpenCode 1.18.x rewrites a loaded {} file to `{\n  "$schema": "...",}` on
@@ -244,6 +266,7 @@ for placeholder in '{}' '{ }' $'{}\n' $'  {\n}\n' \
   printf '%s' "$placeholder" > "$scaffold_file"
   HOME="$scaffold_home" scaffold_opencode_local >/dev/null
   check "placeholder $(printf '%q' "$placeholder"): upgraded" test "$(otel_flag "$scaffold_file")" = "True"
+  check "placeholder $(printf '%q' "$placeholder"): plugin scaffolded" test "$(mlflow_plugin "$scaffold_file")" = "present"
 done
 
 rm -rf "$scaffold_home"

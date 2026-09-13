@@ -32,6 +32,8 @@ scaffold_opencode_local() {
   // OpenTelemetry spans are exported to the collector named by
   // $OTEL_EXPORTER_OTLP_ENDPOINT.
   "$schema": "https://opencode.ai/config.json",
+  // MLflow experiment tracking; host-up supplies MLFLOW_TRACKING_URI and MLFLOW_EXPERIMENT_ID.
+  "plugin": ["@mlflow/opencode"],
   "experimental": { "openTelemetry": true }
 }
 JSONC

@@ -121,13 +121,15 @@ The installer scaffolds defaults where needed.
 |-----------------|---------|
 | `~/.bashrc.local` | Extra shell config, aliases, exports |
 | `~/.gitconfig.local` | Work-specific Git author, signing key |
-| `~/.config/opencode-local/opencode.jsonc` | See scaffold rules below. |
+| `~/.config/opencode-local/opencode.jsonc` | Personal OpenCode overrides, scaffolded with the MLflow plugin; see scaffold rules below. |
 | `~/.config/opencode-local/` | Personal OpenCode agents, commands, modes, plugins |
 | `container/dev.env` | Environment variables for dev container |
 | `container/custom-ca.pem` | Corporate TLS proxy CA certificate (for container builds) |
 
-Both installers scaffold the personal OpenCode file with `$schema` and
-`experimental.openTelemetry: true` when it is absent. They also upgrade the old
+Both installers scaffold the personal OpenCode file with `$schema`, the
+`@mlflow/opencode` plugin (the environment supplies `MLFLOW_TRACKING_URI` and
+`MLFLOW_EXPERIMENT_ID`), and `experimental.openTelemetry: true` when it is
+absent. They also upgrade the old
 empty `{}` placeholder, including the schema-only form with a trailing comma
 that OpenCode writes on first launch. All other existing content stays
 unchanged. For an existing personal configuration, add `"openTelemetry": true`
