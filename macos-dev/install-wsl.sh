@@ -678,7 +678,7 @@ link tmux/.tmux.conf  .tmux.conf
 # starship, lazygit, mise (Plans 6–8)
 link starship/starship.toml  .config/starship.toml
 link lazygit/config.yml      .config/lazygit/config.yml
-link mise/config.toml        .config/mise/config.toml
+# host-up owns ~/.config/mise/config.toml on WSL.
 
 # atuin (Plan Layer 1a)
 link atuin/config.toml        .config/atuin/config.toml

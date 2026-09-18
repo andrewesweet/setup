@@ -174,7 +174,7 @@ check "macos: lazygit mapping"        grep -q 'link lazygit/config.yml.*\.config
 check "macos: mise mapping"           grep -q 'link mise/config.toml.*\.config/mise/config.toml' "$REPO_ROOT/install-macos.sh"
 check "wsl: starship mapping"         grep -q 'link starship/starship.toml.*\.config/starship.toml' "$REPO_ROOT/install-wsl.sh"
 check "wsl: lazygit mapping"          grep -q 'link lazygit/config.yml.*\.config/lazygit/config.yml' "$REPO_ROOT/install-wsl.sh"
-check "wsl: mise mapping"             grep -q 'link mise/config.toml.*\.config/mise/config.toml' "$REPO_ROOT/install-wsl.sh"
+check "wsl: mise mapping"             test "$(grep -c 'link mise/config.toml.*\.config/mise/config.toml' "$REPO_ROOT/install-wsl.sh")" -eq 0
 
 # Regression: Plans 2–5 link() calls preserved
 check "macos: bash links preserved"   test "$(grep -c 'link bash/' "$REPO_ROOT/install-macos.sh")" -eq 4

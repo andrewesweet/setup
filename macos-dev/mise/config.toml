@@ -2,6 +2,7 @@
 # See docs/design/languages.md for the specification.
 #
 # This is the global config installed to ~/.config/mise/config.toml.
+# This file is installed only on macOS; WSL gets it from host-up (roles/toolchain).
 # Per-project .mise.toml files override these versions.
 
 [tools]
